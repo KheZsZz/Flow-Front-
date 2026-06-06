@@ -37,6 +37,13 @@ export default function UploadScreen() {
     error: results.filter((r) => r.status === "error").length,
   };
 
+  const removeFile = (indexToRemove: number) => {
+    setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
+    if (results.length > 0) {
+      setResults([]);
+    }
+  };
+
   const pickDocument = async () => {
     const result = await DocumentPicker.getDocumentAsync({
       type: ["application/xml", "text/xml", "*/*"],
@@ -136,7 +143,7 @@ export default function UploadScreen() {
           keyExtractor={(_, i) => i.toString()}
           style={[styles.fileList]}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             if (results.length === 0) {
               return (
                 <View style={[styles.fileRow]}>
@@ -148,6 +155,12 @@ export default function UploadScreen() {
                   <Text style={[styles.fileName]} numberOfLines={1}>
                     {item.name}
                   </Text>
+                  <TouchableOpacity
+                    style={[styles.removeButton]}
+                    onPress={() => removeFile(index)}
+                  >
+                    <Feather name="trash-2" size={18} color="#fff" />
+                  </TouchableOpacity>
                 </View>
               );
             }

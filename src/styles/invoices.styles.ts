@@ -137,6 +137,12 @@ export const createInvoiceUploadStyles = (theme: AppTheme, isMobile: boolean) =>
       marginTop: 2,
     },
 
+    removeButton: {
+      backgroundColor: theme.error,
+      borderRadius: 8,
+      padding: 6,
+    },
+
     button: {
       backgroundColor: theme.primary,
       padding: 18,
