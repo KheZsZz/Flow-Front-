@@ -21,28 +21,83 @@ api.interceptors.request.use(async (config) => {
 
 // middleware
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    let errorMessage = "Ocorreu um erro inesperado no ecossistema.";
+    if (!error.response) {
+      const isTimeout = error.code === "ECONNABORTED";
+      Toast.show({
+        type: "error",
+        text1: isTimeout ? "Tempo esgotado" : "Sem conexão",
+        text2: isTimeout
+          ? "O servidor demorou para responder. Tente novamente."
+          : "Não foi possível conectar ao servidor. Verifique sua conexão.",
+        position: "bottom",
+        visibilityTime: 5000,
+      });
+      return Promise.reject(error);
+    }
 
-    if (error.response) {
-      errorMessage =
-        error.response.data?.error ||
-        error.response.data?.message ||
-        errorMessage;
-    } else if (error.request) {
-      errorMessage =
-        "Não foi possível conectar ao servidor. Verifique a sua conexão.";
+    const status = error.response.status;
+    const data = error.response.data;
+
+    const serverMessage = data?.error || data?.message;
+
+    // Mapa de status → título + fallback descritivo
+    const statusMap: Record<number, { title: string; fallback: string }> = {
+      400: {
+        title: "Dados inválidos",
+        fallback: "Verifique os campos e tente novamente.",
+      },
+      401: {
+        title: "Sessão expirada",
+        fallback: "Faça login novamente para continuar.",
+      },
+      403: {
+        title: "Acesso negado",
+        fallback: "Você não tem permissão para esta ação.",
+      },
+      404: {
+        title: "Não encontrado",
+        fallback: "O recurso solicitado não existe.",
+      },
+      409: {
+        title: "Conflito de dados",
+        fallback: "Já existe um registro com essas informações.",
+      },
+      422: {
+        title: "Erro de validação",
+        fallback: "Os dados enviados são inválidos.",
+      },
+      429: {
+        title: "Muitas requisições",
+        fallback: "Aguarde alguns instantes e tente novamente.",
+      },
+      500: {
+        title: "Erro no servidor",
+        fallback: "Ocorreu um erro interno. Tente mais tarde.",
+      },
+      503: {
+        title: "Serviço indisponível",
+        fallback: "O serviço está temporariamente fora do ar.",
+      },
+    };
+
+    const mapped = statusMap[status] ?? {
+      title: `Erro ${status}`,
+      fallback: "Ocorreu um erro inesperado.",
+    };
+
+    if (status === 401) {
+      // Se você tiver acesso ao router aqui, chame logout/redirect
+      // authStore.logout() ou router.replace("/(auth)/login")
     }
 
     Toast.show({
       type: "error",
-      text1: "Falha na Operação",
-      text2: errorMessage,
+      text1: mapped.title,
+      text2: serverMessage || mapped.fallback,
       position: "bottom",
-      visibilityTime: 5000,
+      visibilityTime: status >= 500 ? 7000 : 5000,
       autoHide: true,
     });
 

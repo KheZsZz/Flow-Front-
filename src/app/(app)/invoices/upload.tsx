@@ -3,131 +3,203 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   SafeAreaView,
   ActivityIndicator,
   FlatList,
+  useWindowDimensions,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
 import { useTheme } from "@/contexts/themeContext";
-import { invoiceService } from "@/services/invoices";
+import {
+  invoiceService,
+  UploadResult,
+  UploadStatus,
+} from "@/services/invoices";
+
+import {
+  STATUS_CONFIG,
+  createInvoiceUploadStyles,
+} from "@/styles/invoices.styles";
 
 export default function UploadScreen() {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { width } = useWindowDimensions();
+  const { theme, isDark } = useTheme();
   const [files, setFiles] = useState<any[]>([]);
+  const [results, setResults] = useState<UploadResult[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const metrics = {
+    success: results.filter((r) => r.status === "success").length,
+    duplicate: results.filter((r) => r.status === "duplicate").length,
+    error: results.filter((r) => r.status === "error").length,
+  };
 
   const pickDocument = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "application/xml",
-        multiple: true,
-      });
-
-      if (!result.canceled) {
-        setFiles((prev) => [...prev, ...result.assets]);
-      }
-    } catch (err) {
-      console.error(err);
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ["application/xml", "text/xml", "*/*"],
+      multiple: true,
+    });
+    if (!result.canceled) {
+      setFiles((prev) => [...prev, ...result.assets]);
+      setResults([]);
     }
   };
 
   const handleUpload = async () => {
     if (files.length === 0) return;
     setLoading(true);
+    setResults([]);
     try {
-      await invoiceService.uploadXMLs(files);
-      Alert.alert("Sucesso", "Notas importadas com sucesso!");
-      router.back();
-    } catch (error) {
-      Alert.alert("Erro", "Falha ao processar arquivos.");
+      const uploadResults = await invoiceService.uploadXMLs(files);
+      setResults(uploadResults);
+      const failedFiles = uploadResults
+        .filter((r) => r.status === "error")
+        .map((r) => r.file);
+      setFiles((prev) => prev.filter((f) => failedFiles.includes(f.name)));
     } finally {
       setLoading(false);
     }
   };
 
+  const isMobile = width < 820;
+  const styles = createInvoiceUploadStyles(theme, isMobile);
+
+  const cardBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.background, padding: 20 }}
-    >
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 30 }}
-      >
-        <TouchableOpacity onPress={() => router.back()}>
-          <Feather name="arrow-left" size={24} color={theme.text} />
-        </TouchableOpacity>
-        <Text
-          style={{
-            color: theme.text,
-            fontSize: 20,
-            fontWeight: "bold",
-            marginLeft: 15,
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace("/(app)/dashboard");
+            }
           }}
         >
-          Importar XML
-        </Text>
+          <Feather
+            name="chevron-left"
+            size={24}
+            color={theme.isDark ? theme.text : theme.textSecondary}
+          />
+        </TouchableOpacity>
+        <Text style={styles.title}>Importar XML</Text>
       </View>
 
-      <TouchableOpacity
-        onPress={pickDocument}
-        style={{
-          borderWidth: 2,
-          borderColor: theme.primary,
-          borderStyle: "dashed",
-          padding: 40,
-          borderRadius: 15,
-          alignItems: "center",
-          marginBottom: 20,
-        }}
-      >
-        <Feather name="upload-cloud" size={40} color={theme.primary} />
-        <Text style={{ color: theme.textSecondary, marginTop: 10 }}>
-          Toque para selecionar arquivos
+      <TouchableOpacity onPress={pickDocument} style={[styles.dropzone]}>
+        <Feather
+          name="upload-cloud"
+          size={40}
+          color={theme.isDark ? theme.text : theme.primary}
+        />
+        <Text style={[styles.dropzoneText]}>
+          {files.length > 0
+            ? `${files.length} arquivo(s) selecionado(s) — toque para adicionar mais`
+            : "Toque para selecionar arquivos XML"}
         </Text>
       </TouchableOpacity>
 
-      <FlatList
-        data={files}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              padding: 15,
-              backgroundColor: theme.card,
-              borderRadius: 8,
-              marginBottom: 10,
-            }}
-          >
-            <Feather name="file-text" size={20} color={theme.primary} />
-            <Text style={{ color: theme.text, marginLeft: 10 }}>
-              {item.name}
-            </Text>
-          </View>
-        )}
-      />
+      {results.length > 0 && (
+        <View style={styles.metricsRow}>
+          {(["success", "duplicate", "error"] as UploadStatus[]).map((key) => {
+            const cfg = STATUS_CONFIG[key];
+            return (
+              <View
+                key={key}
+                style={[
+                  styles.metricCard,
+                  { backgroundColor: cardBg, borderColor: cfg.color },
+                ]}
+              >
+                <Text style={[styles.metricNumber, { color: cfg.color }]}>
+                  {metrics[key]}
+                </Text>
+                <Text
+                  style={[styles.metricLabel, { color: theme.textSecondary }]}
+                >
+                  {cfg.label}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      )}
+
+      <View style={styles.ListContent}>
+        <FlatList
+          data={results.length > 0 ? results : files}
+          keyExtractor={(_, i) => i.toString()}
+          style={[styles.fileList]}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => {
+            if (results.length === 0) {
+              return (
+                <View style={[styles.fileRow]}>
+                  <Feather
+                    name="file-text"
+                    size={20}
+                    color={theme.isDark ? theme.success : theme.primary}
+                  />
+                  <Text style={[styles.fileName]} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                </View>
+              );
+            }
+
+            // Resultado após upload
+            const result = item as UploadResult;
+            const cfg = STATUS_CONFIG[result.status];
+
+            return (
+              <View
+                style={[
+                  styles.fileRow,
+                  {
+                    backgroundColor: cardBg,
+                    borderLeftColor: cfg.color,
+                    borderLeftWidth: 3,
+                  },
+                ]}
+              >
+                <Feather name={cfg.icon as any} size={18} color={cfg.color} />
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <Text
+                    style={[styles.fileName, { color: theme.text }]}
+                    numberOfLines={1}
+                  >
+                    {result.file}
+                  </Text>
+                  <Text style={[styles.fileMessage, { color: cfg.color }]}>
+                    {result.message}
+                  </Text>
+                </View>
+              </View>
+            );
+          }}
+        />
+      </View>
 
       {files.length > 0 && (
         <TouchableOpacity
           onPress={handleUpload}
           disabled={loading}
-          style={{
-            backgroundColor: theme.primary,
-            padding: 20,
-            borderRadius: 12,
-            alignItems: "center",
-          }}
+          style={styles.button}
         >
           {loading ? (
             <ActivityIndicator color="#FFF" />
           ) : (
-            <Text style={{ color: "#FFF", fontWeight: "bold" }}>
-              Processar {files.length} Notas
-            </Text>
+            <>
+              <Feather name="upload" size={18} color="#FFF" />
+              <Text style={styles.buttonText}>
+                Processar {files.length} {files.length === 1 ? "nota" : "notas"}
+              </Text>
+            </>
           )}
         </TouchableOpacity>
       )}

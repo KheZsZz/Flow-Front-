@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { View, Text } from "react-native";
+import { View, Text, useWindowDimensions } from "react-native";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
@@ -24,9 +24,11 @@ type LoginFormData = z.infer<typeof LoginValidationSchema>;
 export default function LoginScreen() {
   const { singIn } = useAuth();
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
   const [submitting, setSubmitting] = useState(false);
 
-  const styles = createLoginStyles(theme);
+  const isMobile = width < 820;
+  const styles = createLoginStyles(theme, isMobile);
 
   const {
     control,
@@ -34,10 +36,7 @@ export default function LoginScreen() {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(LoginValidationSchema),
-    defaultValues: {
-      email_user: "",
-      password_user: "",
-    },
+    defaultValues: { email_user: "", password_user: "" },
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -54,31 +53,27 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={theme.gradient}
-        locations={[0.1, 0.3, 1]}
-        style={styles.gradient}
-      />
-
+      <LinearGradient colors={theme.gradient} style={styles.gradient} />
       <BlurView
         intensity={30}
         tint={theme.isDark ? "dark" : "light"}
         style={styles.blur}
       />
-      <View style={[styles.content]}>
+
+      <View style={styles.content}>
         <View style={styles.headers}>
           <Image
             style={styles.image}
             source="https://picsum.photos/seed/696/3000/2000"
-            placeholder="icone do sistema"
             contentFit="cover"
             transition={1000}
           />
-          <Text style={styles.title}> Flow Transportes</Text>
-          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
+          <Text style={styles.title}>Flow Transportes</Text>
+          <Text style={styles.subtitle}>
             SaaS Integrado de Monitoramento Logístico
           </Text>
         </View>
+
         <View style={styles.card}>
           <View style={styles.form}>
             <ControlledInput
@@ -91,7 +86,6 @@ export default function LoginScreen() {
               autoCapitalize="none"
               keyboardType="email-address"
             />
-
             <ControlledInput
               iconName="lock"
               control={control}
@@ -102,7 +96,6 @@ export default function LoginScreen() {
               secureTextEntry
             />
           </View>
-
           <Button
             title="Acessar Ecossistema"
             isLoading={submitting}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { Slot } from "expo-router";
-import { Sidebar } from "@/components/navbar"; 
+import { Sidebar } from "@/components/navbar";
 import { useTheme } from "@/contexts/themeContext";
 
 export default function AppLayout() {
@@ -10,16 +10,14 @@ export default function AppLayout() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      
-      <Sidebar 
-        isCollapsed={isSidebarCollapsed} 
-        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+      <Sidebar
+        isCollapsed={isSidebarCollapsed}
+        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      <View style={styles.contentArea}>
+      <ScrollView style={styles.contentArea}>
         <Slot />
-      </View>
-
+      </ScrollView>
     </View>
   );
 }
@@ -27,9 +25,9 @@ export default function AppLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "row", 
+    flexDirection: "row",
   },
   contentArea: {
-    flex: 1, 
+    flex: 1,
   },
 });

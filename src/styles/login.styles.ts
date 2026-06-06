@@ -3,6 +3,7 @@ import { lightTheme, darkTheme } from "@/constants/colors";
 
 export const createLoginStyles = (
   theme: typeof lightTheme | typeof darkTheme,
+  isMobile: boolean,
 ) =>
   StyleSheet.create({
     container: {
@@ -11,88 +12,63 @@ export const createLoginStyles = (
       alignItems: "center",
       padding: 20,
     },
-
-    gradient: {
-      ...StyleSheet.absoluteFill,
-    },
-
-    blur: {
-      ...StyleSheet.absoluteFill,
-    },
+    gradient: { ...StyleSheet.absoluteFill },
+    blur: { ...StyleSheet.absoluteFill },
 
     content: {
-      flex: 1,
-      flexDirection: "row",
+      flexDirection: isMobile ? "column" : "row",
+      width: isMobile ? "100%" : "80%",
+      alignItems: "stretch",
       justifyContent: "center",
-      alignItems: "center",
-      width: Dimensions.get("window").width - 70,
-      padding: 20,
+      height: isMobile ? "auto" : "80%",
     },
 
     headers: {
-      flex: 1,
-      height: "100%",
-      width: "30%",
+      width: isMobile ? "100%" : "30%", // 30% em desktop
       padding: 20,
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: theme.primary,
-      elevation: 5,
-      borderTopStartRadius: 14,
-      borderBottomStartRadius: 14,
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.15,
-      shadowRadius: 20,
+      borderTopLeftRadius: 14,
+      borderBottomLeftRadius: isMobile ? 0 : 14,
+      borderTopRightRadius: isMobile ? 14 : 0,
     },
 
     card: {
-      width: "50%",
-      height: "100%",
+      width: isMobile ? "100%" : "50%", // 50% em desktop
       padding: 20,
-      borderTopEndRadius: 14,
-      borderBottomEndRadius: 14,
       alignItems: "center",
-      overflow: "hidden",
-      borderWidth: 1,
-      boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.15)",
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.15,
-      shadowRadius: 20,
-      elevation: 5,
-      borderColor: theme.isDark
-        ? "rgba(255,255,255,0.1)"
-        : "rgba(255,255,255,0.3)",
+      justifyContent: "center",
       backgroundColor: theme.isDark
         ? "rgba(0,0,0,0.25)"
         : "rgba(255,255,255,0.3)",
+      borderTopRightRadius: 14,
+      borderBottomRightRadius: 14,
+      borderBottomLeftRadius: isMobile ? 14 : 0,
     },
+
     image: {
-      width: "30%",
-      height: "32%",
-      marginBottom: 50,
-      borderRadius: "50%",
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      marginBottom: 20,
     },
 
     title: {
-      fontSize: 42,
+      fontSize: isMobile ? 24 : 32,
       fontWeight: "bold",
       color: theme.textSecondary,
-      marginBottom: 22,
+      textAlign: "center",
     },
 
     subtitle: {
-      fontSize: 16,
+      fontSize: 14,
       color: theme.textSecondary,
       textAlign: "center",
     },
 
     form: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
       width: "100%",
-      marginTop: 50,
+      marginBottom: 20,
     },
   });

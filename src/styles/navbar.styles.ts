@@ -1,19 +1,17 @@
-import { Dimensions, StyleSheet, Platform } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { lightTheme, darkTheme } from "@/constants/colors";
-import { Color } from "expo-router";
 
-export const createNavbarStyles = (
-  theme: typeof lightTheme | typeof darkTheme,
-) =>
+type AppTheme = typeof lightTheme | typeof darkTheme;
+
+export const createNavbarStyles = (theme: AppTheme) =>
   StyleSheet.create({
     sidebar: {
       width: 260,
       backgroundColor: theme.primary,
-      padding: 20,
+      padding: 10,
       justifyContent: "space-between",
       borderRightWidth: 1,
       borderRightColor: theme.inputBorder,
-
       ...Platform.select({
         web: {
           transitionProperty: "width, background-color",
@@ -28,31 +26,19 @@ export const createNavbarStyles = (
       alignItems: "center",
     },
 
+    // ── Header ──────────────────────────────────────────────────────────────
     headerContainer: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 24,
+      marginBottom: 16,
       height: 40,
     },
 
     headerContainerCollapsed: {
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 32,
-    },
-
-    userAvatar: {
-      justifyContent: "center",
-      alignItems: "center",
-      width: 70,
-      height: 70,
-      borderRadius: 20,
-      marginRight: 12,
-      borderWidth: 1,
-      borderColor: theme.inputBorder,
-      marginBottom: 12,
-      // backgroundColor: "#FFF",
+      marginBottom: 16,
     },
 
     logoText: {
@@ -60,26 +46,61 @@ export const createNavbarStyles = (
       fontSize: 20,
       fontWeight: "700",
       letterSpacing: 1,
-      alignItems: "center",
     },
 
     toggleButton: {
-      padding: 6,
-      borderRadius: 6,
+      marginTop: 8,
+      padding: 12,
+      borderRadius: 10,
       backgroundColor: theme.isDark ? theme.link : theme.card,
     },
 
-    toggleButtonHover: {
-      opacity: 0.85,
+    // ── Theme toggle ─────────────────────────────────────────────────────────
+    themeTrack: {
+      flexDirection: "row",
+      borderRadius: 10,
+      padding: 3,
+      marginBottom: 20,
     },
 
+    themeOption: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      paddingVertical: 7,
+      borderRadius: 8,
+    },
+
+    themeOptionText: {
+      fontSize: 12,
+    },
+
+    themeOptionCollapsed: {
+      alignItems: "center",
+      justifyContent: "center",
+      height: 40,
+      borderRadius: 8,
+      marginBottom: 16,
+    },
+
+    // ── User badge ───────────────────────────────────────────────────────────
     userBadge: {
       justifyContent: "center",
       alignItems: "center",
       marginBottom: 32,
       padding: 12,
-      backgroundColor: "transparent",
       borderRadius: 8,
+    },
+
+    userAvatar: {
+      width: 70,
+      height: 70,
+      borderRadius: 20,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: theme.inputBorder,
     },
 
     userName: {
@@ -96,6 +117,7 @@ export const createNavbarStyles = (
       marginTop: 2,
     },
 
+    // ── Menu ─────────────────────────────────────────────────────────────────
     menuContainer: {
       flex: 1,
       gap: 4,
@@ -119,19 +141,8 @@ export const createNavbarStyles = (
 
     menuItemActive: {
       backgroundColor: theme.card,
-      color: theme.text,
       borderLeftWidth: 3,
       borderLeftColor: theme.text,
-    },
-
-    menuItemHover: {
-      backgroundColor: theme.success,
-      opacity: 0.7,
-    },
-
-    menuItemActiveHover: {
-      backgroundColor: theme.card,
-      opacity: 0.9,
     },
 
     menuItemText: {
@@ -141,10 +152,11 @@ export const createNavbarStyles = (
     },
 
     menuItemTextActive: {
-      color: theme.text, // Puxa a cor principal de texto do tema ativo
+      color: theme.text,
       fontWeight: "600",
     },
 
+    // ── Logout ───────────────────────────────────────────────────────────────
     logoutButton: {
       flexDirection: "row",
       alignItems: "center",
@@ -152,21 +164,9 @@ export const createNavbarStyles = (
       gap: 8,
       paddingVertical: 12,
       borderRadius: 8,
-      backgroundColor: theme.error, // Vermelho de erro ideal para logout
+      backgroundColor: theme.error,
       marginTop: "auto",
       width: "100%",
-    },
-
-    // 🚀 NOVO: Hover do botão de sair para dar feedback visual
-    logoutButtonHover: {
-      opacity: 0.9,
-      backgroundColor: theme.error,
-      shadowColor: "#000", // Leve sombra na web
-      ...Platform.select({
-        web: {
-          filter: "brightness(0.9)", // Deixa o vermelho ligeiramente mais escuro no hover
-        } as any,
-      }),
     },
 
     logoutButtonCollapsed: {
@@ -179,5 +179,16 @@ export const createNavbarStyles = (
       color: "#ffffff",
       fontSize: 14,
       fontWeight: "600",
+    },
+
+    // ── Mobile hamburguer ────────────────────────────────────────────────────
+    hamburger: {
+      position: "absolute",
+      top: 16,
+      right: 10,
+      zIndex: 100,
+      backgroundColor: theme.isDark ? theme.link : theme.card,
+      padding: 10,
+      borderRadius: 10,
     },
   });

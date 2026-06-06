@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+
 import {
   View,
   TextInput,
@@ -7,15 +8,18 @@ import {
   SafeAreaView,
   Platform,
 } from "react-native";
+
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { InvoiceList } from "@/components/invoicesList";
 import { invoiceService } from "@/services/invoices";
 import { useTheme } from "@/contexts/themeContext";
+import { createInvoiceListStyles } from "@/styles/invoices.styles";
 
 export default function InvoiceScreen() {
   const { theme } = useTheme();
   const router = useRouter();
+  const styles = createInvoiceListStyles(theme);
 
   const [invoices, setInvoices] = useState([]);
   const [search, setSearch] = useState("");
@@ -52,51 +56,23 @@ export default function InvoiceScreen() {
   }, [search, invoices]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-      {/* Container superior com padding extra para não sobrepor o botão de tema */}
-      <View
-        style={{
-          paddingHorizontal: 20,
-          paddingTop: Platform.OS === "ios" ? 10 : 45,
-          paddingBottom: 10,
-        }}
-      >
-        {/* Header: Título e Botão de Adicionar */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 20,
-          }}
-        >
-          <Text style={{ color: theme.text, fontSize: 24, fontWeight: "bold" }}>
-            Notas Fiscais
-          </Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.headers}>
+          <Text style={styles.title}>Notas Fiscais</Text>
 
           <TouchableOpacity
             onPress={() => router.push("/(app)/invoices/upload")}
-            style={{
-              backgroundColor: theme.primary,
-              padding: 10,
-              borderRadius: 12,
-            }}
+            style={styles.btn_add}
           >
             <Feather name="plus" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
 
-        {/* Campo de pesquisa unificado */}
         <TextInput
           placeholder="Pesquisar NFe, Cliente ou CTe..."
-          placeholderTextColor={theme.textSecondary}
-          style={{
-            backgroundColor: theme.card,
-            padding: 15,
-            borderRadius: 12,
-            color: theme.text,
-            fontSize: 16,
-          }}
+          placeholderTextColor={theme.isDark ? theme.textSecondary : theme.text}
+          style={styles.search}
           value={search}
           onChangeText={setSearch}
         />

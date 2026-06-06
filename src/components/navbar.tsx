@@ -1,36 +1,128 @@
-// src/components/Sidebar.tsx
 import React from "react";
-import { View, Text, Pressable, Image } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  useWindowDimensions,
+  Modal,
+} from "react-native";
 import { useRouter, usePathname } from "expo-router";
 import { useAuth } from "@/contexts/authContext";
 import { Feather } from "@expo/vector-icons";
 import { createNavbarStyles } from "@/styles/navbar.styles";
-import { useTheme } from "@/contexts/themeContext";
+import { useTheme, ThemeMode } from "@/contexts/themeContext";
 
 interface SidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
 }
 
-export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
+const THEME_OPTIONS: { id: ThemeMode; icon: "sun" | "moon"; label: string }[] =
+  [
+    { id: "light", icon: "sun", label: "Claro" },
+    { id: "dark", icon: "moon", label: "Escuro" },
+  ];
+
+const MENU_ITEMS = [
+  { name: "Dashboard", path: "/dashboard", icon: "grid" },
+  { name: "Notas Fiscais", path: "/invoices", icon: "file-text" },
+  { name: "Frota", path: "/vehicles", icon: "truck" },
+  { name: "Manutenção", path: "/fuel", icon: "tool" },
+  { name: "Motoristas", path: "/drives", icon: "users" },
+  { name: "Cargas / Rotas", path: "/orders", icon: "truck" },
+  { name: "Configurações", path: "/settings", icon: "settings" },
+] as const;
+
+function ThemeToggle({ collapsed }: { collapsed: boolean }) {
+  const { mode, isDark, setThemeMode, theme } = useTheme();
+  const styles = createNavbarStyles(theme);
+
+  if (!theme) return null;
+
+  const trackBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+  const activeBg = isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.10)";
+
+  if (collapsed) {
+    const next = mode === "dark" ? "light" : "dark";
+    const current =
+      THEME_OPTIONS.find((o) => o.id === mode) ?? THEME_OPTIONS[0];
+
+    return (
+      <Pressable
+        onPress={() => setThemeMode(next)}
+        style={[styles.themeOptionCollapsed, { backgroundColor: trackBg }]}
+      >
+        <Feather name={current?.icon} size={16} color={theme?.textSecondary} />
+      </Pressable>
+    );
+  }
+
+  return (
+    <View style={[styles.themeTrack, { backgroundColor: trackBg }]}>
+      {THEME_OPTIONS.map((opt) => {
+        const isActive = mode === opt.id;
+        return (
+          <TouchableOpacity
+            key={opt.id}
+            onPress={() => setThemeMode(opt.id)}
+            style={[
+              styles.themeOption,
+              { backgroundColor: isActive ? activeBg : "transparent" },
+            ]}
+          >
+            <Feather
+              name={opt.icon}
+              size={13}
+              color={isActive ? theme.text : theme.textSecondary}
+            />
+            <Text
+              style={[
+                styles.themeOptionText,
+                {
+                  fontWeight: isActive ? "600" : "400",
+                  color: isActive ? theme.text : theme.textSecondary,
+                },
+              ]}
+            >
+              {opt.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+// ─── Sidebar Content ──────────────────────────────────────────────────────────
+function SidebarContent({
+  isCollapsed,
+  onToggle,
+  onNavigate,
+}: {
+  isCollapsed: boolean;
+  onToggle: () => void;
+  onNavigate?: () => void;
+}) {
   const { theme } = useTheme();
   const styles = createNavbarStyles(theme);
   const { user, singOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  const menuItems = [
-    { name: "Dashboard", path: "/dashboard", icon: "grid" as const },
-    { name: "Notas Fiscais", path: "/invoices", icon: "file-text" as const },
-    { name: "Frota", path: "/vehicles", icon: "truck" as const },
-    { name: "Manutenção", path: "/fuel", icon: "tool" as const },
-    { name: "Motoristas", path: "/drives", icon: "users" as const },
-    { name: "Cargas / Rotas", path: "/orders", icon: "truck" as const },
-    { name: "Configurações", path: "/settings", icon: "settings" as const },
-  ];
+  const handleNav = (path: string) => {
+    router.push(path as any);
+    onNavigate?.();
+  };
 
   return (
-    <View style={[styles.sidebar, isCollapsed && styles.sidebarCollapsed]}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
+      {/* Header */}
       <View
         style={[
           styles.headerContainer,
@@ -42,16 +134,19 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             {user?.company?.name.split(" ")[0]}
           </Text>
         )}
-
         <Pressable onPress={onToggle} style={styles.toggleButton}>
           <Feather
-            name={isCollapsed ? "chevron-right" : "chevron-left"}
+            name={isCollapsed ? "chevrons-right" : "x-circle"}
             size={20}
             color={theme.text}
           />
         </Pressable>
       </View>
 
+      {/* Theme toggle — abaixo do header */}
+      <ThemeToggle collapsed={isCollapsed} />
+
+      {/* User badge */}
       {user && !isCollapsed && (
         <View style={styles.userBadge}>
           <Image
@@ -65,10 +160,10 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         </View>
       )}
 
+      {/* Menu */}
       <View style={styles.menuContainer}>
-        {menuItems.map((item) => {
+        {MENU_ITEMS.map((item) => {
           const isActive = pathname === item.path;
-
           return (
             <Pressable
               key={item.path}
@@ -77,14 +172,13 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                 isActive && styles.menuItemActive,
                 isCollapsed && styles.menuItemCollapsed,
               ]}
-              onPress={() => router.push(item.path as any)}
+              onPress={() => handleNav(item.path)}
             >
               <Feather
-                name={item.icon}
+                name={item.icon as any}
                 size={20}
                 color={isActive ? theme.text : theme.textSecondary}
               />
-
               {!isCollapsed && (
                 <Text
                   style={[
@@ -100,6 +194,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         })}
       </View>
 
+      {/* Logout */}
       <Pressable
         style={[
           styles.logoutButton,
@@ -110,6 +205,50 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         <Feather name="log-out" size={20} color="#ffffff" />
         {!isCollapsed && <Text style={styles.logoutButtonText}>Sair</Text>}
       </Pressable>
+    </ScrollView>
+  );
+}
+
+// ─── Main export ──────────────────────────────────────────────────────────────
+export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
+  const { theme } = useTheme();
+  const styles = createNavbarStyles(theme);
+  const { width, height } = useWindowDimensions();
+
+  const isMobile = width < 768 || height < 720;
+
+  if (isMobile) {
+    return (
+      <>
+        <Pressable onPress={onToggle} style={styles.hamburger}>
+          <Feather
+            name={isCollapsed ? "menu" : "x"}
+            size={22}
+            color={theme.text}
+          />
+        </Pressable>
+
+        <Modal
+          visible={!isCollapsed}
+          animationType="slide"
+          transparent={false}
+          onRequestClose={onToggle}
+        >
+          <View style={[styles.sidebar, { width: "100%", flex: 1 }]}>
+            <SidebarContent
+              isCollapsed={false}
+              onToggle={onToggle}
+              onNavigate={onToggle}
+            />
+          </View>
+        </Modal>
+      </>
+    );
+  }
+
+  return (
+    <View style={[styles.sidebar, isCollapsed && styles.sidebarCollapsed]}>
+      <SidebarContent isCollapsed={isCollapsed} onToggle={onToggle} />
     </View>
   );
 }
