@@ -78,7 +78,6 @@ export default function InvoiceScreen() {
         />
       </View>
 
-      {/* Lista de notas */}
       <InvoiceList data={filteredData} loading={loading} onRefresh={loadData} />
     </SafeAreaView>
   );
