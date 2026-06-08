@@ -1,11 +1,18 @@
 import React from "react";
-import { View, Text, FlatList, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  RefreshControl,
+  useWindowDimensions,
+} from "react-native";
 import { useTheme } from "@/contexts/themeContext";
 import { createInvoiceListStyles } from "@/styles/invoices.styles";
 
 export const InvoiceList = ({ data, loading, onRefresh }: any) => {
   const { theme } = useTheme();
-  const styles = createInvoiceListStyles(theme);
+  const isMobile = useWindowDimensions().width < 820;
+  const styles = createInvoiceListStyles(theme, isMobile);
 
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat("pt-BR", {
