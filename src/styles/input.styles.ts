@@ -36,7 +36,7 @@ export const createInputStyles = (
 
     input: {
       fontSize: 15,
-      color: theme.text,
+      color: theme.isDark ? theme.textSecondary : theme.text,
       flex: 1,
       height: "100%",
       paddingHorizontal: 8,

@@ -4,7 +4,6 @@ import { is } from "zod/v4/locales";
 
 type AppTheme = typeof lightTheme | typeof darkTheme;
 
-// ─── Status config exportado para uso no componente ───────────────────────────
 export type UploadStatus = "success" | "duplicate" | "error";
 
 export const STATUS_CONFIG: Record<
@@ -16,7 +15,6 @@ export const STATUS_CONFIG: Record<
   error: { color: "#ef4444", icon: "x-circle", label: "Erro" },
 };
 
-// ─── Upload screen ─────────────────────────────────────────────────────────────
 export const createInvoiceUploadStyles = (theme: AppTheme, isMobile: boolean) =>
   StyleSheet.create({
     container: {
@@ -167,7 +165,7 @@ export const createInvoiceUploadStyles = (theme: AppTheme, isMobile: boolean) =>
     },
   });
 
-export const createInvoiceListStyles = (theme: AppTheme) =>
+export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -200,7 +198,7 @@ export const createInvoiceListStyles = (theme: AppTheme) =>
     },
 
     search: {
-      width: "60%",
+      width: isMobile ? "60%" : "100%",
       borderWidth: 1,
       borderColor: theme.borderColor,
       backgroundColor: theme.card,
@@ -244,7 +242,7 @@ export const createInvoiceListStyles = (theme: AppTheme) =>
     },
 
     issuerText: {
-      color: theme.textSecondary,
+      color: theme.isDark ? theme.textSecondary : theme.text,
       fontSize: 13,
       marginTop: 6,
     },
