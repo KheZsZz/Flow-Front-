@@ -312,4 +312,36 @@ export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
       flex: 1,
       minWidth: 120,
     },
+
+    header: {
+      width: "100%",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 32,
+    },
+
+    headerTitle: {
+      color: theme.isDark ? theme.textSecondary : theme.text,
+      width: "100%",
+      textAlign: "center",
+      fontSize: 22,
+      fontWeight: "bold",
+      borderBottomWidth: 1,
+      borderBottomColor: theme.borderColor,
+      padding: 10,
+      // boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)",
+    },
+
+    headerSubtitle: {
+      width: "100%",
+      justifyContent: "center",
+      fontSize: 18,
+      fontWeight: "bold",
+      marginTop: 20,
+      padding: 10,
+      color: theme.isDark ? theme.textSecondary : theme.text,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.borderColor,
+      boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)",
+    },
   });

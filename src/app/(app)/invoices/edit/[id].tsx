@@ -11,7 +11,7 @@ import { Button } from "@/components/button";
 import { ControlledInput } from "@/components/controllerInput";
 import { useForm } from "react-hook-form";
 import { createInvoiceUpdateStyles } from "@/styles/invoices.styles";
-import { useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View, Text } from "react-native";
 
 export default function EditInvoiceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -19,7 +19,7 @@ export default function EditInvoiceScreen() {
   const isMobile = useWindowDimensions().width < 768;
   const styles = createInvoiceUpdateStyles(theme, isMobile);
 
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<InvoiceTypes>();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -61,6 +61,10 @@ export default function EditInvoiceScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Editar Nota Fiscal</Text>
+      </View>
+
       <View style={styles.content}>
         <View style={styles.contentInline}>
           <View style={styles.inputWrapper}>
@@ -87,6 +91,17 @@ export default function EditInvoiceScreen() {
           <View style={styles.inputWrapper}>
             <ControlledInput
               control={control}
+              label="Natureza"
+              name="nature_transaction"
+              placeholder="Natureza da transação"
+              errorMessage={errors.nature_transaction?.message}
+            />
+          </View>
+        </View>
+        <View style={styles.contentInline}>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
               label="Data de Emissão"
               name="issue_date"
               placeholder="Digite a data de emissão"
@@ -104,17 +119,95 @@ export default function EditInvoiceScreen() {
               variant="numeric"
             />
           </View>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="Peso"
+              name="weight_brute"
+              placeholder="Digite o peso"
+              errorMessage={errors.weight_brute?.message}
+              variant="numeric"
+            />
+          </View>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="Quantidade"
+              name="quantity_volumes"
+              placeholder="Digite a quantidade"
+              errorMessage={errors.quantity_volumes?.message}
+              variant="numeric"
+            />
+          </View>
         </View>
 
-        <View>
+        <View style={styles.contentInline}>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="CT-e"
+              name="cte"
+              placeholder="Digite o CT-e"
+              errorMessage={errors.cte?.message}
+              variant="numeric"
+            />
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="Valor CT-e"
+              name="cte_value"
+              placeholder="Digite o valor do CT-e"
+              errorMessage={errors.cte_value?.message}
+              variant="numeric"
+            />
+          </View>
+        </View>
+
+        <View style={styles.inputWrapper}>
           <ControlledInput
             control={control}
-            label="Valor da NF-e"
-            name="value_nfe"
-            onChangeText={(val) => setData({ ...data, value_nfe: val })}
-            placeholder="Digite o valor da NF-e"
-            errorMessage={errors.value_nfe?.message}
-            variant="numeric"
+            label="Codigo de barras"
+            name="barcode"
+            placeholder="Digite o codigo de barras"
+            errorMessage={errors.barcode?.message}
+          />
+        </View>
+      </View>
+
+      <View style={styles.header}>
+        <Text style={styles.headerSubtitle}>Dados de Remente/Destinatário</Text>
+      </View>
+
+      <View style={styles.contentInline}>
+        <View style={styles.inputWrapper}>
+          <ControlledInput
+            control={control}
+            label="Cnpj Emitente"
+            name="mailer"
+            placeholder="Digite o emitente"
+            errorMessage={errors.mailer?.message}
+          />
+        </View>
+        <View style={styles.inputWrapper}>
+          <ControlledInput
+            control={control}
+            label="Cnpj Destinatário"
+            name="receiver"
+            placeholder="Digite o cnpj do destinatário"
+            errorMessage={errors.receiver?.message}
+          />
+        </View>
+      </View>
+      <View style={styles.contentInline}>
+        <View style={styles.inputWrapper}>
+          <ControlledInput
+            control={control}
+            label="Observações"
+            name="observation"
+            placeholder=""
+            errorMessage={errors.observation?.message}
           />
         </View>
       </View>

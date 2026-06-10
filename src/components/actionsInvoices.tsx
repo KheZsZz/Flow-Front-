@@ -5,9 +5,9 @@ import { Feather } from "@expo/vector-icons";
 export function InvoiceActions({ onEdit, onDelete, onView }: any) {
   return (
     <View style={styles.actionsContainer}>
-      <TouchableOpacity onPress={onView} style={styles.btnAction}>
+      {/*<TouchableOpacity onPress={onView} style={styles.btnAction}>
         <Feather name="eye" size={18} color="#3b82f6" />
-      </TouchableOpacity>
+      </TouchableOpacity>*/}
       <TouchableOpacity onPress={onEdit} style={styles.btnAction}>
         <Feather name="edit-2" size={18} color="#f59e0b" />
       </TouchableOpacity>
