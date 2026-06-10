@@ -49,7 +49,7 @@ export default function CreateVehicleScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -105,6 +105,6 @@ export default function CreateVehicleScreen() {
           <Text style={styles.buttonText}>Cadastrar</Text>
         )}
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }

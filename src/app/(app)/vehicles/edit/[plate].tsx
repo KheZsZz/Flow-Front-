@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   Alert,
   useWindowDimensions,
@@ -19,13 +18,11 @@ import { vehicleSchema, VehicleType } from "@/schemas/vehicleSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VehicleTypeSchema } from "@/schemas/enumSchema";
 import rollback from "@/services/rollback";
-// import { reset } from "expo-router/build/react-navigation/routers/CommonActions";
 
 export default function EditVehicleScreen() {
   const { theme } = useTheme();
   const isMobile = useWindowDimensions().width < 768;
   const styles = createVehicleStyles(theme, isMobile);
-  const router = useRouter();
 
   const { plate } = useLocalSearchParams();
 
@@ -86,10 +83,8 @@ export default function EditVehicleScreen() {
       await api.put(`/vehicles/${vehicle?.id}`, normalizedData);
 
       Alert.alert("Sucesso", "Veículo atualizado!");
-      router.back();
+      rollback();
     } catch (err: any) {
-      console.error("Erro na atualização:", err.response?.data || err);
-
       Alert.alert(
         "Erro",
         err.response?.data?.message || "Não foi possível atualizar o veículo.",
@@ -113,7 +108,7 @@ export default function EditVehicleScreen() {
     );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
           <Feather
@@ -191,6 +186,6 @@ export default function EditVehicleScreen() {
           <Text style={styles.buttonText}>Salvar</Text>
         )}
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }

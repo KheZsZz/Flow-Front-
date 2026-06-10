@@ -43,6 +43,22 @@ export const createInputStyles = (
       borderWidth: 0,
     },
 
+    inputDate: {
+      flexDirection: "row",
+      alignItems: "center",
+      width: "100%",
+      height: 50,
+      borderRadius: 12,
+      borderWidth: 1,
+      backgroundColor: theme.isDark
+        ? "rgba(255, 255, 255, 0.08)"
+        : "rgba(255, 255, 255, 0.8)",
+      borderColor: theme.isDark
+        ? "rgba(255, 255, 255, 0.15)"
+        : "rgba(0, 0, 0, 0.12)",
+      paddingHorizontal: 12,
+      color: theme.isDark ? theme.textSecondary : theme.text,
+    },
     errorText: {
       fontSize: 12,
       marginTop: 4,

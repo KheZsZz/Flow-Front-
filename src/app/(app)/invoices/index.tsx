@@ -25,7 +25,7 @@ export default function InvoiceScreen() {
 
   const [invoices, setInvoices] = useState<InvoiceTypes[]>([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     setLoading(true);
@@ -41,6 +41,7 @@ export default function InvoiceScreen() {
 
   useEffect(() => {
     loadData();
+    setLoading(false);
   }, []);
 
   const filteredData = useMemo(() => {
@@ -53,7 +54,7 @@ export default function InvoiceScreen() {
   }, [search, invoices]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.headers}>
           <Text style={styles.title}>Notas Fiscais</Text>
@@ -80,6 +81,6 @@ export default function InvoiceScreen() {
           onDeleteSuccess={loadData}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

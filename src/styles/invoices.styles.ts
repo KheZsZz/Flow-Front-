@@ -288,3 +288,28 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
       backgroundColor: theme.isDark ? "#1f1f1f" : "#f0f0f0",
     },
   });
+
+export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      width: "100%",
+      padding: isMobile ? 16 : 20,
+    },
+    content: {
+      width: "100%",
+    },
+    contentInline: {
+      width: "100%",
+      flexWrap: "wrap",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12,
+    },
+
+    inputWrapper: {
+      flex: 1,
+      minWidth: 120,
+    },
+  });

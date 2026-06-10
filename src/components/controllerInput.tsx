@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Platform } from "react-native";
 import {
   View,
   Text,
@@ -107,20 +108,30 @@ export function ControlledInput<TFieldValues extends FieldValues>({
 
           // 3. VARIANT: DATE
           if (variant === "date") {
+            if (Platform.OS === "web") {
+              return (
+                <input
+                  type="date"
+                  value={
+                    value ? new Date(value).toISOString().split("T")[0] : ""
+                  }
+                  onChange={(e) => onChange(e.target.value)}
+                  style={styles.inputDate}
+                />
+              );
+            }
             return (
               <View>
                 <TouchableOpacity
                   style={[styles.inputWrapper, style]}
                   onPress={() => setShowDatePicker(true)}
                 >
-                  {iconName && (
-                    <Feather
-                      name={iconName}
-                      size={18}
-                      color={theme.text}
-                      style={{ marginLeft: 12, marginRight: 4 }}
-                    />
-                  )}
+                  <Feather
+                    name="calendar"
+                    size={18}
+                    color={theme.text}
+                    style={{ marginLeft: 12 }}
+                  />
                   <Text
                     style={[
                       styles.input,
@@ -131,17 +142,21 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                     ]}
                   >
                     {value
-                      ? new Date(value).toLocaleDateString()
+                      ? new Date(value).toLocaleDateString("pt-BR")
                       : "Selecione uma data"}
                   </Text>
                 </TouchableOpacity>
+
                 {showDatePicker && (
                   <DateTimePicker
                     value={value ? new Date(value) : new Date()}
                     mode="date"
-                    onChange={(event: DateTimePickerEvent, date?: Date) => {
-                      setShowDatePicker(false);
-                      if (date) onChange(date.toISOString());
+                    display="default" // No iOS, 'default' abre um modal
+                    onChange={(event, date) => {
+                      setShowDatePicker(false); // Fecha o picker
+                      if (date) {
+                        onChange(date.toISOString()); // Atualiza o form
+                      }
                     }}
                   />
                 )}

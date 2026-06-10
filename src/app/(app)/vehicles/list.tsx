@@ -47,7 +47,6 @@ export default function VehiclesScreen() {
   };
 
   const handleEdit = async (vehicle: VehicleType) => {
-    // console.log("Editando veículo:", vehicle.license_plate);
     router.push(`/vehicles/edit/${vehicle.license_plate}`);
   };
 

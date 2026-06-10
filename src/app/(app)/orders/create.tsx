@@ -22,19 +22,15 @@ export default function CreateOrderScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // Estados principais da Ordem
-  const [statusId, setStatusId] = useState("UUID_STATUS_EM_ABERTO"); // Pré-fixado no código ou via select
+  const [statusId, setStatusId] = useState("UUID_STATUS_EM_ABERTO");
   const [driverId, setDriverId] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(new Date().toISOString());
   const [notes, setNotes] = useState("");
 
-  // Regra de Negócio: Até 3 veículos/placas
   const [vehicles, setVehicles] = useState<string[]>([""]);
 
-  // Itens/Invoices vinculadas
   const [items, setItems] = useState<InvoiceItem[]>([]);
 
-  // Funções manipuladoras para os Veículos (Máximo 3)
   const handleAddVehicleField = () => {
     if (vehicles.length < 3) setVehicles([...vehicles, ""]);
   };
@@ -44,8 +40,6 @@ export default function CreateOrderScreen() {
     updated[index] = text;
     setVehicles(updated);
   };
-
-  // Funções manipuladoras para as Invoices/Itens
   const handleAddInvoiceItem = () => {
     setItems([
       ...items,
@@ -68,12 +62,10 @@ export default function CreateOrderScreen() {
     setItems(updated);
   };
 
-  // Envio do payload idêntico ao esperado pela sua RPC/API
   const handleSubmit = async () => {
     try {
       setLoading(true);
 
-      // Filtra campos vazios do array de veículos antes de enviar
       const filteredVehicles = vehicles.filter((v) => v.trim() !== "");
 
       const payload = {
@@ -81,7 +73,7 @@ export default function CreateOrderScreen() {
         driver_id: driverId,
         delivery_date: deliveryDate,
         notes: notes || null,
-        vehicles: filteredVehicles, // Envia o array de strings (UUIDs)
+        vehicles: filteredVehicles,
         items: items,
       };
 

@@ -84,4 +84,14 @@ export const invoiceService = {
       throw error;
     }
   },
+
+  async getInvoiceById(id: string) {
+    const response = await api.get(`/invoices/${id}`);
+    return response.data;
+  },
+
+  async updateInvoice(id: string, data: any) {
+    const response = await api.put(`/invoices/${id}`, data);
+    return response.data;
+  },
 };
