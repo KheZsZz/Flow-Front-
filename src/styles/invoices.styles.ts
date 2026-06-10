@@ -344,4 +344,9 @@ export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
       borderBottomColor: theme.borderColor,
       boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)",
     },
+
+    tableClient: {
+      flexDirection: "column",
+      width: "50%",
+    },
   });

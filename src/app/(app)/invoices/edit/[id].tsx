@@ -180,26 +180,39 @@ export default function EditInvoiceScreen() {
         <Text style={styles.headerSubtitle}>Dados de Remente/Destinatário</Text>
       </View>
 
+      {/*Table Client*/}
       <View style={styles.contentInline}>
-        <View style={styles.inputWrapper}>
-          <ControlledInput
-            control={control}
-            label="Cnpj Emitente"
-            name="mailer"
-            placeholder="Digite o emitente"
-            errorMessage={errors.mailer?.message}
-          />
-        </View>
-        <View style={styles.inputWrapper}>
-          <ControlledInput
-            control={control}
-            label="Cnpj Destinatário"
-            name="receiver"
-            placeholder="Digite o cnpj do destinatário"
-            errorMessage={errors.receiver?.message}
-          />
+        <View style={styles.tableClient}>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="Cnpj Emitente"
+              name="destinatario.document"
+              placeholder="Digite o CNPJ do emitente"
+              errorMessage={errors.destinatario?.message}
+            />
+          </View>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="Nome Destinatário"
+              name="destinatario.name_client"
+              placeholder="Digite o nome do destinatário"
+              errorMessage={errors.destinatario?.name_client?.message}
+            />
+          </View>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="phone_user"
+              name="destinatario.phone_user"
+              placeholder="Digite o telefone"
+              errorMessage={errors.destinatario?.phone_user?.message}
+            />
+          </View>
         </View>
       </View>
+
       <View style={styles.contentInline}>
         <View style={styles.inputWrapper}>
           <ControlledInput

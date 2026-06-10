@@ -87,6 +87,7 @@ export const invoiceService = {
 
   async getInvoiceById(id: string) {
     const response = await api.get(`/invoices/${id}`);
+    // console.log(response.data);
     return response.data;
   },
 

@@ -1,0 +1,28 @@
+{
+  "barcode": "42260607175725004742550010000201821281016720",
+  "created_at": "2026-06-09T14:30:38.545658+00:00",
+  "cte": "AGUARDANDO",
+  "cte_value": 0,
+  "destinatario": {
+    "document": "166411000151",
+    "id": "30663cfd-faa1-4341-a432-426d43c7ca3d",
+    "name_client": "ODILIO CORREIA DA TRINDADE"
+  },
+  "id": "aa39c9de-bc4a-4eb6-84a6-128b8c425bde",
+  "issue_date": "2026-06-02",
+  "nature_transaction": "VDA.PROD.ESTABELECIMENTO C/PIS/COFINS-NORMAL",
+  "nfe": "20182",
+  "observation": "Importado automaticamente via XML",
+  "quantity_volumes": 2,
+  "remetente": {
+    "document": "7175725004742",
+    "id": "da1b7834-f277-4d6e-820c-03ab17046ad4",
+    "name_client": "WEG EQUIPAMENTOS ELETRICOS S/A"
+  },
+  "serie_nf": "1",
+  "updated_at": "2026-06-09T14:30:38.545658+00:00",
+  "value_nfe": 16096.76,
+  "weight_brute": 838.2,
+  "xml_cte_url": "",
+  "xml_nfe_url": ""
+}

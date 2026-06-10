@@ -57,7 +57,7 @@ export const clientSchema = z.object({
     .refine((val) => (val.length === 11 ? validarCPF(val) : validarCNPJ(val)), {
       message: "CPF ou CNPJ inválido",
     }),
-  name: z.string().min(1, "O nome é obrigatório").max(255),
+  name_client: z.string().min(1, "O nome é obrigatório").max(255),
   email: z
     .string()
     .trim()
