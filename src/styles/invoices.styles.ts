@@ -19,7 +19,7 @@ export const createInvoiceUploadStyles = (theme: AppTheme, isMobile: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 20,
+      // padding: 20,
       backgroundColor: theme.background,
       alignItems: "center",
       width: "100%",
@@ -169,7 +169,6 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 20,
       backgroundColor: theme.background,
     },
     content: {
@@ -198,7 +197,7 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
     },
 
     search: {
-      width: isMobile ? "60%" : "100%",
+      width: isMobile ? "100%" : "60%",
       borderWidth: 1,
       borderColor: theme.borderColor,
       backgroundColor: theme.card,
@@ -209,6 +208,8 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
     },
 
     card: {
+      flex: 1,
+      justifyContent: "space-between",
       backgroundColor: theme.card,
       marginHorizontal: 15,
       marginVertical: 8,
@@ -217,7 +218,7 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
       borderLeftWidth: 4,
       borderLeftColor: theme.primary,
       elevation: 1,
-      shadowColor: "#000",
+      boxShadow: "4px 10px 20px rgba(0, 0, 0, 0.05)",
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.05,
       shadowRadius: 2,
@@ -236,7 +237,7 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
     },
 
     invoiceValue: {
-      color: theme.primary,
+      color: theme.success,
       fontWeight: "bold",
       fontSize: 15,
     },
@@ -255,8 +256,9 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
     },
 
     dateText: {
-      color: theme.textSecondary,
-      fontSize: 12,
+      color: theme.isDark ? theme.textSecondary : theme.text,
+      fontWeight: "bold",
+      fontSize: 14,
     },
 
     badge: {
@@ -268,5 +270,21 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
     badgeText: {
       fontSize: 11,
       fontWeight: "700",
+    },
+
+    actionsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 12,
+      marginTop: 15,
+      borderTopWidth: 1,
+      borderTopColor: theme.isDark ? "#333" : "#eee",
+      paddingTop: 10,
+      alignItems: "center",
+    },
+    btnAction: {
+      padding: 8,
+      borderRadius: 6,
+      backgroundColor: theme.isDark ? "#1f1f1f" : "#f0f0f0",
     },
   });

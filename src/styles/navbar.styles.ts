@@ -49,7 +49,7 @@ export const createNavbarStyles = (theme: AppTheme) =>
     },
 
     toggleButton: {
-      marginTop: 8,
+      marginTop: 22,
       padding: 12,
       borderRadius: 10,
       backgroundColor: theme.isDark ? theme.link : theme.card,
@@ -184,10 +184,10 @@ export const createNavbarStyles = (theme: AppTheme) =>
     // ── Mobile hamburguer ────────────────────────────────────────────────────
     hamburger: {
       position: "absolute",
-      top: 16,
+      bottom: 22,
       right: 10,
       zIndex: 100,
-      backgroundColor: theme.isDark ? theme.link : theme.card,
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
       padding: 10,
       borderRadius: 10,
     },

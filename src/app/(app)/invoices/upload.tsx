@@ -22,6 +22,7 @@ import {
   STATUS_CONFIG,
   createInvoiceUploadStyles,
 } from "@/styles/invoices.styles";
+import rollback from "@/services/rollback";
 
 export default function UploadScreen() {
   const router = useRouter();
@@ -79,16 +80,7 @@ export default function UploadScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace("/(app)/dashboard");
-            }
-          }}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={rollback}>
           <Feather
             name="chevron-left"
             size={24}

@@ -75,4 +75,13 @@ export const invoiceService = {
     const response = await api.get("/invoices");
     return response.data;
   },
+
+  async deleteInvoice(id: string): Promise<void> {
+    try {
+      await api.delete(`/invoices/${id}`);
+    } catch (error: any) {
+      console.error("Erro ao deletar nota:", error);
+      throw error;
+    }
+  },
 };

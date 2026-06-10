@@ -18,7 +18,8 @@ import { ControlledInput } from "@/components/controllerInput";
 import { vehicleSchema, VehicleType } from "@/schemas/vehicleSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VehicleTypeSchema } from "@/schemas/enumSchema";
-import { reset } from "expo-router/build/react-navigation/routers/CommonActions";
+import rollback from "@/services/rollback";
+// import { reset } from "expo-router/build/react-navigation/routers/CommonActions";
 
 export default function EditVehicleScreen() {
   const { theme } = useTheme();
@@ -58,7 +59,6 @@ export default function EditVehicleScreen() {
   const fetchVehicle = async (plate: string) => {
     try {
       const res = await api.get(`/vehicles/plate/${plate}`);
-      // console.log("Dados recebidos da API:", res.data);
       if (res.data) {
         setVehicle(res.data);
         reset({
@@ -115,7 +115,7 @@ export default function EditVehicleScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity style={styles.backButton} onPress={rollback}>
           <Feather
             name="arrow-left"
             size={24}

@@ -99,7 +99,7 @@ function NavigationGuard() {
     } else if (user) {
       const inAuthGroup = segments[0] === "(auth)";
       if (inAuthGroup || !segments[0] || segments[0] === "index") {
-        switch (user.profile_user) {
+        switch (user.user.profile_user) {
           case "Driver":
             router.replace("/(app)/driver");
             break;
@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   toggleContainer: {
     position: "absolute",
     right: 16,
@@ -170,6 +171,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     zIndex: 99999,
   },
+
   segmentButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -178,6 +180,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 6,
   },
+
   segmentLabel: {
     fontSize: 11,
     fontWeight: "600",

@@ -1,104 +1,101 @@
-import axios from "axios";
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from "axios";
+import { router } from "expo-router";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const api = axios.create({
-  baseURL:
-    process.env.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_API_URL_DEV,
-  headers: {
-    "Content-Type": "application/json",
-  },
+export const api: AxiosInstance = axios.create({
+  baseURL: process.env.EXPO_PUBLIC_API_URL || "",
+  headers: { "Content-Type": "application/json" },
 });
 
-// Interceptor
-api.interceptors.request.use(async (config) => {
-  const savedUser = localStorage.getItem("@flow:auth_user");
-  if (savedUser && config.headers) {
-    const { token } = JSON.parse(savedUser);
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  try {
+    const savedUser = await AsyncStorage.getItem("@flow:auth_user");
+    if (savedUser) {
+      const { token } = JSON.parse(savedUser);
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.warn("Falha ao injetar token:", error);
   }
   return config;
 });
 
+const STATUS_MESSAGES: Record<number, { title: string; fallback: string }> = {
+  400: {
+    title: "Dados inválidos",
+    fallback: "Verifique os campos e tente novamente.",
+  },
+  401: { title: "Sessão expirada", fallback: "Faça login novamente." },
+  403: {
+    title: "Acesso negado",
+    fallback: "Você não tem permissão para esta ação.",
+  },
+  404: { title: "Não encontrado", fallback: "O recurso não existe." },
+  409: {
+    title: "Conflito de dados",
+    fallback: "Já existe um registro com estas informações.",
+  },
+  422: {
+    title: "Erro de validação",
+    fallback: "Os dados enviados são inválidos.",
+  },
+  429: {
+    title: "Muitas requisições",
+    fallback: "Aguarde alguns instantes e tente novamente.",
+  },
+  500: {
+    title: "Erro no servidor",
+    fallback: "Ocorreu um erro interno. Tente mais tarde.",
+  },
+  503: {
+    title: "Serviço indisponível",
+    fallback: "O serviço está temporariamente fora do ar.",
+  },
+};
+
 // middleware
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  (error: AxiosError<any>) => {
+    // Caso de Sem Conexão ou Timeout
     if (!error.response) {
       const isTimeout = error.code === "ECONNABORTED";
       Toast.show({
         type: "error",
         text1: isTimeout ? "Tempo esgotado" : "Sem conexão",
         text2: isTimeout
-          ? "O servidor demorou para responder. Tente novamente."
-          : "Não foi possível conectar ao servidor. Verifique sua conexão.",
+          ? "O servidor demorou para responder."
+          : "Verifique sua internet.",
         position: "bottom",
-        visibilityTime: 5000,
       });
       return Promise.reject(error);
     }
 
     const status = error.response.status;
-    const data = error.response.data;
+    const serverMessage =
+      error.response.data?.message || error.response.data?.error;
 
-    const serverMessage = data?.error || data?.message;
+    if (status === 401) {
+      AsyncStorage.removeItem("@flow:auth_user");
+      router.replace("/(auth)/login");
+    }
 
-    // Mapa de status → título + fallback descritivo
-    const statusMap: Record<number, { title: string; fallback: string }> = {
-      400: {
-        title: "Dados inválidos",
-        fallback: "Verifique os campos e tente novamente.",
-      },
-      401: {
-        title: "Sessão expirada",
-        fallback: "Faça login novamente para continuar.",
-      },
-      403: {
-        title: "Acesso negado",
-        fallback: "Você não tem permissão para esta ação.",
-      },
-      404: {
-        title: "Não encontrado",
-        fallback: "O recurso solicitado não existe.",
-      },
-      409: {
-        title: "Conflito de dados",
-        fallback: "Já existe um registro com essas informações.",
-      },
-      422: {
-        title: "Erro de validação",
-        fallback: "Os dados enviados são inválidos.",
-      },
-      429: {
-        title: "Muitas requisições",
-        fallback: "Aguarde alguns instantes e tente novamente.",
-      },
-      500: {
-        title: "Erro no servidor",
-        fallback: "Ocorreu um erro interno. Tente mais tarde.",
-      },
-      503: {
-        title: "Serviço indisponível",
-        fallback: "O serviço está temporariamente fora do ar.",
-      },
-    };
-
-    const mapped = statusMap[status] ?? {
+    const mapped = STATUS_MESSAGES[status] ?? {
       title: `Erro ${status}`,
       fallback: "Ocorreu um erro inesperado.",
     };
-
-    if (status === 401) {
-      // Se você tiver acesso ao router aqui, chame logout/redirect
-      // authStore.logout() ou router.replace("/(auth)/login")
-    }
 
     Toast.show({
       type: "error",
       text1: mapped.title,
       text2: serverMessage || mapped.fallback,
-      position: "bottom",
+      position: "top",
       visibilityTime: status >= 500 ? 7000 : 5000,
-      autoHide: true,
     });
 
     return Promise.reject(error);

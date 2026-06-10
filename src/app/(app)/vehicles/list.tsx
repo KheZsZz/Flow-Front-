@@ -17,7 +17,7 @@ import { VehicleType } from "@/schemas/vehicleSchema";
 
 export default function VehiclesScreen() {
   const { theme } = useTheme();
-  const isMobile = useWindowDimensions().width <= 768;
+  const isMobile = useWindowDimensions().width <= 820;
   const styles = createVehicleListStyles(theme, isMobile);
   const router = useRouter();
   const [vehicles, setVehicles] = useState<VehicleType[]>([]);

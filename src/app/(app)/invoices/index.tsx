@@ -1,27 +1,29 @@
-import React, { useState, useMemo, useEffect } from "react";
-
+import React from "react";
+import { InvoiceList } from "@/components/invoicesList";
+import { InvoiceTypes } from "@/schemas/invoicesSchema";
+import { invoiceService } from "@/services/invoices";
+import { createInvoiceListStyles } from "@/styles/invoices.styles";
+import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useTheme } from "@/contexts/themeContext";
+import { useEffect, useMemo, useState } from "react";
 import {
+  useWindowDimensions,
   View,
-  TextInput,
   TouchableOpacity,
   Text,
   SafeAreaView,
   Platform,
+  TextInput,
 } from "react-native";
-
-import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { InvoiceList } from "@/components/invoicesList";
-import { invoiceService } from "@/services/invoices";
-import { useTheme } from "@/contexts/themeContext";
-import { createInvoiceListStyles } from "@/styles/invoices.styles";
 
 export default function InvoiceScreen() {
   const { theme } = useTheme();
   const router = useRouter();
-  const styles = createInvoiceListStyles(theme);
+  const isMobile = useWindowDimensions().width < 768;
+  const styles = createInvoiceListStyles(theme, isMobile);
 
-  const [invoices, setInvoices] = useState([]);
+  const [invoices, setInvoices] = useState<InvoiceTypes[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -42,16 +44,11 @@ export default function InvoiceScreen() {
   }, []);
 
   const filteredData = useMemo(() => {
+    const s = search.toLowerCase();
     return invoices.filter(
       (item: any) =>
-        item.nfe?.toLowerCase().includes(search.toLowerCase()) ||
-        item.remetente?.name_client
-          ?.toLowerCase()
-          .includes(search.toLowerCase()) ||
-        item.destinatario?.name_client
-          ?.toLowerCase()
-          .includes(search.toLowerCase()) ||
-        item.cte?.toLowerCase().includes(search.toLowerCase()),
+        item.nfe?.toLowerCase().includes(s) ||
+        item.remetente?.name_client?.toLowerCase().includes(s),
     );
   }, [search, invoices]);
 
@@ -60,7 +57,6 @@ export default function InvoiceScreen() {
       <View style={styles.content}>
         <View style={styles.headers}>
           <Text style={styles.title}>Notas Fiscais</Text>
-
           <TouchableOpacity
             onPress={() => router.push("/(app)/invoices/upload")}
             style={styles.btn_add}
@@ -68,17 +64,22 @@ export default function InvoiceScreen() {
             <Feather name="plus" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
-
         <TextInput
-          placeholder="Pesquisar NFe, Cliente ou CTe..."
-          placeholderTextColor={theme.isDark ? theme.textSecondary : theme.text}
+          placeholder="Pesquisar..."
           style={styles.search}
           value={search}
           onChangeText={setSearch}
         />
       </View>
 
-      <InvoiceList data={filteredData} loading={loading} onRefresh={loadData} />
+      <View style={{ flex: 1 }}>
+        <InvoiceList
+          data={filteredData}
+          loading={loading}
+          onRefresh={loadData}
+          onDeleteSuccess={loadData}
+        />
+      </View>
     </SafeAreaView>
   );
 }

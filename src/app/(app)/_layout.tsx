@@ -15,9 +15,9 @@ export default function AppLayout() {
         onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      <ScrollView style={styles.contentArea}>
+      <View style={styles.contentArea}>
         <Slot />
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -27,7 +27,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
   },
+
   contentArea: {
     flex: 1,
+    padding: 20,
   },
 });
