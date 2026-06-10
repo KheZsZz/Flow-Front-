@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<nfeProc versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe">
+<protNFe>
+<infProt>
+<nProt>135262267223079</nProt>
+<digVal>z5RgQR09k0DnIFsWpAbIUF6+faM=</digVal>
+<dhRecbto>2026-06-09T16:36:16-03:00</dhRecbto>
+<Id>Id135262267223079</Id>
+<chNFe>35260612475660000108550010001672371230016200</chNFe>
+<xMotivo>Autorizado o uso da NF-e</xMotivo>
+<cStat>100</cStat>
+</infProt>
+</protNFe>
+<NFe>
+<infNFe Id="NFe35260612475660000108550010001672371230016200">
+<infAdic>
+<infCpl
+                >PIS/COFINS Lei 10.485/2002(1,65% e 7,60%)Art. 30 Parag. 30 Retencao PIS COD:3770 e COFINS COD 3746-COFINS 0,50%:     63,09 PIS 0,10%:    315,47</infCpl></infAdic><infRespTec
+            ><fone>1128593904</fone><CNPJ>53113791000122</CNPJ><xContato
+                >Rodrigo de Almeida Sartorio</xContato><email
+                >resp_tecnico_dfe_protheus@totvs.com.br</email></infRespTec><det
+            ><nItem>1</nItem><prod><cEAN>SEM GTIN</cEAN><cProd
+                    >R1R13MB000</cProd><qCom>720.0000</qCom><cEANTrib
+                    >SEM GTIN</cEANTrib><vUnTrib>87.6300000000</vUnTrib><qTrib
+                    >720.0000</qTrib><vProd>63093.60</vProd><xProd
+                    >JOGO TAPETE PVC HB20 (BR2)</xProd><vUnCom
+                    >87.6300000000</vUnCom><indTot>1</indTot><uTrib
+                    >JG</uTrib><NCM>87089990</NCM><uCom>JG</uCom><CFOP
+                    >5101</CFOP><CEST>0107500</CEST></prod><imposto><IBSCBS><CST
+                        >000</CST><cClassTrib>000001</cClassTrib><gIBSCBS><vIBS
+                            >46.95</vIBS><gCBS><gDevTrib><vDevTrib
+                                    >0</vDevTrib></gDevTrib><pCBS
+                                >0.9000</pCBS><vCBS>422.56</vCBS></gCBS><gIBSUF
+                            ><gDevTrib><vDevTrib>0</vDevTrib></gDevTrib><pIBSUF
+                                >0.1000</pIBSUF><vIBSUF
+                                >46.95</vIBSUF></gIBSUF><vBC
+                            >46951.10</vBC><gIBSMun><pIBSMun>0</pIBSMun><vIBSMun
+                                >0</vIBSMun></gIBSMun></gIBSCBS></IBSCBS><ICMS
+                    ><ICMS00><modBC>3</modBC><orig>0</orig><CST>00</CST><vBC
+                            >63093.60</vBC><vICMS>11356.85</vICMS><pICMS
+                            >18.0000</pICMS></ICMS00></ICMS><IPI><cEnq
+                        >999</cEnq><IPITrib><CST>50</CST><vBC
+                            >63093.60</vBC><pIPI>3.2500</pIPI><vIPI
+                            >2050.54</vIPI></IPITrib></IPI><COFINS><COFINSAliq
+                        ><vCOFINS>3931.99</vCOFINS><CST>01</CST><vBC
+                            >51736.75</vBC><pCOFINS
+                            >7.6000</pCOFINS></COFINSAliq></COFINS><PIS><PISAliq
+                        ><vPIS>853.66</vPIS><CST>01</CST><vBC
+                            >51736.75</vBC><pPIS
+                            >1.6500</pPIS></PISAliq></PIS></imposto><vItem
+                >65144.14</vItem></det><total><retTrib><vRetCOFINS
+                    >315.47</vRetCOFINS><vRetPIS
+                    >63.09</vRetPIS></retTrib><vNFTot>65144.14</vNFTot><ICMSTot
+                ><vICMSUFDest>0</vICMSUFDest><vICMSUFRemet
+                    >0</vICMSUFRemet><vCOFINS>3931.99</vCOFINS><vBCST
+                    >0</vBCST><vICMSDeson>0</vICMSDeson><vFCPUFDest
+                    >0</vFCPUFDest><vProd>63093.60</vProd><vSeg>0</vSeg><vFCP
+                    >0</vFCP><vFCPST>0</vFCPST><vNF>65144.14</vNF><vPIS
+                    >853.66</vPIS><vIPIDevol>0</vIPIDevol><vBC
+                    >63093.60</vBC><vST>0</vST><vICMS>11356.85</vICMS><vII
+                    >0</vII><vFCPSTRet>0</vFCPSTRet><vDesc>0</vDesc><vOutro
+                    >0</vOutro><vIPI>2050.54</vIPI><vFrete
+                    >0</vFrete></ICMSTot><IBSCBSTot><gCBS><vDevTrib
+                        >0</vDevTrib><vCredPres
+                        >0.00</vCredPres><vCredPresCondSus
+                        >0.00</vCredPresCondSus><vCBS>422.56</vCBS><vDif
+                        >0</vDif></gCBS><vBCIBSCBS>46951.10</vBCIBSCBS><gIBS
+                    ><vIBS>46.95</vIBS><gIBSUF><vDevTrib>0</vDevTrib><vIBSUF
+                            >46.95</vIBSUF><vDif>0</vDif></gIBSUF><vCredPres
+                        >0.00</vCredPres><vCredPresCondSus
+                        >0.00</vCredPresCondSus><gIBSMun><vDevTrib
+                            >0</vDevTrib><vIBSMun>0</vIBSMun><vDif
+                            >0</vDif></gIBSMun></gIBS></IBSCBSTot></total><cobr
+            ><fat><vOrig>64765.58</vOrig><nFat>1167237</nFat><vDesc
+                    >0</vDesc><vLiq>64765.58</vLiq></fat><dup><dVenc
+                    >2026-07-20</dVenc><nDup>001</nDup><vDup
+                    >64765.58</vDup></dup></cobr><pag><detPag><vPag
+                    >65144.14</vPag><tPag>15</tPag><indPag
+                    >1</indPag></detPag></pag><Id
+            >NFe35260612475660000108550010001672371230016200</Id><ide><tpNF
+                >1</tpNF><mod>55</mod><indPres>9</indPres><tpImp>1</tpImp><nNF
+                >167237</nNF><cMunFG>3522208</cMunFG><procEmi>0</procEmi><finNFe
+                >1</finNFe><dhEmi>2026-06-09T15:33:00-03:00</dhEmi><tpAmb
+                >1</tpAmb><indFinal>0</indFinal><dhSaiEnt
+                >2026-06-09T15:33:00-03:00</dhSaiEnt><idDest>1</idDest><tpEmis
+                >1</tpEmis><cDV>0</cDV><cUF>35</cUF><serie>1</serie><natOp
+                >VENDA C/ RET PIS/COF</natOp><cNF>23001620</cNF><verProc
+                >12.1.2410 | 3.0</verProc><indIntermed
+                >0</indIntermed></ide><emit><CNAE>1352900</CNAE><xNome
+                >BORKAR TAPETES AUTOMOTIVOS</xNome><IM>25638</IM><CRT
+                >3</CRT><xFant>BORKAR</xFant><CNPJ>12475660000108</CNPJ>
+                <enderEmit>
+                <fone>1147046928</fone>
+                <UF>SP</UF>
+                <xPais>BRASIL</xPais>
+                <cPais>1058</cPais>
+                <xLgr>RUA DAS NOGUEIRAS</xLgr>
+                <xMun>ITAPECERICA DA SERRA</xMun>
+                <nro>398</nro>
+                <cMun>3522208</cMun>
+                <xBairro>BAIRRO ALDEINHA</xBairro>
+                <CEP>06877125</CEP>
+                </enderEmit>
+                <IE>370103716118</IE>
+                </emit>
+                <dest>
+                <xNome>MOBIS BRASIL FABRICACAO DE AUTO PECAS LTDA</xNome>
+                <CNPJ>08585033000314</CNPJ>
+
+                <enderDest>
+                <xCpl>SP 308 ROD DO ACUCAR</xCpl>
+                    >RUA SEBASTIAO MONTEIRO</xLgr><xMun
+                    >RIO DAS PEDRAS</xMun><nro>320</nro><cMun
+                    >3544004</cMun><xBairro
+                    >DISTRITO INDUSTRIAL AUGUSTO SCARASSATTI</xBairro><CEP
+                    >13390000</CEP></enderDest><IE>588017283116</IE><indIEDest
+                >1</indIEDest><email>nferdp@gmobis.com</email></dest><transp
+            ><modFrete>0</modFrete><vol><pesoL>2277.360</pesoL><esp
+                    >VOLUMES</esp><qVol>6</qVol><pesoB
+                    >2277.360</pesoB></vol><transporta><xNome
+                    >LEONARDO CARDOSO TRANSPORTES - ME</xNome><UF>SP</UF><xEnder
+                    >Rua Adalcina Francisca da Silva</xEnder><xMun
+                    >ITAPECERICA DA</xMun><CNPJ>17759121000114</CNPJ><IE
+                    >370079480112</IE></transporta></transp></infNFe></NFe><versao
+    >4.00</versao></nfeProc>

@@ -11,7 +11,7 @@ import { Button } from "@/components/button";
 import { ControlledInput } from "@/components/controllerInput";
 import { useForm } from "react-hook-form";
 import { createInvoiceUpdateStyles } from "@/styles/invoices.styles";
-import { useWindowDimensions, View, Text } from "react-native";
+import { useWindowDimensions, View, Text, ScrollView } from "react-native";
 
 export default function EditInvoiceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -60,7 +60,7 @@ export default function EditInvoiceScreen() {
     return <Loadding color={isDark ? theme.link : theme.text} size={50} />;
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Editar Nota Fiscal</Text>
       </View>
@@ -182,11 +182,43 @@ export default function EditInvoiceScreen() {
 
       {/*Table Client*/}
       <View style={styles.contentInline}>
+        {/*Remetente*/}
         <View style={styles.tableClient}>
           <View style={styles.inputWrapper}>
             <ControlledInput
               control={control}
               label="Cnpj Emitente"
+              name="remetente.document"
+              placeholder="Digite o CNPJ do emitente"
+              errorMessage={errors.remetente?.document?.message}
+            />
+          </View>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="Nome Destinatário"
+              name="remetente.name_client"
+              placeholder="Digite o nome do destinatário"
+              errorMessage={errors.remetente?.name_client?.message}
+            />
+          </View>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="phone_user"
+              name="remetente.phone_user"
+              placeholder="Digite o telefone"
+              errorMessage={errors.remetente?.phone_user?.message}
+            />
+          </View>
+        </View>
+
+        {/*Destinatario*/}
+        <View style={styles.tableClient}>
+          <View style={styles.inputWrapper}>
+            <ControlledInput
+              control={control}
+              label="Cnpj Destinatario"
               name="destinatario.document"
               placeholder="Digite o CNPJ do emitente"
               errorMessage={errors.destinatario?.message}
@@ -230,6 +262,6 @@ export default function EditInvoiceScreen() {
         onPress={handleSubmit(handleSave)}
         disabled={saving}
       />
-    </View>
+    </ScrollView>
   );
 }

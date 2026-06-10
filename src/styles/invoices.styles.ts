@@ -346,6 +346,7 @@ export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
     },
 
     tableClient: {
+      flex: 1,
       flexDirection: "column",
       width: "50%",
     },
