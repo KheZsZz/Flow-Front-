@@ -14,6 +14,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { createVehicleListStyles } from "@/styles/vehicleList.styles";
 import { api } from "@/services/api";
 import { VehicleType } from "@/schemas/vehicleSchema";
+import { Loadding } from "@/components/loadding";
 
 export default function VehiclesScreen() {
   const { theme } = useTheme();
@@ -21,10 +22,12 @@ export default function VehiclesScreen() {
   const styles = createVehicleListStyles(theme, isMobile);
   const router = useRouter();
   const [vehicles, setVehicles] = useState<VehicleType[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchVehicles = async () => {
     const { data } = await api.get("/vehicles");
     setVehicles(data);
+    setLoading(false);
   };
 
   const toggleStatus = async (vehicle: VehicleType) => {
@@ -54,6 +57,11 @@ export default function VehiclesScreen() {
     fetchVehicles();
   }, []);
 
+  if (loading)
+    return (
+      <Loadding color={theme.isDark ? theme.link : theme.text} size={50} />
+    );
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -62,68 +70,73 @@ export default function VehiclesScreen() {
           <Feather name="plus" size={24} color={theme.primary} />
         </TouchableOpacity>
       </View>
+      {vehicles.length === 0 ? (
+        <Text style={styles.title}>Nenhum veículo encontrado.</Text>
+      ) : (
+        <View style={styles.gridContainer}>
+          {vehicles.map((item) => (
+            <View key={item.id} style={styles.card}>
+              <View
+                style={[
+                  styles.imagePlaceholder,
+                  { borderBottomColor: item.is_active ? "#3b82f6" : "#ef4444" },
+                ]}
+              >
+                <Feather name="truck" size={50} color="#666" />
+              </View>
 
-      <View style={styles.gridContainer}>
-        {vehicles.map((item) => (
-          <View key={item.id} style={styles.card}>
-            <View
-              style={[
-                styles.imagePlaceholder,
-                { borderBottomColor: item.is_active ? "#3b82f6" : "#ef4444" },
-              ]}
-            >
-              <Feather name="truck" size={50} color="#666" />
-            </View>
+              <View
+                style={[
+                  styles.titleBar,
+                  { backgroundColor: item.is_active ? "#3b82f6" : "#ef4444" },
+                ]}
+              >
+                <Text style={styles.titleText}>{item.model.toUpperCase()}</Text>
+              </View>
 
-            <View
-              style={[
-                styles.titleBar,
-                { backgroundColor: item.is_active ? "#3b82f6" : "#ef4444" },
-              ]}
-            >
-              <Text style={styles.titleText}>{item.model.toUpperCase()}</Text>
-            </View>
+              <View style={styles.body}>
+                <View style={styles.infoRow}>
+                  <Text style={styles.label}>Placa: {item.license_plate}</Text>
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleBtn,
+                      {
+                        backgroundColor: item.is_active ? "#ef4444" : "#22c55e",
+                      },
+                    ]}
+                    onPress={() => toggleStatus(item)}
+                  >
+                    <Text style={styles.btnText}>
+                      {item.is_active ? "Desativar" : "Ativar"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
 
-            <View style={styles.body}>
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>Placa: {item.license_plate}</Text>
-                <TouchableOpacity
-                  style={[
-                    styles.toggleBtn,
-                    { backgroundColor: item.is_active ? "#ef4444" : "#22c55e" },
-                  ]}
-                  onPress={() => toggleStatus(item)}
-                >
-                  <Text style={styles.btnText}>
-                    {item.is_active ? "Desativar" : "Ativar"}
+                <View style={styles.infoRow}>
+                  <Text style={styles.label}>
+                    Status: {item.is_active ? "Ativo" : "Inativo"}
                   </Text>
-                </TouchableOpacity>
-              </View>
 
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>
-                  Status: {item.is_active ? "Ativo" : "Inativo"}
-                </Text>
+                  <TouchableOpacity
+                    style={styles.editBtn}
+                    onPress={() => handleEdit(item)}
+                  >
+                    <Text style={styles.btnText}>
+                      Alterar <Feather name="edit-2" size={10} />
+                    </Text>
+                  </TouchableOpacity>
+                </View>
 
-                <TouchableOpacity
-                  style={styles.editBtn}
-                  onPress={() => handleEdit(item)}
-                >
-                  <Text style={styles.btnText}>
-                    Alterar <Feather name="edit-2" size={10} />
+                <View style={styles.footer}>
+                  <Text style={styles.footerText}>
+                    Modelo: {item.model} | Ano: {item.year}
                   </Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>
-                  Modelo: {item.model} | Ano: {item.year}
-                </Text>
+                </View>
               </View>
             </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }
