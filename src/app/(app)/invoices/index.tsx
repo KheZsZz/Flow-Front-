@@ -12,8 +12,6 @@ import {
   View,
   TouchableOpacity,
   Text,
-  SafeAreaView,
-  Platform,
   TextInput,
 } from "react-native";
 
@@ -28,7 +26,6 @@ export default function InvoiceScreen() {
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
-    setLoading(true);
     try {
       const data = await invoiceService.getInvoices();
       setInvoices(data);
@@ -41,7 +38,6 @@ export default function InvoiceScreen() {
 
   useEffect(() => {
     loadData();
-    setLoading(false);
   }, []);
 
   const filteredData = useMemo(() => {

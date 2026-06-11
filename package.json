@@ -32,6 +32,7 @@
     "react-native": "0.85.3",
     "react-native-chart-kit": "^6.12.3",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-mask-text": "^0.15.0",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-svg": "15.15.4",
     "react-native-toast-message": "^2.3.3",

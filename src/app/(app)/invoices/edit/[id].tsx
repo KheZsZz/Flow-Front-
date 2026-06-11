@@ -1,17 +1,18 @@
-import React from "react";
-import rollback from "@/services/rollback";
+import React, { useEffect, useState } from "react";
+import { useWindowDimensions, View, Text, ScrollView } from "react-native";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { invoiceSchema, InvoiceTypes } from "@/schemas/invoicesSchema";
-import { useEffect, useState } from "react";
-import { invoiceService } from "@/services/invoices";
 import { useLocalSearchParams } from "expo-router";
+
+import rollback from "@/services/rollback";
+import { invoiceService } from "@/services/invoices";
 import { useTheme } from "@/contexts/themeContext";
+import { invoiceSchema, InvoiceTypes } from "@/schemas/invoicesSchema";
+
 import { Loadding } from "@/components/loadding";
 import { Button } from "@/components/button";
 import { ControlledInput } from "@/components/controllerInput";
-import { useForm } from "react-hook-form";
 import { createInvoiceUpdateStyles } from "@/styles/invoices.styles";
-import { useWindowDimensions, View, Text, ScrollView } from "react-native";
 
 export default function EditInvoiceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -19,7 +20,6 @@ export default function EditInvoiceScreen() {
   const isMobile = useWindowDimensions().width < 768;
   const styles = createInvoiceUpdateStyles(theme, isMobile);
 
-  const [data, setData] = useState<InvoiceTypes>();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -27,16 +27,49 @@ export default function EditInvoiceScreen() {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(invoiceSchema),
   });
 
+  const remetenteAddress = useWatch({
+    control,
+    name: "remetente.address",
+  });
+
+  useEffect(() => {
+    if (!remetenteAddress) return;
+    const { street, number, city, state, neighborhood } = remetenteAddress;
+
+    const newFullAddress = [
+      street,
+      number ? `nº ${number}` : "S/N",
+      neighborhood,
+      city,
+      state,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    if (newFullAddress !== remetenteAddress.fullAddress) {
+      setValue("remetente.address.fullAddress", newFullAddress, {
+        shouldValidate: true,
+      });
+    }
+  }, [
+    remetenteAddress?.street,
+    remetenteAddress?.number,
+    remetenteAddress?.neighborhood,
+    remetenteAddress?.city,
+    remetenteAddress?.state,
+    setValue,
+  ]);
+
   useEffect(() => {
     invoiceService
       .getInvoiceById(id)
       .then((res) => {
-        setData(res);
         reset(res);
         setLoading(false);
       })
@@ -190,6 +223,7 @@ export default function EditInvoiceScreen() {
               label="Cnpj Emitente"
               name="remetente.document"
               placeholder="Digite o CNPJ do emitente"
+              mask="99.999.999/9999-99"
               errorMessage={errors.remetente?.document?.message}
             />
           </View>
@@ -205,41 +239,20 @@ export default function EditInvoiceScreen() {
           <View style={styles.inputWrapper}>
             <ControlledInput
               control={control}
-              label="phone_user"
-              name="remetente.phone_user"
+              label="Telefone"
+              name="remetente.phone"
               placeholder="Digite o telefone"
-              errorMessage={errors.remetente?.phone_user?.message}
-            />
-          </View>
-        </View>
-
-        {/*Destinatario*/}
-        <View style={styles.tableClient}>
-          <View style={styles.inputWrapper}>
-            <ControlledInput
-              control={control}
-              label="Cnpj Destinatario"
-              name="destinatario.document"
-              placeholder="Digite o CNPJ do emitente"
-              errorMessage={errors.destinatario?.message}
+              errorMessage={errors.remetente?.phone?.message}
             />
           </View>
           <View style={styles.inputWrapper}>
             <ControlledInput
               control={control}
-              label="Nome Destinatário"
-              name="destinatario.name_client"
-              placeholder="Digite o nome do destinatário"
-              errorMessage={errors.destinatario?.name_client?.message}
-            />
-          </View>
-          <View style={styles.inputWrapper}>
-            <ControlledInput
-              control={control}
-              label="phone_user"
-              name="destinatario.phone_user"
-              placeholder="Digite o telefone"
-              errorMessage={errors.destinatario?.phone_user?.message}
+              label="Endereço"
+              name="remetente.address.fullAddress"
+              disabled={true}
+              placeholder="Digite o endereço"
+              errorMessage={errors.remetente?.address?.fullAddress?.message}
             />
           </View>
         </View>
