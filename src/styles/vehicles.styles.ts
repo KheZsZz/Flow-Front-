@@ -7,7 +7,7 @@ export const createVehicleStyles = (theme: AppTheme, isMobile: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 20,
+      // padding: 20,
       backgroundColor: theme.background,
       alignItems: "center",
       width: "100%",
@@ -25,9 +25,8 @@ export const createVehicleStyles = (theme: AppTheme, isMobile: boolean) =>
 
     backButton: {
       position: "absolute",
-      top: 10,
-      left: 10,
-      margin: 10,
+      top: 0,
+      left: 0,
       borderRadius: 10,
       backgroundColor: theme.isDark ? theme.link : theme.primary,
       padding: 10,

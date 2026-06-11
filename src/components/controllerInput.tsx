@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import {
-  Platform,
   View,
   Text,
   TextInput,
   TextInputProps,
   TouchableOpacity,
   Switch,
+  Platform,
 } from "react-native";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
-import { MaskedTextInput } from "react-native-mask-text"; // Importação necessária
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import { MaskedTextInput } from "react-native-mask-text";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
 import { createInputStyles } from "@/styles/input.styles";
@@ -25,8 +27,8 @@ interface ControlledInputProps<
   iconName?: React.ComponentProps<typeof Feather>["name"];
   variant?: "text" | "select" | "switch" | "date" | "numeric";
   options?: { label: string; value: any }[];
-  disabled?: boolean; // Adicionado
-  mask?: string; // Adicionado para suportar CNPJ/CPF/CEP
+  mask?: string;
+  disabled?: boolean;
 }
 
 export function ControlledInput<TFieldValues extends FieldValues>({
@@ -37,10 +39,10 @@ export function ControlledInput<TFieldValues extends FieldValues>({
   iconName,
   variant = "text",
   options = [],
+  mask,
   style,
   secureTextEntry,
-  disabled = false,
-  mask,
+
   ...textInputProps
 }: ControlledInputProps<TFieldValues>) {
   const { theme } = useTheme();
@@ -55,61 +57,127 @@ export function ControlledInput<TFieldValues extends FieldValues>({
       <Controller
         control={control}
         name={name}
-        disabled={disabled}
         render={({ field: { onChange, value } }) => {
           // 1. VARIANT: SWITCH
           if (variant === "switch") {
             return (
-              <Switch
-                value={!!value}
-                onValueChange={onChange}
-                disabled={disabled}
-                trackColor={{ true: theme.primary }}
-              />
+              <View style={{ marginVertical: 8 }}>
+                <Switch
+                  value={!!value}
+                  onValueChange={onChange}
+                  trackColor={{ true: theme.primary }}
+                />
+              </View>
             );
           }
 
-          // 2. VARIANT: TEXT / NUMERIC / MASKED
-          const renderInput = () => {
-            const commonProps = {
-              style: [styles.input],
-              editable: !disabled,
-              value: value !== undefined ? String(value) : "",
-              placeholderTextColor: theme.isDark
-                ? theme.textSecondary
-                : theme.text,
-              ...textInputProps,
-            };
+          // 2. VARIANT: SELECT (Lista de botões)
+          if (variant === "select") {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  marginVertical: 8,
+                }}
+              >
+                {options.map((opt) => (
+                  <TouchableOpacity
+                    key={String(opt.value)}
+                    onPress={() => onChange(opt.value)}
+                    style={{
+                      paddingHorizontal: 16,
+                      paddingVertical: 10,
+                      backgroundColor:
+                        value === opt.value
+                          ? theme.primary
+                          : theme.isDark
+                            ? "#333"
+                            : "#EEE",
+                      borderRadius: 8,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: value === opt.value ? "#FFF" : theme.text,
+                      }}
+                    >
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            );
+          }
 
-            if (mask) {
+          // 3. VARIANT: DATE
+          if (variant === "date") {
+            if (variant === "date" && Platform.OS === "web") {
               return (
-                <MaskedTextInput
-                  {...commonProps}
-                  mask={mask}
-                  onChangeText={(text, rawText) => onChange(rawText)}
-                  keyboardType="numeric"
+                <input
+                  type="date"
+                  value={
+                    value ? new Date(value).toISOString().split("T")[0] : ""
+                  }
+                  onChange={(e) =>
+                    onChange(new Date(e.target.value).toISOString())
+                  }
+                  style={styles.inputDate}
                 />
               );
             }
-
             return (
-              <TextInput
-                {...commonProps}
-                keyboardType={
-                  variant === "numeric"
-                    ? "numeric"
-                    : textInputProps.keyboardType
-                }
-                onChangeText={
-                  variant === "numeric"
-                    ? (t) => onChange(t.replace(/[^0-9]/g, ""))
-                    : onChange
-                }
-                secureTextEntry={secureTextEntry ? passwordHidden : false}
-              />
-            );
-          };
+              <>
+                <TouchableOpacity
+                  style={[styles.inputWrapper, style]}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  {iconName && (
+                    <Feather
+                      name={iconName}
+                      size={18}
+                      color={theme.text}
+                      style={{ marginLeft: 12 }}
+                    />
+                  )}
+                  <Text
+                    style={[
+                      styles.input,
+                      {
+                        paddingVertical: 12,
+                        color: value ? theme.text : theme.textSecondary,
+                      },
+                    ]}
+                  >
+                    {value
+                      ? new Date(value).toLocaleDateString()
+                      : "Selecione uma data"}
+                  </Text>
+                </TouchableOpacity>
 
+                {/* Renderize fora do container se necessário, ou garanta a visibilidade */}
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={value ? new Date(value) : new Date()}
+                    mode="date"
+                    display="default"
+                    {...(Platform.OS === "web"
+                      ? { style: { display: "flex" } }
+                      : {})}
+                    onChange={(e: DateTimePickerEvent, date?: Date) => {
+                      setShowDatePicker(false);
+                      if (e.type === "set" && date) {
+                        onChange(date.toISOString());
+                      }
+                    }}
+                  />
+                )}
+              </>
+            );
+          }
+
+          // 4. VARIANT: TEXT / NUMERIC / MASK
           return (
             <View
               style={[
@@ -126,9 +194,61 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                   style={{ marginLeft: 12 }}
                 />
               )}
-              {renderInput()}
 
-              {/* Ícone de olho para senha */}
+              {mask === "money" ? (
+                <MaskedTextInput
+                  {...textInputProps}
+                  type="currency"
+                  options={{
+                    prefix: "R$ ",
+                    decimalSeparator: ",",
+                    groupSeparator: ".",
+                    precision: 2,
+                  }}
+                  style={[styles.input]}
+                  onChangeText={(text, rawText) => {
+                    onChange(rawText);
+                  }}
+                  value={
+                    value !== null && value !== undefined ? String(value) : ""
+                  }
+                  keyboardType="numeric"
+                />
+              ) : mask ? (
+                <MaskedTextInput
+                  {...textInputProps}
+                  style={[styles.input]}
+                  mask={mask}
+                  onChangeText={(text, rawText) => onChange(rawText)}
+                  value={value}
+                  keyboardType="numeric"
+                />
+              ) : (
+                <TextInput
+                  {...textInputProps}
+                  style={[styles.input]}
+                  keyboardType={
+                    variant === "numeric"
+                      ? "decimal-pad"
+                      : textInputProps.keyboardType
+                  }
+                  onChangeText={
+                    variant === "numeric"
+                      ? (t) => {
+                          const formatted = t
+                            .replace(/[^0-9.]/g, "")
+                            .replace(/(\..*)\./g, "$1");
+                          onChange(formatted);
+                        }
+                      : onChange
+                  }
+                  value={
+                    value !== null && value !== undefined ? String(value) : ""
+                  }
+                  secureTextEntry={secureTextEntry ? passwordHidden : false}
+                />
+              )}
+
               {secureTextEntry && (
                 <TouchableOpacity
                   onPress={() => setPasswordHidden(!passwordHidden)}

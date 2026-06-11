@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   Alert,
   useWindowDimensions,
@@ -18,6 +17,9 @@ import { useTheme } from "@/contexts/themeContext";
 import { createVehicleStyles } from "@/styles/vehicles.styles";
 import { api } from "@/services/api";
 import { ControlledInput } from "@/components/controllerInput";
+import { VehicleTypeSchema } from "@/schemas/enumSchema";
+import rollback from "@/services/rollback";
+import { useAuth } from "@/contexts/authContext";
 
 export default function CreateVehicleScreen() {
   const { theme } = useTheme();
@@ -26,6 +28,7 @@ export default function CreateVehicleScreen() {
   const styles = createVehicleStyles(theme, isMobile);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const {
     control,
@@ -38,9 +41,9 @@ export default function CreateVehicleScreen() {
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      await api.post("/vehicles", data);
+      await api.post("/vehicles", { ...data, created_by: user?.user.id });
       Alert.alert("Sucesso", "Veículo cadastrado!");
-      router.back();
+      rollback();
     } catch (e) {
       Alert.alert("Erro", "Falha ao cadastrar.");
     } finally {
@@ -48,13 +51,15 @@ export default function CreateVehicleScreen() {
     }
   };
 
+  const vehicleOptions = VehicleTypeSchema.options.map((option) => ({
+    label: option,
+    value: option,
+  }));
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={rollback}>
           <Feather
             name="arrow-left"
             size={24}
@@ -68,27 +73,57 @@ export default function CreateVehicleScreen() {
           control={control}
           name="license_plate"
           label="Placa"
-          iconName="credit-card"
-          placeholder="ABC-1234"
+          placeholder="Ex: ABC1D34"
+          mask="AAA9A99"
+          iconName={"filter"}
           errorMessage={errors.license_plate?.message as string}
         />
-
         <ControlledInput
           control={control}
           name="model"
           label="Modelo"
-          iconName="truck"
+          iconName={"filter"}
           placeholder="Ex: FH 540"
           errorMessage={errors.model?.message as string}
         />
-
         <ControlledInput
           control={control}
           name="make"
           label="Marca"
-          iconName="tag"
-          placeholder="Ex: Volvo"
+          placeholder="Ex: Scania"
+          iconName={"filter"}
           errorMessage={errors.make?.message as string}
+        />
+        <ControlledInput
+          control={control}
+          name="capacity_fuel"
+          label="Capacidade de Combustível (L)"
+          iconName="droplet"
+          placeholder="Ex: 50"
+          variant="numeric"
+          errorMessage={errors.capacity_fuel?.message as string}
+        />
+
+        <ControlledInput
+          control={control}
+          name="year"
+          label="Ano"
+          iconName="calendar"
+          placeholder="Ex: "
+          variant="numeric"
+          maxLength={4}
+          errorMessage={errors.year?.message as string}
+        />
+
+        <ControlledInput
+          control={control}
+          name="type"
+          label="Tipo"
+          placeholder="Ex: Caminhão, Van"
+          iconName="truck"
+          variant="select"
+          options={vehicleOptions}
+          errorMessage={errors.type?.message as string}
         />
       </View>
 

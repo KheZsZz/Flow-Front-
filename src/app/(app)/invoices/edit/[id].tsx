@@ -33,9 +33,9 @@ export default function EditInvoiceScreen() {
     resolver: zodResolver(invoiceSchema),
   });
 
-  const remetenteAddress = useWatch({
+  const [remetenteAddress, destinatarioAddress] = useWatch({
     control,
-    name: "remetente.address",
+    name: ["remetente.address", "destinatario.address"],
   });
 
   useEffect(() => {
@@ -67,6 +67,34 @@ export default function EditInvoiceScreen() {
   ]);
 
   useEffect(() => {
+    if (!destinatarioAddress) return;
+    const { street, number, city, state, neighborhood } = destinatarioAddress;
+
+    const newFullAddress = [
+      street,
+      number ? `nº ${number}` : "S/N",
+      neighborhood,
+      city,
+      state,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    if (newFullAddress !== destinatarioAddress.fullAddress) {
+      setValue("destinatario.address.fullAddress", newFullAddress, {
+        shouldValidate: true,
+      });
+    }
+  }, [
+    destinatarioAddress?.street,
+    destinatarioAddress?.number,
+    destinatarioAddress?.neighborhood,
+    destinatarioAddress?.city,
+    destinatarioAddress?.state,
+    setValue,
+  ]);
+
+  useEffect(() => {
     invoiceService
       .getInvoiceById(id)
       .then((res) => {
@@ -82,8 +110,11 @@ export default function EditInvoiceScreen() {
   const handleSave = async (data: InvoiceTypes) => {
     try {
       setSaving(true);
-      await invoiceService.updateInvoice(id, data);
+      const response = await invoiceService.updateInvoice(id, data);
+      console.log(response.data);
       rollback();
+    } catch (error) {
+      console.log(error);
     } finally {
       setSaving(false);
     }
@@ -139,6 +170,7 @@ export default function EditInvoiceScreen() {
               name="issue_date"
               placeholder="Digite a data de emissão"
               errorMessage={errors.issue_date?.message}
+              mask="DD/MM/YYYY"
               variant="date"
             />
           </View>
@@ -148,6 +180,7 @@ export default function EditInvoiceScreen() {
               label="Valor da NF-e"
               name="value_nfe"
               placeholder="Digite o valor da NF-e"
+              mask="money"
               errorMessage={errors.value_nfe?.message}
               variant="numeric"
             />
@@ -191,6 +224,7 @@ export default function EditInvoiceScreen() {
               control={control}
               label="Valor CT-e"
               name="cte_value"
+              mask="money"
               placeholder="Digite o valor do CT-e"
               errorMessage={errors.cte_value?.message}
               variant="numeric"
@@ -205,6 +239,7 @@ export default function EditInvoiceScreen() {
             name="barcode"
             placeholder="Digite o codigo de barras"
             errorMessage={errors.barcode?.message}
+            disabled={true}
           />
         </View>
       </View>
@@ -242,18 +277,21 @@ export default function EditInvoiceScreen() {
               label="Telefone"
               name="remetente.phone"
               placeholder="Digite o telefone"
+              mask="(99) 9.9999-9999"
               errorMessage={errors.remetente?.phone?.message}
             />
           </View>
           <View style={styles.inputWrapper}>
-            <ControlledInput
-              control={control}
-              label="Endereço"
-              name="remetente.address.fullAddress"
-              disabled={true}
-              placeholder="Digite o endereço"
-              errorMessage={errors.remetente?.address?.fullAddress?.message}
-            />
+            <Text>Endereço:</Text>
+            <View>
+              <ControlledInput
+                control={control}
+                label="Endereço"
+                name="remetente.address."
+                placeholder="Digite o endereço"
+                errorMessage={errors.remetente?.address?.fullAddress?.message}
+              />
+            </View>
           </View>
         </View>
       </View>

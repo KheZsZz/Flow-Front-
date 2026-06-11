@@ -77,12 +77,12 @@ export const clientSchema = z.object({
   phone: z
     .string()
     .max(16, { message: "O telefone deve ter no máximo 16 caracteres" })
-    .regex(/^\(\d{2}\)\s\d\.\d{4}-\d{4}$/, {
-      message: "O telefone deve estar no formato (XX) 9.XXXX-XXXX",
-    }),
-  password: z
-    .string()
-    .min(6, "A senha deve ter no mínimo 6 caracteres")
+    //   .regex(/^\(\d{2}\)\s\d\.\d{4}-\d{4}$/, {
+    //     message: "O telefone deve estar no formato (XX) 9.XXXX-XXXX",
+    //   }),
+    // password: z
+    //   .string()
+    //   .min(6, "A senha deve ter no mínimo 6 caracteres")
     .max(255),
 
   is_active: z.boolean().default(true),

@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useForm } from "react-hook-form";
 import { useTheme } from "@/contexts/themeContext";
 import { createVehicleStyles } from "@/styles/vehicles.styles";

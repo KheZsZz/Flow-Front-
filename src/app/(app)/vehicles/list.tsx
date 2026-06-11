@@ -66,12 +66,19 @@ export default function VehiclesScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Veículos Ativos</Text>
-        <TouchableOpacity onPress={() => router.push("/vehicles/create")}>
-          <Feather name="plus" size={24} color={theme.primary} />
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() => router.push("/vehicles/create")}
+        >
+          <Feather
+            name="plus"
+            size={24}
+            color={theme.isDark ? theme.textSecondary : theme.primary}
+          />
         </TouchableOpacity>
       </View>
       {vehicles.length === 0 ? (
-        <Text style={styles.title}>Nenhum veículo encontrado.</Text>
+        <Text style={styles.emptyText}>Nenhum veículo encontrado.</Text>
       ) : (
         <View style={styles.gridContainer}>
           {vehicles.map((item) => (

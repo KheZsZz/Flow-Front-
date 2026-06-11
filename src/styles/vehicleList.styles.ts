@@ -1,6 +1,8 @@
 import { StyleSheet } from "react-native";
+import { darkTheme, lightTheme } from "@/constants/colors";
+type AppTheme = typeof lightTheme | typeof darkTheme;
 
-export const createVehicleListStyles = (theme: any, isMobile: boolean) =>
+export const createVehicleListStyles = (theme: AppTheme, isMobile: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -19,6 +21,20 @@ export const createVehicleListStyles = (theme: any, isMobile: boolean) =>
       color: theme.text,
       fontSize: 28,
       fontWeight: "bold",
+    },
+
+    emptyText: {
+      color: theme.text,
+      fontSize: 16,
+      textAlign: "center",
+      marginTop: 20,
+    },
+
+    addBtn: {
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
+      padding: 10,
+      borderRadius: 8,
+      alignItems: "center",
     },
 
     // Grid container
@@ -94,7 +110,7 @@ export const createVehicleListStyles = (theme: any, isMobile: boolean) =>
     toggleBtn: {
       margin: 5,
       alignItems: "center",
-      backgroundColor: "#2563eb",
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
       padding: 8,
       borderRadius: 4,
       width: isMobile ? "30%" : 70,
