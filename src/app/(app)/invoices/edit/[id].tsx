@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useWindowDimensions, View, Text, ScrollView } from "react-native";
+import {
+  useWindowDimensions,
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocalSearchParams } from "expo-router";
@@ -13,6 +19,8 @@ import { Loadding } from "@/components/loadding";
 import { Button } from "@/components/button";
 import { ControlledInput } from "@/components/controllerInput";
 import { createInvoiceUpdateStyles } from "@/styles/invoices.styles";
+import { Feather } from "@expo/vector-icons";
+import { CollapsibleSection } from "@/components/collapsList";
 
 export default function EditInvoiceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -22,6 +30,7 @@ export default function EditInvoiceScreen() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const {
     control,
@@ -130,6 +139,16 @@ export default function EditInvoiceScreen() {
       </View>
 
       <View style={styles.content}>
+        <View style={styles.inputWrapper}>
+          <ControlledInput
+            control={control}
+            label="Codigo de barras"
+            name="barcode"
+            placeholder="Digite o codigo de barras"
+            errorMessage={errors.barcode?.message}
+            disabled={true}
+          />
+        </View>
         <View style={styles.contentInline}>
           <View style={styles.inputWrapper}>
             <ControlledInput
@@ -235,71 +254,6 @@ export default function EditInvoiceScreen() {
         <View style={styles.inputWrapper}>
           <ControlledInput
             control={control}
-            label="Codigo de barras"
-            name="barcode"
-            placeholder="Digite o codigo de barras"
-            errorMessage={errors.barcode?.message}
-            disabled={true}
-          />
-        </View>
-      </View>
-
-      <View style={styles.header}>
-        <Text style={styles.headerSubtitle}>Dados de Remente/Destinatário</Text>
-      </View>
-
-      {/*Table Client*/}
-      <View style={styles.contentInline}>
-        {/*Remetente*/}
-        <View style={styles.tableClient}>
-          <View style={styles.inputWrapper}>
-            <ControlledInput
-              control={control}
-              label="Cnpj Emitente"
-              name="remetente.document"
-              placeholder="Digite o CNPJ do emitente"
-              mask="99.999.999/9999-99"
-              errorMessage={errors.remetente?.document?.message}
-            />
-          </View>
-          <View style={styles.inputWrapper}>
-            <ControlledInput
-              control={control}
-              label="Nome Destinatário"
-              name="remetente.name_client"
-              placeholder="Digite o nome do destinatário"
-              errorMessage={errors.remetente?.name_client?.message}
-            />
-          </View>
-          <View style={styles.inputWrapper}>
-            <ControlledInput
-              control={control}
-              label="Telefone"
-              name="remetente.phone"
-              placeholder="Digite o telefone"
-              mask="(99) 9.9999-9999"
-              errorMessage={errors.remetente?.phone?.message}
-            />
-          </View>
-          <View style={styles.inputWrapper}>
-            <Text>Endereço:</Text>
-            <View>
-              <ControlledInput
-                control={control}
-                label="Endereço"
-                name="remetente.address."
-                placeholder="Digite o endereço"
-                errorMessage={errors.remetente?.address?.fullAddress?.message}
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.contentInline}>
-        <View style={styles.inputWrapper}>
-          <ControlledInput
-            control={control}
             label="Observações"
             name="observation"
             placeholder=""
@@ -307,6 +261,238 @@ export default function EditInvoiceScreen() {
           />
         </View>
       </View>
+
+      <CollapsibleSection title="Dados do Remetente">
+        <View style={styles.contentInline}>
+          {/*Remetente*/}
+          <View style={styles.tableClient}>
+            <View style={styles.inputWrapper}>
+              <ControlledInput
+                control={control}
+                label="Cnpj Emitente"
+                name="remetente.document"
+                placeholder="Digite o CNPJ do emitente"
+                mask="99.999.999/9999-99"
+                errorMessage={errors.remetente?.document?.message}
+              />
+            </View>
+            <View style={styles.inputWrapper}>
+              <ControlledInput
+                control={control}
+                label="Nome emitente"
+                name="remetente.name_client"
+                placeholder="Digite o nome do destinatário"
+                errorMessage={errors.remetente?.name_client?.message}
+              />
+            </View>
+            <View style={styles.inputWrapper}>
+              <ControlledInput
+                control={control}
+                label="Telefone"
+                name="remetente.phone"
+                placeholder="Digite o telefone"
+                mask="(99) 9.9999-9999"
+                errorMessage={errors.remetente?.phone?.message}
+              />
+            </View>
+
+            <View style={styles.header}>
+              <Text style={styles.headerSubtitle2}>Endereço</Text>
+            </View>
+
+            <View style={styles.addressWrapper}>
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Cep"
+                  name="remetente.address.zip_code"
+                  placeholder="Digite o endereço"
+                  mask="99999-999"
+                  errorMessage={errors.remetente?.address?.zip_code?.message}
+                />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Rua"
+                  name="remetente.address.street"
+                  placeholder="Digite o endereço"
+                  errorMessage={errors.remetente?.address?.street?.message}
+                />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Bairro"
+                  name="remetente.address.neighborhood"
+                  placeholder="Digite o endereço"
+                  errorMessage={
+                    errors.remetente?.address?.neighborhood?.message
+                  }
+                />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Numero"
+                  name="remetente.address.number"
+                  variant="numeric"
+                  placeholder="Digite o endereço"
+                  errorMessage={errors.remetente?.address?.number?.message}
+                />
+              </View>
+            </View>
+            <View style={styles.addressWrapper}>
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Cidade"
+                  name="remetente.address.city"
+                  placeholder="Digite o endereço"
+                  errorMessage={errors.remetente?.address?.city?.message}
+                />
+              </View>
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Estado"
+                  name="remetente.address.state"
+                  placeholder="Digite o endereço"
+                  errorMessage={errors.remetente?.address?.city?.message}
+                />
+              </View>
+            </View>
+            <View style={styles.inputWrapper}>
+              <ControlledInput
+                control={control}
+                label="Complemento"
+                name="remetente.address.complement"
+                placeholder="Digite o endereço"
+                errorMessage={errors.remetente?.address?.city?.message}
+              />
+            </View>
+          </View>
+        </View>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Dados do Destinatário">
+        <View style={styles.contentInline}>
+          {/*Destinatário*/}
+          <View style={styles.tableClient}>
+            <View style={styles.inputWrapper}>
+              <ControlledInput
+                control={control}
+                label="Cnpj Destinatário"
+                name="destinatario.document"
+                placeholder="Digite o CNPJ do destinatário"
+                mask="99.999.999/9999-99"
+                errorMessage={errors.remetente?.document?.message}
+              />
+            </View>
+            <View style={styles.inputWrapper}>
+              <ControlledInput
+                control={control}
+                label="Nome Destinatário"
+                name="destinatario.name_client"
+                placeholder="Digite o nome do destinatário"
+                errorMessage={errors.destinatario?.name_client?.message}
+              />
+            </View>
+            <View style={styles.inputWrapper}>
+              <ControlledInput
+                control={control}
+                label="Telefone"
+                name="destinatario.phone"
+                placeholder="Digite o telefone"
+                mask="(99) 9.9999-9999"
+                errorMessage={errors.destinatario?.phone?.message}
+              />
+            </View>
+
+            <View style={styles.header}>
+              <Text style={styles.headerSubtitle2}>Endereço</Text>
+            </View>
+
+            <View style={styles.addressWrapper}>
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Cep"
+                  name="destinatario.address.zip_code"
+                  placeholder="Digite o endereço"
+                  mask="99999-999"
+                  errorMessage={errors.destinatario?.address?.zip_code?.message}
+                />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Rua"
+                  name="destinatario.address.street"
+                  placeholder="Digite o endereço"
+                  errorMessage={errors.destinatario?.address?.street?.message}
+                />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Bairro"
+                  name="destinatario.address.neighborhood"
+                  placeholder="Digite o endereço"
+                  errorMessage={
+                    errors.destinatario?.address?.neighborhood?.message
+                  }
+                />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Numero"
+                  name="destinatario.address.number"
+                  variant="numeric"
+                  placeholder="Digite o endereço"
+                  errorMessage={errors.destinatario?.address?.number?.message}
+                />
+              </View>
+            </View>
+            <View style={styles.addressWrapper}>
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Cidade"
+                  name="destinatario.address.city"
+                  placeholder="Digite o endereço"
+                  errorMessage={errors.destinatario?.address?.city?.message}
+                />
+              </View>
+              <View style={styles.inputWrapper}>
+                <ControlledInput
+                  control={control}
+                  label="Estado"
+                  name="destinatario.address.state"
+                  placeholder="Digite o endereço"
+                  errorMessage={errors.destinatario?.address?.city?.message}
+                />
+              </View>
+            </View>
+            <View style={styles.inputWrapper}>
+              <ControlledInput
+                control={control}
+                label="Complemento"
+                name="destinatario.address.complement"
+                placeholder="Digite o endereço"
+                errorMessage={errors.destinatario?.address?.city?.message}
+              />
+            </View>
+          </View>
+        </View>
+      </CollapsibleSection>
 
       <Button
         title={saving ? "Salvando..." : "Salvar Alterações"}

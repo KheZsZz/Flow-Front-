@@ -315,7 +315,7 @@ export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
 
     header: {
       width: "100%",
-      alignItems: "center",
+      // alignItems: "center",
       justifyContent: "space-between",
       marginBottom: 32,
     },
@@ -329,7 +329,7 @@ export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
       borderBottomWidth: 1,
       borderBottomColor: theme.borderColor,
       padding: 10,
-      // boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)",
+      boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)",
     },
 
     headerSubtitle: {
@@ -338,6 +338,7 @@ export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
       fontSize: 18,
       fontWeight: "bold",
       marginTop: 20,
+      marginBottom: 10,
       padding: 10,
       color: theme.isDark ? theme.textSecondary : theme.text,
       borderBottomWidth: 1,
@@ -349,5 +350,12 @@ export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
       flex: 1,
       flexDirection: "column",
       width: "50%",
+    },
+
+    addressWrapper: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+      width: "100%",
     },
   });
