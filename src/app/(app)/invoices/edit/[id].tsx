@@ -19,8 +19,8 @@ import { Loadding } from "@/components/loadding";
 import { Button } from "@/components/button";
 import { ControlledInput } from "@/components/controllerInput";
 import { createInvoiceUpdateStyles } from "@/styles/invoices.styles";
-import { Feather } from "@expo/vector-icons";
 import { CollapsibleSection } from "@/components/collapsList";
+import { Feather } from "@expo/vector-icons";
 
 export default function EditInvoiceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -30,7 +30,6 @@ export default function EditInvoiceScreen() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
 
   const {
     control,
@@ -46,6 +45,8 @@ export default function EditInvoiceScreen() {
     control,
     name: ["remetente.address", "destinatario.address"],
   });
+  const onInvalid = (errors: any) =>
+    console.error("Erros de validação:", errors);
 
   useEffect(() => {
     if (!remetenteAddress) return;
@@ -119,6 +120,7 @@ export default function EditInvoiceScreen() {
   const handleSave = async (data: InvoiceTypes) => {
     try {
       setSaving(true);
+      console.log(data);
       const response = await invoiceService.updateInvoice(id, data);
       console.log(response.data);
       rollback();
@@ -135,7 +137,15 @@ export default function EditInvoiceScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Editar Nota Fiscal</Text>
+        <TouchableOpacity onPress={rollback}>
+          <Feather
+            style={styles.backButton}
+            name="arrow-left"
+            size={24}
+            color={theme.isDark ? theme.textSecondary : "#FFF"}
+          />
+          <Text style={styles.headerTitle}>Editar Nota Fiscal</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
@@ -147,6 +157,7 @@ export default function EditInvoiceScreen() {
             placeholder="Digite o codigo de barras"
             errorMessage={errors.barcode?.message}
             disabled={true}
+            iconName="barcode"
           />
         </View>
         <View style={styles.contentInline}>
@@ -158,6 +169,7 @@ export default function EditInvoiceScreen() {
               placeholder="Digite o número da NFe"
               variant="numeric"
               errorMessage={errors.nfe?.message}
+              iconName="folder"
             />
           </View>
           <View style={[styles.inputWrapper]}>
@@ -169,6 +181,7 @@ export default function EditInvoiceScreen() {
               variant="numeric"
               maxLength={2}
               errorMessage={errors.serie_nf?.message}
+              iconName="folder"
             />
           </View>
           <View style={styles.inputWrapper}>
@@ -178,6 +191,7 @@ export default function EditInvoiceScreen() {
               name="nature_transaction"
               placeholder="Natureza da transação"
               errorMessage={errors.nature_transaction?.message}
+              iconName="folder"
             />
           </View>
         </View>
@@ -202,6 +216,7 @@ export default function EditInvoiceScreen() {
               mask="money"
               errorMessage={errors.value_nfe?.message}
               variant="numeric"
+              iconName="money-bill-1"
             />
           </View>
           <View style={styles.inputWrapper}>
@@ -212,6 +227,7 @@ export default function EditInvoiceScreen() {
               placeholder="Digite o peso"
               errorMessage={errors.weight_brute?.message}
               variant="numeric"
+              iconName="weight-hanging"
             />
           </View>
           <View style={styles.inputWrapper}>
@@ -222,6 +238,7 @@ export default function EditInvoiceScreen() {
               placeholder="Digite a quantidade"
               errorMessage={errors.quantity_volumes?.message}
               variant="numeric"
+              iconName="add"
             />
           </View>
         </View>
@@ -235,6 +252,7 @@ export default function EditInvoiceScreen() {
               placeholder="Digite o CT-e"
               errorMessage={errors.cte?.message}
               variant="numeric"
+              iconName="clipboard-list"
             />
           </View>
 
@@ -247,6 +265,7 @@ export default function EditInvoiceScreen() {
               placeholder="Digite o valor do CT-e"
               errorMessage={errors.cte_value?.message}
               variant="numeric"
+              iconName="money-bill-1"
             />
           </View>
         </View>
@@ -258,6 +277,7 @@ export default function EditInvoiceScreen() {
             name="observation"
             placeholder=""
             errorMessage={errors.observation?.message}
+            iconName="circle-info"
           />
         </View>
       </View>
@@ -274,6 +294,7 @@ export default function EditInvoiceScreen() {
                 placeholder="Digite o CNPJ do emitente"
                 mask="99.999.999/9999-99"
                 errorMessage={errors.remetente?.document?.message}
+                iconName="building"
               />
             </View>
             <View style={styles.inputWrapper}>
@@ -283,6 +304,7 @@ export default function EditInvoiceScreen() {
                 name="remetente.name_client"
                 placeholder="Digite o nome do destinatário"
                 errorMessage={errors.remetente?.name_client?.message}
+                iconName="building-user"
               />
             </View>
             <View style={styles.inputWrapper}>
@@ -293,11 +315,12 @@ export default function EditInvoiceScreen() {
                 placeholder="Digite o telefone"
                 mask="(99) 9.9999-9999"
                 errorMessage={errors.remetente?.phone?.message}
+                iconName="square-phone-flip"
               />
             </View>
 
             <View style={styles.header}>
-              <Text style={styles.headerSubtitle2}>Endereço</Text>
+              <Text style={styles.headerSubtitle}>Endereço</Text>
             </View>
 
             <View style={styles.addressWrapper}>
@@ -307,7 +330,7 @@ export default function EditInvoiceScreen() {
                   label="Cep"
                   name="remetente.address.zip_code"
                   placeholder="Digite o endereço"
-                  mask="99999-999"
+                  mask="99999-9999"
                   errorMessage={errors.remetente?.address?.zip_code?.message}
                 />
               </View>
@@ -339,7 +362,6 @@ export default function EditInvoiceScreen() {
                   control={control}
                   label="Numero"
                   name="remetente.address.number"
-                  variant="numeric"
                   placeholder="Digite o endereço"
                   errorMessage={errors.remetente?.address?.number?.message}
                 />
@@ -390,6 +412,7 @@ export default function EditInvoiceScreen() {
                 placeholder="Digite o CNPJ do destinatário"
                 mask="99.999.999/9999-99"
                 errorMessage={errors.remetente?.document?.message}
+                iconName="building"
               />
             </View>
             <View style={styles.inputWrapper}>
@@ -399,6 +422,7 @@ export default function EditInvoiceScreen() {
                 name="destinatario.name_client"
                 placeholder="Digite o nome do destinatário"
                 errorMessage={errors.destinatario?.name_client?.message}
+                iconName="building-user"
               />
             </View>
             <View style={styles.inputWrapper}>
@@ -409,11 +433,12 @@ export default function EditInvoiceScreen() {
                 placeholder="Digite o telefone"
                 mask="(99) 9.9999-9999"
                 errorMessage={errors.destinatario?.phone?.message}
+                iconName="square-phone-flip"
               />
             </View>
 
             <View style={styles.header}>
-              <Text style={styles.headerSubtitle2}>Endereço</Text>
+              <Text style={styles.headerSubtitle}>Endereço</Text>
             </View>
 
             <View style={styles.addressWrapper}>
@@ -455,7 +480,6 @@ export default function EditInvoiceScreen() {
                   control={control}
                   label="Numero"
                   name="destinatario.address.number"
-                  variant="numeric"
                   placeholder="Digite o endereço"
                   errorMessage={errors.destinatario?.address?.number?.message}
                 />
@@ -496,7 +520,7 @@ export default function EditInvoiceScreen() {
 
       <Button
         title={saving ? "Salvando..." : "Salvar Alterações"}
-        onPress={handleSubmit(handleSave)}
+        onPress={handleSubmit(handleSave, onInvalid)}
         disabled={saving}
       />
     </ScrollView>
