@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useRouter, usePathname } from "expo-router";
 import { useAuth } from "@/contexts/authContext";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome6 } from "@expo/vector-icons";
 import { createNavbarStyles } from "@/styles/navbar.styles";
 import { useTheme, ThemeMode } from "@/contexts/themeContext";
 
@@ -156,6 +156,7 @@ function SidebarContent({
           <Text style={styles.userName} numberOfLines={1}>
             {user.user.name_user}
           </Text>
+          {/*<FontAwesome6 icon="user-tie"></FontAwesome6>*/}
           <Text style={styles.userProfile}>{user.user.profile_user}</Text>
         </View>
       )}
