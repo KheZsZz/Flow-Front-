@@ -77,7 +77,7 @@ export default function LoginScreen() {
         <View style={styles.card}>
           <View style={styles.form}>
             <ControlledInput
-              iconName="mail"
+              iconName="envelope-open-text"
               control={control}
               name="email_user"
               label="E-mail"
@@ -100,6 +100,7 @@ export default function LoginScreen() {
             title="Acessar Ecossistema"
             isLoading={submitting}
             onPress={handleSubmit(onSubmit)}
+            // iconName="arrow-right-to-bracket"
           />
         </View>
       </View>
