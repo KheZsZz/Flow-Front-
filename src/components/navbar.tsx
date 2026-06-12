@@ -29,10 +29,11 @@ const THEME_OPTIONS: { id: ThemeMode; icon: "sun" | "moon"; label: string }[] =
 const MENU_ITEMS = [
   { name: "Dashboard", path: "/dashboard", icon: "grid" },
   { name: "Notas Fiscais", path: "/invoices", icon: "file-text" },
+  { name: "Cargas / Rotas", path: "/orders", icon: "truck" },
   { name: "Frota", path: "/vehicles/list", icon: "truck" },
   { name: "Manutenção", path: "/fuel", icon: "tool" },
   { name: "Motoristas", path: "/drives", icon: "users" },
-  { name: "Cargas / Rotas", path: "/orders", icon: "truck" },
+  { name: "Clientes", path: "/clients", icon: "people-group" },
   { name: "Configurações", path: "/settings", icon: "settings" },
 ] as const;
 

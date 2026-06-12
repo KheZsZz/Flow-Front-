@@ -128,7 +128,10 @@ function NavigationGuard() {
           { backgroundColor: theme.background || "#ffffff" },
         ]}
       >
-        <ActivityIndicator size="large" color={theme.primary || "#0070f3"} />
+        <ActivityIndicator
+          size="large"
+          color={theme.isDark ? theme.link : theme.primary}
+        />
       </View>
     );
   }
