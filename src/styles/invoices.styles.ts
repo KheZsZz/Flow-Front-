@@ -358,4 +358,13 @@ export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>
       gap: 12,
       width: "100%",
     },
+
+    backButton: {
+      position: "absolute",
+      top: isMobile ? 0 : -20,
+      left: 0,
+      borderRadius: 10,
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
+      padding: 10,
+    },
   });
