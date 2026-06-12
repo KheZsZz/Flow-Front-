@@ -48,16 +48,14 @@ const validarCNPJ = (cnpj: string) => {
 
 export const clientSchema = z.object({
   id: z.string().uuid().optional(),
-  document: z
-    .string()
-    .min(1, "O documento é obrigatório")
-    .transform((val) => val.replace(/\D/g, ""))
-    .refine((val) => val.length === 11 || val.length === 14, {
-      message: "O documento deve ter 11 dígitos (CPF) ou 14 dígitos (CNPJ)",
-    })
-    .refine((val) => (val.length === 11 ? validarCPF(val) : validarCNPJ(val)), {
-      message: "CPF ou CNPJ inválido",
-    }),
+  document: z.string().min(1, "O documento é obrigatório"),
+  // .transform((val) => val.replace(/\D/g, ""))
+  // .refine((val) => val.length === 11 || val.length === 14, {
+  //   message: "O documento deve ter 11 dígitos (CPF) ou 14 dígitos (CNPJ)",
+  // })
+  // .refine((val) => (val.length === 11 ? validarCPF(val) : validarCNPJ(val)), {
+  //   message: "CPF ou CNPJ inválido",
+  // }),
   name_client: z.string().min(1, "O nome é obrigatório").max(255),
   email: z
     .string()
@@ -98,3 +96,4 @@ export const clientSchema = z.object({
 });
 
 export type ClientType = z.infer<typeof clientSchema>;
+export type ClientInputType = z.input<typeof clientSchema>;

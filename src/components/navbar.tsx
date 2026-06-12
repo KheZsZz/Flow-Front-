@@ -33,7 +33,7 @@ const MENU_ITEMS = [
   { name: "Frota", path: "/vehicles/list", icon: "truck" },
   { name: "Manutenção", path: "/fuel", icon: "tool" },
   { name: "Motoristas", path: "/drives", icon: "users" },
-  { name: "Clientes", path: "/clients", icon: "people-group" },
+  { name: "Clientes", path: "/clients", icon: "briefcase" },
   { name: "Configurações", path: "/settings", icon: "settings" },
 ] as const;
 

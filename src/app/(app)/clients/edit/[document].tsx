@@ -7,27 +7,30 @@ import {
   ActivityIndicator,
   Alert,
   useWindowDimensions,
-  StyleSheet,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { clientSchema, ClientType } from "@/schemas/clientsSchema";
+import {
+  clientSchema,
+  ClientType,
+  ClientInputType,
+} from "@/schemas/clientsSchema";
 import { useTheme } from "@/contexts/themeContext";
 import { api } from "@/services/api";
 import { ControlledInput } from "@/components/controllerInput";
 import rollback from "@/services/rollback";
 import { Loadding } from "@/components/loadding";
-import { updateClientStyles } from "@/styles/clients.styles";
+import { listClientStyles } from "@/styles/clients.styles";
 
 export default function EditClientScreen() {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
-  const styles = updateClientStyles(theme, isMobile);
+  const styles = listClientStyles(theme, isMobile);
 
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { document } = useLocalSearchParams<{ document: string }>();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [client, setClient] = useState<ClientType | null>(null);
@@ -37,13 +40,13 @@ export default function EditClientScreen() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ClientType>({
+  } = useForm<ClientInputType>({
     resolver: zodResolver(clientSchema),
   });
 
   const fetchClient = async () => {
     try {
-      const { data } = await api.get(`/clients/${id}`);
+      const { data } = await api.get(`/clients/document/${document}`);
       setClient(data);
       reset({
         ...data,
@@ -61,9 +64,10 @@ export default function EditClientScreen() {
   };
 
   const onSubmit = async (data: ClientType) => {
+    // console.log(data);
     setSubmitting(true);
     try {
-      await api.put(`/clients/${id}`, data);
+      await api.put(`/clients/${data.id}`, data);
       Alert.alert("Sucesso", "Cliente atualizado com sucesso!");
       rollback();
     } catch (e: any) {
@@ -75,8 +79,7 @@ export default function EditClientScreen() {
       setSubmitting(false);
     }
   };
-
-  const handleToggleStatus = () => {
+  const handleToggleStatus = (id: string) => {
     Alert.alert(
       client?.is_active ? "Desativar Cliente" : "Ativar Cliente",
       `Deseja realmente ${client?.is_active ? "desativar" : "ativar"} este cliente?`,
@@ -87,7 +90,7 @@ export default function EditClientScreen() {
           style: client?.is_active ? "destructive" : "default",
           onPress: async () => {
             try {
-              await api.patch(`/clients/${id}/status`, {
+              await api.patch(`/clients/${id}`, {
                 is_active: !client?.is_active,
               });
               fetchClient();
@@ -101,8 +104,8 @@ export default function EditClientScreen() {
   };
 
   useEffect(() => {
-    if (id) fetchClient();
-  }, [id]);
+    if (document) fetchClient();
+  }, [document]);
 
   const formatDate = (date?: Date | string) => {
     if (!date) return "—";
@@ -153,19 +156,6 @@ export default function EditClientScreen() {
           {/* Info de auditoria */}
           {client && (
             <View style={styles.infoCard}>
-              <View style={styles.infoRow}>
-                <Feather
-                  name="calendar"
-                  size={13}
-                  color={theme.isDark ? "#aaa" : "#666"}
-                />
-                <Text style={styles.infoLabel}>
-                  Cadastrado em:{" "}
-                  <Text style={styles.infoValue}>
-                    {formatDate(client.created_at)}
-                  </Text>
-                </Text>
-              </View>
               {client.updated_at && (
                 <View style={styles.infoRow}>
                   <Feather
@@ -193,6 +183,9 @@ export default function EditClientScreen() {
             label="CPF / CNPJ"
             placeholder="Digite o CPF ou CNPJ"
             iconName="credit-card"
+            mask={
+              document.length === 11 ? "9.999.999-999" : "99.999.999/9999-99"
+            }
             errorMessage={errors.document?.message as string}
           />
 

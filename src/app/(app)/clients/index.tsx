@@ -94,7 +94,7 @@ export default function ClientsListScreen() {
           <Feather
             name="plus"
             size={24}
-            color={theme.isDark ? theme.primary : "#fff"}
+            color={theme.isDark ? theme.textSecondary : theme.text}
           />
         </TouchableOpacity>
       </View>
@@ -103,12 +103,12 @@ export default function ClientsListScreen() {
         <Feather
           name="search"
           size={18}
-          color={theme.isDark ? "#aaa" : "#666"}
+          color={theme.isDark ? theme.textSecondary : theme.text}
         />
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar por nome, CPF/CNPJ ou e-mail..."
-          placeholderTextColor={theme.isDark ? "#666" : "#aaa"}
+          placeholderTextColor={theme.isDark ? theme.textSecondary : "#aaa"}
           value={search}
           onChangeText={handleSearch}
         />
@@ -129,14 +129,7 @@ export default function ClientsListScreen() {
         <View style={styles.gridContainer}>
           {filtered.map((client) => (
             <View key={client.id} style={styles.card}>
-              <View
-                style={[
-                  styles.cardHeader,
-                  {
-                    borderBottomColor: client.is_active ? "#3b82f6" : "#ef4444",
-                  },
-                ]}
-              >
+              <View style={styles.cardHeader}>
                 <View
                   style={{
                     width: 42,
@@ -225,7 +218,9 @@ export default function ClientsListScreen() {
               <View style={styles.cardFooter}>
                 <TouchableOpacity
                   style={styles.editBtn}
-                  onPress={() => router.push(`/clients/edit/${client.id}`)}
+                  onPress={() =>
+                    router.push(`/clients/edit/${client.document}`)
+                  }
                 >
                   <Feather
                     name="edit-2"

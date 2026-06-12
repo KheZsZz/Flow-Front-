@@ -21,12 +21,14 @@ export const createClientsStyles = (theme: AppTheme, isMobile: boolean) =>
       fontSize: 28,
       fontWeight: "bold",
     },
+
     addBtn: {
       backgroundColor: theme.isDark ? theme.link : theme.primary,
       padding: 10,
       borderRadius: 8,
       alignItems: "center",
     },
+
     searchContainer: {
       flexDirection: "row",
       alignItems: "center",
@@ -38,12 +40,14 @@ export const createClientsStyles = (theme: AppTheme, isMobile: boolean) =>
       marginBottom: 20,
       height: 48,
     },
+
     searchInput: {
       flex: 1,
       color: theme.text,
       fontSize: 15,
       paddingHorizontal: 8,
     },
+
     emptyText: {
       color: theme.textSecondary,
       fontSize: 16,
@@ -51,6 +55,7 @@ export const createClientsStyles = (theme: AppTheme, isMobile: boolean) =>
       marginTop: 40,
       opacity: 0.6,
     },
+
     gridContainer: {
       flexDirection: "row",
       flexWrap: "wrap",
@@ -58,7 +63,7 @@ export const createClientsStyles = (theme: AppTheme, isMobile: boolean) =>
       justifyContent: isMobile ? "center" : "flex-start",
     },
     card: {
-      width: isMobile ? "100%" : 340,
+      width: "100%",
       backgroundColor: theme.card,
       borderRadius: 12,
       borderWidth: 1,
@@ -71,6 +76,7 @@ export const createClientsStyles = (theme: AppTheme, isMobile: boolean) =>
       flexDirection: "row",
       alignItems: "center",
       gap: 10,
+      // borderBottomColor: client.is_active ? "#3b82f6" : "#ef4444",
     },
     cardHeaderText: {
       flex: 1,
@@ -110,9 +116,11 @@ export const createClientsStyles = (theme: AppTheme, isMobile: boolean) =>
       borderTopColor: theme.borderColor,
       padding: 10,
       gap: 8,
+      justifyContent: "flex-end",
+      width: "100%",
     },
     editBtn: {
-      flex: 1,
+      flex: isMobile ? 1 : undefined,
       backgroundColor: theme.isDark ? "#1e2640" : "#e8f0fe",
       padding: 8,
       borderRadius: 8,
@@ -127,7 +135,7 @@ export const createClientsStyles = (theme: AppTheme, isMobile: boolean) =>
       fontSize: 13,
     },
     toggleBtn: {
-      flex: 1,
+      flex: isMobile ? 1 : undefined,
       padding: 8,
       borderRadius: 8,
       alignItems: "center",
@@ -314,6 +322,12 @@ export const listClientStyles = (theme: any, isMobile: boolean) =>
       borderBottomWidth: 1,
       borderBottomColor: theme.borderColor,
     },
+
+    title: {
+      color: theme.text,
+      fontSize: 20,
+      fontWeight: "bold",
+    },
     backButton: {
       position: "absolute",
       left: 16,
@@ -321,11 +335,7 @@ export const listClientStyles = (theme: any, isMobile: boolean) =>
       padding: 10,
       borderRadius: 10,
     },
-    title: {
-      color: theme.text,
-      fontSize: 20,
-      fontWeight: "bold",
-    },
+
     scrollContent: {
       paddingBottom: 40,
     },

@@ -14,6 +14,8 @@ import {
   Text,
   TextInput,
 } from "react-native";
+import { set } from "zod/v3";
+import { Loadding } from "@/components/loadding";
 
 export default function InvoiceScreen() {
   const { theme } = useTheme();
@@ -23,9 +25,10 @@ export default function InvoiceScreen() {
 
   const [invoices, setInvoices] = useState<InvoiceTypes[]>([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
+    setLoading(true);
     try {
       const data = await invoiceService.getInvoices();
       setInvoices(data);
@@ -49,6 +52,10 @@ export default function InvoiceScreen() {
     );
   }, [search, invoices]);
 
+  if (loading)
+    return (
+      <Loadding color={theme.isDark ? theme.link : theme.primary} size={50} />
+    );
   return (
     <View style={styles.container}>
       <View style={styles.content}>
