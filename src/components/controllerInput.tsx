@@ -13,7 +13,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { MaskedTextInput } from "react-native-mask-text";
-import { Feather } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
 import { createInputStyles } from "@/styles/input.styles";
 
@@ -24,7 +24,7 @@ interface ControlledInputProps<
   name: Path<TFieldValues>;
   label?: string;
   errorMessage?: string;
-  iconName?: React.ComponentProps<typeof Feather>["name"];
+  iconName?: React.ComponentProps<typeof FontAwesome6>["name"];
   variant?: "text" | "select" | "switch" | "date" | "numeric";
   options?: { label: string; value: any }[];
   mask?: string;
@@ -134,7 +134,7 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                   onPress={() => setShowDatePicker(true)}
                 >
                   {iconName && (
-                    <Feather
+                    <FontAwesome6
                       name={iconName}
                       size={18}
                       color={theme.text}
@@ -187,7 +187,7 @@ export function ControlledInput<TFieldValues extends FieldValues>({
               ]}
             >
               {iconName && (
-                <Feather
+                <FontAwesome6
                   name={iconName}
                   size={18}
                   color={theme.text}
@@ -254,8 +254,8 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                   onPress={() => setPasswordHidden(!passwordHidden)}
                   style={{ paddingHorizontal: 12 }}
                 >
-                  <Feather
-                    name={passwordHidden ? "eye-off" : "eye"}
+                  <FontAwesome6
+                    name={passwordHidden ? "eye-slash" : "eye"}
                     size={18}
                     color={theme.text}
                   />
