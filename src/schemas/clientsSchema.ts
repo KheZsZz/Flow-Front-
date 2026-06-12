@@ -73,17 +73,20 @@ export const clientSchema = z.object({
       {
         message: "Por favor, use um provedor de e-mail confiável",
       },
-    ),
+    )
+    .optional()
+    .nullable(),
   phone: z
     .string()
-    .max(16, { message: "O telefone deve ter no máximo 16 caracteres" })
+    .max(11, { message: "O telefone deve ter no máximo 11 caracteres" })
     //   .regex(/^\(\d{2}\)\s\d\.\d{4}-\d{4}$/, {
     //     message: "O telefone deve estar no formato (XX) 9.XXXX-XXXX",
     //   }),
     // password: z
     //   .string()
     //   .min(6, "A senha deve ter no mínimo 6 caracteres")
-    .max(255),
+    .optional()
+    .nullable(),
 
   is_active: z.boolean().default(true),
 
