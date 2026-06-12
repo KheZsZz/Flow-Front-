@@ -15,6 +15,9 @@ import {
 import { Feather } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 
+import { UserTypeEnum } from "@/schemas/enumSchema";
+import { HOME_BY_ROLE, ROLE_ALLOWED_ROUTES } from "@/hooks/usePermission";
+
 import { AuthProvider, useAuth } from "@/contexts/authContext";
 import { ThemeProvider, useTheme, ThemeMode } from "@/contexts/themeContext";
 
@@ -89,33 +92,42 @@ function NavigationGuard() {
   const { theme } = useTheme();
   const segments = useSegments();
   const router = useRouter();
+  const pathname = usePathname(); // adicione este import: import { usePathname } from "expo-router"
 
   useEffect(() => {
     if (loading) return;
-    const inAppGroup = segments[0] === "(app)";
 
+    const inAppGroup = segments[0] === "(app)";
+    const inAuthGroup = segments[0] === "(auth)";
+
+    // Não autenticado tentando acessar app → login
     if (!user && inAppGroup) {
       router.replace("/(auth)/login");
-    } else if (user) {
-      const inAuthGroup = segments[0] === "(auth)";
-      if (inAuthGroup || !segments[0] || segments[0] === "index") {
-        switch (user.user.profile_user) {
-          case "Driver":
-            router.replace("/(app)/driver");
-            break;
-          case "Requestor":
-          case "Commum":
-            router.replace("/(app)/orders/create");
-            break;
-          case "Financer":
-            router.replace("/(app)/finance");
-            break;
-          case "Admin":
-          case "Manager":
-          default:
-            router.replace("/(app)/dashboard");
-            break;
-        }
+      return;
+    }
+
+    // Autenticado em tela de auth ou raiz → redireciona para home do perfil
+    if (user && (inAuthGroup || !segments[0] || segments[0] === "index")) {
+      const profile = (user.user.profile_user ?? "Commum") as UserTypeEnum;
+      router.replace(HOME_BY_ROLE[profile] as any);
+      return;
+    }
+
+    if (user && inAppGroup) {
+      const profile = (user.user.profile_user ?? "Commum") as UserTypeEnum;
+      const isAdminOrManager = profile === "Admin" || profile === "Manager";
+
+      if (isAdminOrManager) return;
+
+      const currentPath = "/" + segments.slice(1).join("/");
+
+      const allowed = ROLE_ALLOWED_ROUTES[profile] ?? [];
+      const hasAccess = allowed.some(
+        (r) => currentPath === r || currentPath.startsWith(r + "/"),
+      );
+
+      if (!hasAccess) {
+        router.replace(HOME_BY_ROLE[profile] as any);
       }
     }
   }, [user, loading, segments]);
@@ -139,7 +151,6 @@ function NavigationGuard() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
       <Slot />
-      {/*<GlobalThemeToggle />*/}
     </View>
   );
 }

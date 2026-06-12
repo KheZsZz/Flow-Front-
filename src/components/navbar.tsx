@@ -14,6 +14,8 @@ import { useAuth } from "@/contexts/authContext";
 import { Feather, FontAwesome6 } from "@expo/vector-icons";
 import { createNavbarStyles } from "@/styles/navbar.styles";
 import { useTheme, ThemeMode } from "@/contexts/themeContext";
+import { usePermissions } from "@/hooks/usePermission";
+import { UserTypeEnum } from "@/schemas/enumSchema";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -26,16 +28,41 @@ const THEME_OPTIONS: { id: ThemeMode; icon: "sun" | "moon"; label: string }[] =
     { id: "dark", icon: "moon", label: "Escuro" },
   ];
 
-const MENU_ITEMS = [
-  { name: "Dashboard", path: "/dashboard", icon: "grid" },
-  { name: "Notas Fiscais", path: "/invoices", icon: "file-text" },
-  { name: "Cargas / Rotas", path: "/orders", icon: "truck" },
-  { name: "Frota", path: "/vehicles/list", icon: "truck" },
-  { name: "Manutenção", path: "/fuel", icon: "tool" },
-  { name: "Motoristas", path: "/drives", icon: "users" },
-  { name: "Clientes", path: "/clients", icon: "briefcase" },
-  { name: "Configurações", path: "/settings", icon: "settings" },
-] as const;
+const MENU_ITEMS: {
+  name: string;
+  path: string;
+  icon: string;
+  minRole: UserTypeEnum;
+}[] = [
+  { name: "Dashboard", path: "/dashboard", icon: "grid", minRole: "Financer" },
+  {
+    name: "Notas Fiscais",
+    path: "/invoices",
+    icon: "file-text",
+    minRole: "Financer",
+  },
+  {
+    name: "Cargas / Rotas",
+    path: "/orders",
+    icon: "truck",
+    minRole: "Requestor",
+  },
+  { name: "Frota", path: "/vehicles/list", icon: "truck", minRole: "Admin" },
+  { name: "Manutenção", path: "/fuel", icon: "tool", minRole: "Admin" },
+  { name: "Motoristas", path: "/drives", icon: "users", minRole: "Admin" },
+  {
+    name: "Clientes",
+    path: "/clients",
+    icon: "people-group",
+    minRole: "Admin",
+  },
+  {
+    name: "Configurações",
+    path: "/settings",
+    icon: "settings",
+    minRole: "Admin",
+  },
+];
 
 function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   const { mode, isDark, setThemeMode, theme } = useTheme();
