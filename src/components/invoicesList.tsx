@@ -4,6 +4,7 @@ import { createInvoiceListStyles } from "@/styles/invoices.styles";
 import { router } from "expo-router";
 import { InvoiceActions } from "@/components/actionsInvoices";
 import { invoiceService } from "@/services/invoices";
+import { formatCurrency, formatCurrencyCTe } from "@/services/formatMoney";
 
 import {
   View,
@@ -25,14 +26,9 @@ export const InvoiceList = ({
   const { theme } = useTheme();
   const isMobile = useWindowDimensions().width < 820;
   const styles = createInvoiceListStyles(theme, isMobile);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [idToDelete, setIdToDelete] = useState<string | null>(null);
-
-  const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(val);
 
   const handleDelete = async () => {
     if (idToDelete) {
@@ -69,7 +65,17 @@ export const InvoiceList = ({
                 fontWeight: "bold",
               }}
             >
-              {item.cte}
+              CT-e {item.cte}
+            </Text>
+
+            <Text
+              style={{
+                color: item.cte === "AGUARDANDO" ? "#EF6C00" : "#2E7D32",
+                fontWeight: "bold",
+                fontSize: 16,
+              }}
+            >
+              {formatCurrencyCTe(item.cte_value)}
             </Text>
           </View>
           <View
