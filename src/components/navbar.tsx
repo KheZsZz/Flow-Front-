@@ -3,24 +3,28 @@ import {
   View,
   Text,
   Pressable,
-  Image,
   ScrollView,
   TouchableOpacity,
   useWindowDimensions,
   Modal,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter, usePathname } from "expo-router";
 import { useAuth } from "@/contexts/authContext";
-import { Feather, FontAwesome6 } from "@expo/vector-icons";
-import { createNavbarStyles } from "@/styles/navbar.styles";
+import { Feather } from "@expo/vector-icons";
 import { useTheme, ThemeMode } from "@/contexts/themeContext";
 import { usePermissions } from "@/hooks/usePermission";
+import { createNavbarStyles } from "@/styles/navbar.styles";
 import { UserTypeEnum } from "@/schemas/enumSchema";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface SidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
 }
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const THEME_OPTIONS: { id: ThemeMode; icon: "sun" | "moon"; label: string }[] =
   [
@@ -28,12 +32,14 @@ const THEME_OPTIONS: { id: ThemeMode; icon: "sun" | "moon"; label: string }[] =
     { id: "dark", icon: "moon", label: "Escuro" },
   ];
 
-const MENU_ITEMS: {
+type MenuItem = {
   name: string;
   path: string;
   icon: string;
   minRole: UserTypeEnum;
-}[] = [
+};
+
+const MENU_ITEMS: MenuItem[] = [
   { name: "Dashboard", path: "/dashboard", icon: "grid", minRole: "Financer" },
   {
     name: "Notas Fiscais",
@@ -44,18 +50,13 @@ const MENU_ITEMS: {
   {
     name: "Cargas / Rotas",
     path: "/orders",
-    icon: "truck",
+    icon: "package",
     minRole: "Requestor",
   },
   { name: "Frota", path: "/vehicles/list", icon: "truck", minRole: "Admin" },
   { name: "Manutenção", path: "/fuel", icon: "tool", minRole: "Admin" },
   { name: "Motoristas", path: "/drives", icon: "users", minRole: "Admin" },
-  {
-    name: "Clientes",
-    path: "/clients",
-    icon: "people-group",
-    minRole: "Admin",
-  },
+  { name: "Clientes", path: "/clients", icon: "briefcase", minRole: "Admin" },
   {
     name: "Configurações",
     path: "/settings",
@@ -64,26 +65,43 @@ const MENU_ITEMS: {
   },
 ];
 
+const ROLE_LABEL: Record<UserTypeEnum, string> = {
+  Manager: "Gerente",
+  Admin: "Administrador",
+  Financer: "Financeiro",
+  Requestor: "Solicitante",
+  Driver: "Motorista",
+  Commum: "Usuário",
+};
+
+const ROLE_COLOR: Record<UserTypeEnum, string> = {
+  Manager: "#f7cc3e",
+  Admin: "#60a5fa",
+  Financer: "#34d399",
+  Requestor: "#a78bfa",
+  Driver: "#fb923c",
+  Commum: "#9ca3af",
+};
+
+// ─── Theme Toggle ─────────────────────────────────────────────────────────────
+
 function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   const { mode, isDark, setThemeMode, theme } = useTheme();
   const styles = createNavbarStyles(theme);
 
-  if (!theme) return null;
-
-  const trackBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
-  const activeBg = isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.10)";
+  const trackBg = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)";
+  const activeBg = isDark ? "rgba(255,255,255,0.16)" : "rgba(0,0,0,0.10)";
 
   if (collapsed) {
     const next = mode === "dark" ? "light" : "dark";
     const current =
       THEME_OPTIONS.find((o) => o.id === mode) ?? THEME_OPTIONS[0];
-
     return (
       <Pressable
         onPress={() => setThemeMode(next)}
         style={[styles.themeOptionCollapsed, { backgroundColor: trackBg }]}
       >
-        <Feather name={current?.icon} size={16} color={theme?.textSecondary} />
+        <Feather name={current.icon} size={16} color="rgba(255,255,255,0.6)" />
       </Pressable>
     );
   }
@@ -91,27 +109,27 @@ function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   return (
     <View style={[styles.themeTrack, { backgroundColor: trackBg }]}>
       {THEME_OPTIONS.map((opt) => {
-        const isActive = mode === opt.id;
+        const active = mode === opt.id;
         return (
           <TouchableOpacity
             key={opt.id}
             onPress={() => setThemeMode(opt.id)}
             style={[
               styles.themeOption,
-              { backgroundColor: isActive ? activeBg : "transparent" },
+              { backgroundColor: active ? activeBg : "transparent" },
             ]}
           >
             <Feather
               name={opt.icon}
               size={13}
-              color={isActive ? theme.text : theme.textSecondary}
+              color={active ? "#fff" : "rgba(255,255,255,0.45)"}
             />
             <Text
               style={[
                 styles.themeOptionText,
                 {
-                  fontWeight: isActive ? "600" : "400",
-                  color: isActive ? theme.text : theme.textSecondary,
+                  color: active ? "#fff" : "rgba(255,255,255,0.45)",
+                  fontWeight: active ? "600" : "400",
                 },
               ]}
             >
@@ -124,7 +142,120 @@ function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   );
 }
 
+// ─── User Badge ───────────────────────────────────────────────────────────────
+
+function UserBadge() {
+  const { user } = useAuth();
+  const { theme } = useTheme();
+  const styles = createNavbarStyles(theme);
+
+  if (!user) return null;
+
+  const profile = (user.user.profile_user ?? "Commum") as UserTypeEnum;
+  const roleColor = ROLE_COLOR[profile];
+  const roleLabel = ROLE_LABEL[profile];
+  const initials = user.user.name_user
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join("");
+
+  return (
+    <View style={styles.userBadge}>
+      {user.user.avatar_url ? (
+        <Image
+          source={{ uri: user.user.avatar_url }}
+          style={styles.userAvatar}
+          contentFit="cover"
+        />
+      ) : (
+        <View style={[styles.avatarFallback, { borderColor: roleColor }]}>
+          <Text style={[styles.avatarInitials, { color: roleColor }]}>
+            {initials}
+          </Text>
+        </View>
+      )}
+      <Text style={styles.userName} numberOfLines={1}>
+        {user.user.name_user}
+      </Text>
+      <View
+        style={[
+          styles.roleBadge,
+          {
+            backgroundColor: roleColor + "22",
+            borderColor: roleColor + "55",
+          },
+        ]}
+      >
+        <Text style={[styles.roleText, { color: roleColor }]}>{roleLabel}</Text>
+      </View>
+    </View>
+  );
+}
+
+// ─── Menu ─────────────────────────────────────────────────────────────────────
+
+function Menu({
+  collapsed,
+  onNavigate,
+}: {
+  collapsed: boolean;
+  onNavigate?: () => void;
+}) {
+  const { theme } = useTheme();
+  const styles = createNavbarStyles(theme);
+  const router = useRouter();
+  const pathname = usePathname();
+  const { hasMinRole } = usePermissions();
+
+  const visibleItems = MENU_ITEMS.filter((item) => hasMinRole(item.minRole));
+
+  const handleNav = (path: string) => {
+    router.push(path as any);
+    onNavigate?.();
+  };
+
+  return (
+    <View style={styles.menuContainer}>
+      {visibleItems.map((item) => {
+        const active =
+          pathname === item.path || pathname.startsWith(item.path + "/");
+        return (
+          <Pressable
+            key={item.path}
+            onPress={() => handleNav(item.path)}
+            style={({ pressed }) => [
+              styles.menuItem,
+              collapsed && styles.menuItemCollapsed,
+              active && styles.menuItemActive,
+              pressed && styles.menuItemPressed,
+            ]}
+          >
+            <Feather
+              name={item.icon as any}
+              size={18}
+              color={active ? "#fff" : "rgba(255,255,255,0.5)"}
+            />
+            {!collapsed && (
+              <Text
+                style={[
+                  styles.menuItemText,
+                  active && styles.menuItemTextActive,
+                ]}
+              >
+                {item.name}
+              </Text>
+            )}
+            {active && !collapsed && <View style={styles.activeIndicator} />}
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 // ─── Sidebar Content ──────────────────────────────────────────────────────────
+
 function SidebarContent({
   isCollapsed,
   onToggle,
@@ -136,125 +267,86 @@ function SidebarContent({
 }) {
   const { theme } = useTheme();
   const styles = createNavbarStyles(theme);
-  const { user, singOut } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const handleNav = (path: string) => {
-    router.push(path as any);
-    onNavigate?.();
-  };
+  const { singOut, user } = useAuth();
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ flexGrow: 1 }}
-    >
-      {/* Header */}
-      <View
-        style={[
-          styles.headerContainer,
-          isCollapsed && styles.headerContainerCollapsed,
-        ]}
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }}
       >
-        {!isCollapsed && (
-          <Text style={styles.logoText}>
-            {user?.company?.name.split(" ")[0]}
-          </Text>
-        )}
-        <Pressable onPress={onToggle} style={styles.toggleButton}>
-          <Feather
-            name={isCollapsed ? "chevrons-right" : "x-circle"}
-            size={20}
-            color={theme.text}
-          />
-        </Pressable>
-      </View>
-
-      {/* Theme toggle — abaixo do header */}
-      <ThemeToggle collapsed={isCollapsed} />
-
-      {/* User badge */}
-      {user && !isCollapsed && (
-        <View style={styles.userBadge}>
-          <Image
-            source={{ uri: user.user.avatar_url ?? "" }}
-            style={styles.userAvatar}
-          />
-          <Text style={styles.userName} numberOfLines={1}>
-            {user.user.name_user}
-          </Text>
-          {/*<FontAwesome6 icon="user-tie"></FontAwesome6>*/}
-          <Text style={styles.userProfile}>{user.user.profile_user}</Text>
+        {/* Header */}
+        <View
+          style={[
+            styles.headerContainer,
+            isCollapsed && styles.headerContainerCollapsed,
+          ]}
+        >
+          {!isCollapsed && (
+            <Text style={styles.logoText} numberOfLines={1}>
+              {user?.company?.name?.split(" ")[0] ?? "Flow"}
+            </Text>
+          )}
+          <Pressable onPress={onToggle} style={styles.toggleButton}>
+            <Feather
+              name={isCollapsed ? "chevrons-right" : "chevrons-left"}
+              size={18}
+              color="rgba(255,255,255,0.7)"
+            />
+          </Pressable>
         </View>
-      )}
 
-      {/* Menu */}
-      <View style={styles.menuContainer}>
-        {MENU_ITEMS.map((item) => {
-          const isActive = pathname === item.path;
-          return (
-            <Pressable
-              key={item.path}
-              style={[
-                styles.menuItem,
-                isActive && styles.menuItemActive,
-                isCollapsed && styles.menuItemCollapsed,
-              ]}
-              onPress={() => handleNav(item.path)}
-            >
-              <Feather
-                name={item.icon as any}
-                size={20}
-                color={isActive ? theme.text : theme.textSecondary}
-              />
-              {!isCollapsed && (
-                <Text
-                  style={[
-                    styles.menuItemText,
-                    isActive && styles.menuItemTextActive,
-                  ]}
-                >
-                  {item.name}
-                </Text>
-              )}
-            </Pressable>
-          );
-        })}
-      </View>
+        {/* Theme Toggle */}
+        <ThemeToggle collapsed={isCollapsed} />
+
+        {/* User Badge */}
+        {!isCollapsed ? (
+          <UserBadge />
+        ) : (
+          <View style={styles.avatarCollapsed}>
+            <View style={styles.avatarFallbackSm}>
+              <Feather name="user" size={16} color="rgba(255,255,255,0.6)" />
+            </View>
+          </View>
+        )}
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Menu */}
+        <Menu collapsed={isCollapsed} onNavigate={onNavigate} />
+      </ScrollView>
 
       {/* Logout */}
       <Pressable
-        style={[
+        onPress={singOut}
+        style={({ pressed }) => [
           styles.logoutButton,
           isCollapsed && styles.logoutButtonCollapsed,
+          pressed && { opacity: 0.8 },
         ]}
-        onPress={singOut}
       >
-        <Feather name="log-out" size={20} color="#ffffff" />
+        <Feather name="log-out" size={18} color="#fff" />
         {!isCollapsed && <Text style={styles.logoutButtonText}>Sair</Text>}
       </Pressable>
-    </ScrollView>
+    </View>
   );
 }
 
-// ─── Main export ──────────────────────────────────────────────────────────────
+// ─── Main Export ──────────────────────────────────────────────────────────────
+
 export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const { theme } = useTheme();
   const styles = createNavbarStyles(theme);
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
-  const isMobile = width < 768 || height < 720;
+  const isMobile = width < 768;
 
   if (isMobile) {
     return (
       <>
         <Pressable onPress={onToggle} style={styles.hamburger}>
-          <Feather
-            name={isCollapsed ? "menu" : "x"}
-            size={22}
-            color={theme.text}
-          />
+          <Feather name={isCollapsed ? "menu" : "x"} size={22} color="#fff" />
         </Pressable>
 
         <Modal
@@ -263,7 +355,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           transparent={false}
           onRequestClose={onToggle}
         >
-          <View style={[styles.sidebar, { width: "100%", flex: 1 }]}>
+          <View style={styles.mobileSidebar}>
             <SidebarContent
               isCollapsed={false}
               onToggle={onToggle}

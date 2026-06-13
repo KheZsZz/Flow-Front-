@@ -5,155 +5,200 @@ type AppTheme = typeof lightTheme | typeof darkTheme;
 
 export const createNavbarStyles = (theme: AppTheme) =>
   StyleSheet.create({
+    // ── Sidebar container ────────────────────────────────────────────────────
     sidebar: {
-      width: 260,
-      backgroundColor: theme.primary,
-      padding: 10,
-      justifyContent: "space-between",
+      width: 240,
+      paddingHorizontal: 12,
+      paddingTop: 16,
+      paddingBottom: 12,
+      backgroundColor: theme.isDark ? "#0d1526" : "#1a3a6b",
       borderRightWidth: 1,
-      borderRightColor: theme.inputBorder,
+      borderRightColor: "rgba(255,255,255,0.07)",
       ...Platform.select({
         web: {
-          transitionProperty: "width, background-color",
+          transitionProperty: "width",
           transitionDuration: "0.2s",
         } as any,
       }),
     },
-
     sidebarCollapsed: {
-      width: 90,
-      paddingHorizontal: 10,
+      width: 72,
       alignItems: "center",
     },
+    mobileSidebar: {
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingTop: 20,
+      paddingBottom: 12,
+      backgroundColor: theme.isDark ? "#0d1526" : "#1a3a6b",
+    },
 
-    // ── Header ──────────────────────────────────────────────────────────────
+    // ── Header ───────────────────────────────────────────────────────────────
     headerContainer: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 16,
-      height: 40,
+      marginBottom: 20,
+      minHeight: 40,
     },
-
     headerContainerCollapsed: {
+      justifyContent: "center",
+    },
+    logoText: {
+      color: "#fff",
+      fontSize: 18,
+      fontWeight: "700",
+      letterSpacing: 0.5,
+      flex: 1,
+    },
+    toggleButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      backgroundColor: "rgba(255,255,255,0.08)",
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 16,
-    },
-
-    logoText: {
-      color: theme.textSecondary,
-      fontSize: 20,
-      fontWeight: "700",
-      letterSpacing: 1,
-    },
-
-    toggleButton: {
-      marginTop: 22,
-      padding: 12,
-      borderRadius: 10,
-      backgroundColor: theme.isDark ? theme.link : theme.card,
     },
 
     // ── Theme toggle ─────────────────────────────────────────────────────────
     themeTrack: {
       flexDirection: "row",
-      borderRadius: 10,
+      borderRadius: 8,
       padding: 3,
       marginBottom: 20,
     },
-
+    themeOptionCollapsed: {
+      height: 36,
+      width: "100%",
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 20,
+    },
     themeOption: {
       flex: 1,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: 6,
-      paddingVertical: 7,
-      borderRadius: 8,
+      gap: 5,
+      paddingVertical: 6,
+      borderRadius: 6,
     },
-
     themeOptionText: {
       fontSize: 12,
     },
 
-    themeOptionCollapsed: {
-      alignItems: "center",
-      justifyContent: "center",
-      height: 40,
-      borderRadius: 8,
-      marginBottom: 16,
-    },
-
     // ── User badge ───────────────────────────────────────────────────────────
     userBadge: {
-      justifyContent: "center",
       alignItems: "center",
-      marginBottom: 32,
-      padding: 12,
-      borderRadius: 8,
+      paddingVertical: 16,
+      paddingHorizontal: 8,
+      marginBottom: 4,
     },
-
     userAvatar: {
-      width: 70,
-      height: 70,
-      borderRadius: 20,
-      marginBottom: 12,
-      borderWidth: 1,
-      borderColor: theme.inputBorder,
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      marginBottom: 10,
     },
-
-    userName: {
-      color: theme.textSecondary,
+    avatarFallback: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      borderWidth: 2,
+      backgroundColor: "rgba(255,255,255,0.08)",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 10,
+    },
+    avatarInitials: {
       fontSize: 22,
+      fontWeight: "700",
+    },
+    avatarCollapsed: {
+      alignItems: "center",
+      marginBottom: 8,
+    },
+    avatarFallbackSm: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: "rgba(255,255,255,0.1)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    userName: {
+      color: "#fff",
+      fontSize: 14,
       fontWeight: "600",
+      marginBottom: 6,
+      textAlign: "center",
+    },
+    roleBadge: {
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      borderRadius: 20,
+      borderWidth: 1,
+    },
+    roleText: {
+      fontSize: 11,
+      fontWeight: "600",
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
     },
 
-    userProfile: {
-      color: theme.success,
-      fontSize: 14,
-      fontWeight: "bold",
-      textTransform: "uppercase",
-      marginTop: 2,
+    // ── Divider ──────────────────────────────────────────────────────────────
+    divider: {
+      height: 1,
+      backgroundColor: "rgba(255,255,255,0.08)",
+      marginVertical: 12,
+      marginHorizontal: 4,
     },
 
     // ── Menu ─────────────────────────────────────────────────────────────────
     menuContainer: {
       flex: 1,
-      gap: 4,
+      gap: 2,
     },
-
     menuItem: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      borderRadius: 8,
-      backgroundColor: "transparent",
+      paddingVertical: 11,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+      position: "relative",
     },
-
     menuItemCollapsed: {
       justifyContent: "center",
-      paddingHorizontal: 10,
-      height: 48,
+      paddingHorizontal: 0,
+      width: 48,
+      alignSelf: "center",
     },
-
     menuItemActive: {
-      backgroundColor: theme.card,
-      borderLeftWidth: 3,
-      borderLeftColor: theme.text,
+      backgroundColor: "rgba(255,255,255,0.12)",
     },
-
+    menuItemPressed: {
+      backgroundColor: "rgba(255,255,255,0.07)",
+    },
     menuItemText: {
-      color: theme.textSecondary,
+      color: "rgba(255,255,255,0.55)",
       fontSize: 14,
       fontWeight: "500",
+      flex: 1,
     },
-
     menuItemTextActive: {
-      color: theme.text,
+      color: "#fff",
       fontWeight: "600",
+    },
+    activeIndicator: {
+      position: "absolute",
+      left: 0,
+      top: 8,
+      bottom: 8,
+      width: 3,
+      borderRadius: 2,
+      backgroundColor: "#fff",
     },
 
     // ── Logout ───────────────────────────────────────────────────────────────
@@ -163,32 +208,34 @@ export const createNavbarStyles = (theme: AppTheme) =>
       justifyContent: "center",
       gap: 8,
       paddingVertical: 12,
-      borderRadius: 8,
-      backgroundColor: theme.error,
-      marginTop: "auto",
-      width: "100%",
+      borderRadius: 10,
+      backgroundColor: "rgba(239,68,68,0.75)",
+      marginTop: 8,
     },
-
     logoutButtonCollapsed: {
+      width: 48,
+      alignSelf: "center",
       gap: 0,
-      paddingVertical: 12,
-      borderRadius: 8,
     },
-
     logoutButtonText: {
-      color: "#ffffff",
+      color: "#fff",
       fontSize: 14,
       fontWeight: "600",
     },
 
-    // ── Mobile hamburguer ────────────────────────────────────────────────────
+    // ── Hamburger (mobile) ───────────────────────────────────────────────────
     hamburger: {
       position: "absolute",
       bottom: 22,
-      right: 10,
+      right: 12,
       zIndex: 100,
+      padding: 12,
+      borderRadius: 12,
       backgroundColor: theme.isDark ? theme.link : theme.primary,
-      padding: 10,
-      borderRadius: 10,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 6,
     },
   });
