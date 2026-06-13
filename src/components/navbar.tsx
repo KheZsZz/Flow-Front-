@@ -16,21 +16,12 @@ import { useTheme, ThemeMode } from "@/contexts/themeContext";
 import { usePermissions } from "@/hooks/usePermission";
 import { createNavbarStyles } from "@/styles/navbar.styles";
 import { UserTypeEnum } from "@/schemas/enumSchema";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { ROLE_LABEL, ROLE_COLOR, THEME_OPTIONS } from "@/constants/colors";
 
 interface SidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
 }
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const THEME_OPTIONS: { id: ThemeMode; icon: "sun" | "moon"; label: string }[] =
-  [
-    { id: "light", icon: "sun", label: "Claro" },
-    { id: "dark", icon: "moon", label: "Escuro" },
-  ];
 
 type MenuItem = {
   name: string;
@@ -41,49 +32,30 @@ type MenuItem = {
 
 const MENU_ITEMS: MenuItem[] = [
   { name: "Dashboard", path: "/dashboard", icon: "grid", minRole: "Financer" },
+
   {
     name: "Notas Fiscais",
     path: "/invoices",
     icon: "file-text",
-    minRole: "Financer",
+    minRole: "Commum",
   },
   {
     name: "Cargas / Rotas",
     path: "/orders",
     icon: "package",
-    minRole: "Requestor",
+    minRole: "Commum",
   },
   { name: "Frota", path: "/vehicles/list", icon: "truck", minRole: "Admin" },
-  { name: "Manutenção", path: "/fuel", icon: "tool", minRole: "Admin" },
-  { name: "Motoristas", path: "/drives", icon: "users", minRole: "Admin" },
+  { name: "Manutenção", path: "/fuel", icon: "tool", minRole: "Financer" },
+  { name: "Usuarios", path: "/users", icon: "users", minRole: "Financer" },
   { name: "Clientes", path: "/clients", icon: "briefcase", minRole: "Admin" },
   {
     name: "Configurações",
     path: "/settings",
     icon: "settings",
-    minRole: "Admin",
+    minRole: "Manager",
   },
 ];
-
-const ROLE_LABEL: Record<UserTypeEnum, string> = {
-  Manager: "Gerente",
-  Admin: "Administrador",
-  Financer: "Financeiro",
-  Requestor: "Solicitante",
-  Driver: "Motorista",
-  Commum: "Usuário",
-};
-
-const ROLE_COLOR: Record<UserTypeEnum, string> = {
-  Manager: "#f7cc3e",
-  Admin: "#60a5fa",
-  Financer: "#34d399",
-  Requestor: "#a78bfa",
-  Driver: "#fb923c",
-  Commum: "#9ca3af",
-};
-
-// ─── Theme Toggle ─────────────────────────────────────────────────────────────
 
 function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   const { mode, isDark, setThemeMode, theme } = useTheme();
@@ -142,8 +114,6 @@ function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-// ─── User Badge ───────────────────────────────────────────────────────────────
-
 function UserBadge() {
   const { user } = useAuth();
   const { theme } = useTheme();
@@ -192,8 +162,6 @@ function UserBadge() {
     </View>
   );
 }
-
-// ─── Menu ─────────────────────────────────────────────────────────────────────
 
 function Menu({
   collapsed,
@@ -253,8 +221,6 @@ function Menu({
     </View>
   );
 }
-
-// ─── Sidebar Content ──────────────────────────────────────────────────────────
 
 function SidebarContent({
   isCollapsed,
@@ -332,8 +298,6 @@ function SidebarContent({
     </View>
   );
 }
-
-// ─── Main Export ──────────────────────────────────────────────────────────────
 
 export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const { theme } = useTheme();

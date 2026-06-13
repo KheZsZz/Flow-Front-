@@ -1,3 +1,6 @@
+import { ThemeMode } from "@/contexts/themeContext";
+import { UserTypeEnum } from "@/schemas/enumSchema";
+
 export type AppTheme = {
   isDark: boolean;
   primary: string;
@@ -65,3 +68,30 @@ export const darkTheme: AppTheme = {
     Reentrega: { bg: "rgba(139, 92, 246, 0.15)", text: "#a78bfa" },
   },
 };
+
+export const ROLE_COLOR: Record<UserTypeEnum, string> = {
+  Manager: "#f7cc3e",
+  Admin: "#60a5fa",
+  Financer: "#34d399",
+  Requestor: "#a78bfa",
+  Driver: "#fb923c",
+  Commum: "#9ca3af",
+};
+
+export const ROLE_LABEL: Record<UserTypeEnum, string> = {
+  Manager: "Manager",
+  Admin: "Administrador",
+  Financer: "Financeiro",
+  Requestor: "Lider",
+  Driver: "Motorista",
+  Commum: "Assistente/Auxiliar",
+};
+
+export const THEME_OPTIONS: {
+  id: ThemeMode;
+  icon: "sun" | "moon";
+  label: string;
+}[] = [
+  { id: "light", icon: "sun", label: "Claro" },
+  { id: "dark", icon: "moon", label: "Escuro" },
+];

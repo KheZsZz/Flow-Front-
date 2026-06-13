@@ -16,7 +16,7 @@ export const ROLE_ALLOWED_ROUTES: Record<UserTypeEnum, string[]> = {
   Financer: ["/dashboard", "/finance", "/invoices", "/invoices/create"],
   Requestor: ["/orders/create", "/orders"],
   Driver: ["/driver"],
-  Commum: ["/orders/create"],
+  Commum: ["/orders/create", "/orders", "/invoices", "/invoices/create"],
 };
 
 // Rota home por perfil (para onde redirecionar após login)
@@ -26,7 +26,7 @@ export const HOME_BY_ROLE: Record<UserTypeEnum, string> = {
   Financer: "/(app)/finance",
   Requestor: "/(app)/orders/create",
   Driver: "/(app)/driver",
-  Commum: "/(app)/orders/create",
+  Commum: "/(app)/invoices",
 };
 
 export function usePermissions() {
