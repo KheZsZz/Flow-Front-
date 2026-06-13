@@ -12,8 +12,8 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/themeContext";
 import { Loadding } from "@/components/loadding";
-import { BaixaViagemModal } from "@/components/baixaViagemModal";
-import { createOrdersStyles } from "@/styles/orders.styles";
+import { BaixaViagemModal } from "@/components/modalOrdens";
+import { createOrdersStyles } from "@/styles/ordens.styles";
 import { orderService, statusColor, isFinalized } from "@/services/orders";
 import { formatCurrency } from "@/services/formatMoney";
 
