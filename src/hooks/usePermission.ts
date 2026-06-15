@@ -13,10 +13,18 @@ const ROLE_LEVEL: Record<UserTypeEnum, number> = {
 export const ROLE_ALLOWED_ROUTES: Record<UserTypeEnum, string[]> = {
   Manager: ["*"],
   Admin: ["*"],
-  Financer: ["/dashboard", "/finance", "/invoices", "/invoices/create"],
-  Requestor: ["/orders/create", "/orders"],
+  Financer: ["/dashboard", "/finance", "/invoices", "/collections"],
+  Requestor: ["/orders/create", "/orders", "/status"],
   Driver: ["/driver"],
-  Commum: ["/orders/create", "/orders", "/invoices", "/invoices/create"],
+  Commum: [
+    "/orders",
+    "/invoices",
+    "/collections",
+
+    "/orders/create",
+    "/invoices/create",
+    "/collections/create",
+  ],
 };
 
 // Rota home por perfil (para onde redirecionar após login)
