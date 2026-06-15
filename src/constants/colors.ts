@@ -95,3 +95,17 @@ export const THEME_OPTIONS: {
   { id: "light", icon: "sun", label: "Claro" },
   { id: "dark", icon: "moon", label: "Escuro" },
 ];
+
+type Period = "all" | "today" | "7d" | "30d";
+
+export interface PeriodsTypes {
+  key: Period;
+  label: string;
+}
+
+export const PERIODS: { key: Period; label: string }[] = [
+  { key: "all", label: "Todas" },
+  { key: "today", label: "Hoje" },
+  { key: "7d", label: "7 dias" },
+  { key: "30d", label: "30 dias" },
+];
