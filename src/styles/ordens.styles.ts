@@ -1,8 +1,5 @@
 import { StyleSheet } from "react-native";
 
-// Mantém o padrão dos outros factories: createXStyles(theme, isMobile).
-// Usa apenas campos de theme já existentes no projeto (primary, text,
-// textSecondary, link, isDark) + cores derivadas de isDark.
 export const createOrdersStyles = (theme: any, isMobile: boolean) => {
   const cardBg = theme.isDark ? "rgba(255,255,255,0.06)" : "#FFFFFF";
   const border = theme.isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)";
@@ -34,20 +31,25 @@ export const createOrdersStyles = (theme: any, isMobile: boolean) => {
 
     // filtros
     search: {
-      backgroundColor: inputBg,
       borderRadius: 10,
       paddingHorizontal: 14,
       paddingVertical: 10,
       color: theme.text,
       marginBottom: 10,
     },
-    dateRow: { flexDirection: "row", gap: 8, marginBottom: 10 },
+
+    dateRow: {
+      width: "100%",
+      flexDirection: "row",
+      gap: 8,
+      marginBottom: 10,
+      flexWrap: "wrap",
+    },
+
     dateInput: {
       flex: 1,
-      backgroundColor: inputBg,
+      width: "50%",
       borderRadius: 10,
-      paddingHorizontal: 12,
-      paddingVertical: 9,
       color: theme.text,
     },
     chipsRow: {

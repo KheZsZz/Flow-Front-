@@ -18,6 +18,7 @@ import { ControlledInput } from "@/components/controllerInput";
 import { createOrdersStyles } from "@/styles/ordens.styles";
 import { orderService } from "@/services/orders";
 import { PERIODS, PeriodsTypes } from "@/constants/colors";
+import { OrderType } from "@/schemas/ordersSchema";
 
 const parseBR = (s: string): Date | null => {
   const parts = s.split("/");
@@ -42,7 +43,7 @@ export default function OrdersScreen() {
   const from = watch("from");
   const to = watch("to");
 
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<OrderType[]>([]);
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState<PeriodsTypes["key"]>("all");
   const [baixaOrder, setBaixaOrder] = useState<any | null>(null);
@@ -88,10 +89,13 @@ export default function OrdersScreen() {
       }
 
       if (!s) return true;
+
       const driver = o.drivers?.users?.name_user?.toLowerCase() || "";
+
       const plates = (o.ordervehicles || [])
         .map((v: any) => v.vehicles?.license_plate?.toLowerCase() || "")
         .join(" ");
+
       const clientsAndNfe = (o.order_add_itens || [])
         .map((l: any) =>
           [
@@ -137,22 +141,28 @@ export default function OrdersScreen() {
         />
 
         <View style={styles.dateRow}>
-          <ControlledInput
-            control={control}
-            name="from"
-            placeholder="De DD/MM/AAAA"
-            mask="99/99/9999"
-            style={{ flex: 1 }}
-            keyboardType="numeric"
-          />
-          <ControlledInput
-            control={control}
-            name="to"
-            placeholder="Até DD/MM/AAAA"
-            mask="99/99/9999"
-            style={{ flex: 1 }}
-            keyboardType="numeric"
-          />
+          <View style={styles.dateInput}>
+            <ControlledInput
+              control={control}
+              name="from"
+              variant="date"
+              placeholder="De DD/MM/AAAA"
+              mask="99/99/9999"
+              style={{ flex: 1 }}
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={styles.dateInput}>
+            <ControlledInput
+              control={control}
+              name="to"
+              variant="date"
+              placeholder="Até DD/MM/AAAA"
+              mask="99/99/9999"
+              style={{ flex: 1 }}
+              keyboardType="numeric"
+            />
+          </View>
         </View>
 
         <View style={styles.chipsRow}>

@@ -40,7 +40,7 @@ export const collectionSchema = z.object({
   status_id: z.string().uuid("ID do status inválido"),
 });
 
-export type CreateOrderType = z.infer<typeof orderSchema>;
+export type OrderType = z.infer<typeof orderSchema>;
 export type OrderVehicleType = z.infer<typeof orderVehicleSchema>;
 export type OrderItemInputType = z.infer<typeof orderItemInputSchema>;
 export type UpdateOrderStatusType = z.infer<typeof updateOrderStatusSchema>;
