@@ -1,185 +1,228 @@
 import { StyleSheet } from "react-native";
 
-export const createOrdersStyles = (theme: any, isMobile: boolean) => {
-  const cardBg = theme.isDark ? "rgba(255,255,255,0.06)" : "#FFFFFF";
-  const border = theme.isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)";
-  const inputBg = theme.isDark ? "rgba(255,255,255,0.06)" : "#F2F3F5";
-  const chipOff = theme.isDark ? "rgba(255,255,255,0.08)" : "#ECEEF1";
-
-  return StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingHorizontal: isMobile ? 12 : 24,
-      paddingTop: 12,
-    },
-    content: { marginBottom: 8 },
-    headers: {
+export const createOrderFormStyles = (theme: any, isMobile: boolean) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.background },
+    header: {
+      padding: 16,
       flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 12,
-    },
-    title: { fontSize: 22, fontWeight: "700", color: theme.text },
-    btn_add: {
-      backgroundColor: theme.primary,
-      width: 44,
-      height: 44,
-      borderRadius: 22,
       alignItems: "center",
       justifyContent: "center",
+      borderBottomWidth: 1,
+      borderBottomColor: theme.borderColor,
     },
-
-    // filtros
-    search: {
+    backButton: {
+      position: "absolute",
+      left: 16,
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
+      padding: 10,
       borderRadius: 10,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
+    },
+    title: { color: theme.text, fontSize: 20, fontWeight: "bold" },
+    scroll: { paddingBottom: 60 },
+    form: {
+      paddingHorizontal: isMobile ? 18 : 40,
+      paddingTop: 20,
+      width: isMobile ? "100%" : "70%",
+      alignSelf: "center",
+    },
+    sectionTitle: {
       color: theme.text,
+      fontSize: 15,
+      fontWeight: "700",
+      marginTop: 18,
       marginBottom: 10,
     },
-
-    dateRow: {
-      width: "100%",
-      flexDirection: "row",
-      gap: 8,
-      marginBottom: 10,
-      flexWrap: "wrap",
-    },
-
-    dateInput: {
-      flex: 1,
-      width: "50%",
-      borderRadius: 10,
+    label: {
       color: theme.text,
+      fontSize: 13,
+      fontWeight: "600",
+      marginBottom: 6,
+      marginTop: 8,
     },
-    chipsRow: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: 8,
-      marginBottom: 12,
-    },
-    chip: {
-      paddingHorizontal: 14,
-      paddingVertical: 7,
-      borderRadius: 18,
-      backgroundColor: chipOff,
-    },
-    chipActive: { backgroundColor: theme.primary },
-    chipText: { color: theme.text, fontSize: 13, fontWeight: "600" },
-    chipTextActive: { color: "#FFF", fontSize: 13, fontWeight: "600" },
-
-    // card de viagem
-    card: {
-      backgroundColor: cardBg,
-      borderRadius: 14,
+    input: {
+      backgroundColor: theme.card,
       borderWidth: 1,
-      borderColor: border,
-      padding: 14,
-      marginBottom: 12,
+      borderColor: theme.inputBorder ?? theme.borderColor,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      height: 48,
+      color: theme.text,
     },
-    cardHeader: {
+    multiline: { height: 90, paddingTop: 12, textAlignVertical: "top" },
+    helper: { color: theme.textSecondary, fontSize: 12, marginTop: 4 },
+    errorText: { color: theme.error, fontSize: 12, marginTop: 4 },
+
+    pickerField: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
+      gap: 10,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.inputBorder ?? theme.borderColor,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      height: 50,
+    },
+    pickerText: { flex: 1, color: theme.text, fontSize: 15 },
+    pickerPlaceholder: { flex: 1, color: theme.textSecondary, fontSize: 15 },
+
+    // composição de veículos
+    vehicleCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.borderColor,
+      borderRadius: 10,
+      padding: 12,
       marginBottom: 8,
     },
-    badge: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: 12,
-      alignSelf: "flex-start",
-    },
-    badgeText: { color: "#FFF", fontSize: 12, fontWeight: "700" },
-    dateText: { color: theme.textSecondary, fontSize: 12 },
-    line: { color: theme.text, fontSize: 14, marginTop: 2 },
-    lineMuted: { color: theme.textSecondary, fontSize: 13, marginTop: 2 },
-    metaRow: {
+    vehicleInfo: { flex: 1 },
+    vehiclePlate: { color: theme.text, fontWeight: "700", fontSize: 14 },
+    vehicleRole: { color: theme.textSecondary, fontSize: 12, marginTop: 2 },
+
+    addBtn: {
       flexDirection: "row",
-      justifyContent: "space-between",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      borderWidth: 1,
+      borderStyle: "dashed",
+      borderColor: theme.isDark ? theme.link : theme.primary,
+      borderRadius: 10,
+      paddingVertical: 12,
+      marginTop: 4,
+    },
+    addBtnText: {
+      color: theme.isDark ? theme.link : theme.primary,
+      fontWeight: "700",
+      fontSize: 14,
+    },
+
+    // chips (type_orders / segmented)
+    chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 6 },
+    chip: {
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: 16,
+      backgroundColor: theme.isDark ? "rgba(255,255,255,0.08)" : "#ECEEF1",
+    },
+    chipActive: { backgroundColor: theme.isDark ? theme.link : theme.primary },
+    chipText: { color: theme.text, fontSize: 12, fontWeight: "600" },
+    chipTextActive: { color: "#FFF", fontSize: 12, fontWeight: "600" },
+
+    // AddInvoiceItems
+    segmented: {
+      flexDirection: "row",
+      backgroundColor: theme.isDark ? "rgba(255,255,255,0.06)" : "#ECEEF1",
+      borderRadius: 10,
+      padding: 4,
+      gap: 4,
+      marginBottom: 12,
+      flexWrap: "wrap",
+    },
+    segment: {
+      flexGrow: 1,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    segmentActive: {
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
+    },
+    segmentText: { color: theme.text, fontSize: 12, fontWeight: "600" },
+    segmentTextActive: { color: "#FFF", fontSize: 12, fontWeight: "600" },
+    lookupRow: { flexDirection: "row", gap: 8, alignItems: "center" },
+    lookupInput: {
+      flex: 1,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.inputBorder ?? theme.borderColor,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      height: 48,
+      color: theme.text,
+    },
+    lookupBtn: {
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
+      borderRadius: 10,
+      paddingHorizontal: 16,
+      height: 48,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    lookupBtnText: { color: "#FFF", fontWeight: "700" },
+
+    itemCard: {
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.borderColor,
+      borderRadius: 12,
+      padding: 12,
       marginTop: 10,
     },
-    metaValue: { color: theme.text, fontWeight: "700" },
-
-    cardActions: {
-      flexDirection: "row",
-      gap: 8,
-      marginTop: 12,
-      justifyContent: "flex-end",
-    },
-    actionBtn: {
+    itemTop: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      justifyContent: "space-between",
+    },
+    itemLabel: { color: theme.text, fontWeight: "700", fontSize: 14 },
+    itemSub: { color: theme.textSecondary, fontSize: 12, marginTop: 2 },
+    trackingInput: {
+      backgroundColor: theme.background,
+      borderWidth: 1,
+      borderColor: theme.inputBorder ?? theme.borderColor,
+      borderRadius: 8,
       paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 8,
-      backgroundColor: chipOff,
+      height: 40,
+      color: theme.text,
+      marginTop: 8,
     },
-    actionBtnPrimary: { backgroundColor: theme.primary },
-    actionText: { color: theme.text, fontWeight: "600", fontSize: 13 },
-    actionTextPrimary: { color: "#FFF", fontWeight: "700", fontSize: 13 },
-    actionDisabled: { opacity: 0.4 },
+    lockTag: {
+      color: "#2E7D32",
+      fontSize: 11,
+      fontWeight: "700",
+    },
 
-    empty: { textAlign: "center", color: theme.textSecondary, marginTop: 40 },
-
-    // ----- modal de baixa -----
-    overlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
+    // submit / delete
+    button: {
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
+      borderRadius: 12,
+      height: 52,
+      alignItems: "center",
       justifyContent: "center",
-      paddingHorizontal: 16,
+      marginTop: 24,
     },
-    modalCard: {
-      backgroundColor: theme.isDark ? "#1B1D22" : "#FFFFFF",
-      borderRadius: 16,
-      padding: 18,
-      maxHeight: "82%",
-    },
-    modalTitle: { fontSize: 18, fontWeight: "700", color: theme.text },
-    modalSub: {
-      fontSize: 13,
-      color: theme.textSecondary,
-      marginTop: 4,
-      marginBottom: 12,
-    },
-    itemRow: {
+    buttonText: { color: "#FFF", fontWeight: "700", fontSize: 16 },
+    deleteBtn: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: border,
-      gap: 12,
-    },
-    checkbox: {
-      width: 22,
-      height: 22,
-      borderRadius: 6,
-      borderWidth: 2,
-      borderColor: theme.primary,
-      alignItems: "center",
       justifyContent: "center",
-    },
-    checkboxOn: { backgroundColor: theme.primary },
-    itemTitle: { color: theme.text, fontWeight: "600" },
-    itemSub: { color: theme.textSecondary, fontSize: 12 },
-    doneTag: { color: "#2E7D32", fontSize: 12, fontWeight: "700" },
-    modalFooter: { flexDirection: "row", gap: 10, marginTop: 16 },
-    modalBtn: {
-      flex: 1,
-      paddingVertical: 12,
-      borderRadius: 10,
-      alignItems: "center",
-    },
-    modalBtnGhost: { backgroundColor: chipOff },
-    modalBtnPrimary: { backgroundColor: theme.primary },
-    modalBtnText: { color: theme.text, fontWeight: "700" },
-    modalBtnTextPrimary: { color: "#FFF", fontWeight: "700" },
-    warn: {
-      backgroundColor: theme.isDark ? "rgba(239,108,0,0.15)" : "#FFF3E0",
-      borderRadius: 8,
-      padding: 10,
+      gap: 8,
+      borderRadius: 12,
+      height: 48,
+      backgroundColor: theme.error,
       marginTop: 12,
     },
-    warnText: { color: "#EF6C00", fontSize: 12, fontWeight: "600" },
+    deleteBtnText: { color: "#FFF", fontWeight: "700", fontSize: 15 },
+
+    lockedBanner: {
+      backgroundColor: theme.isDark ? "rgba(239,68,68,0.15)" : "#fdecea",
+      borderRadius: 10,
+      padding: 12,
+      marginBottom: 8,
+    },
+    lockedText: { color: theme.error, fontSize: 13, fontWeight: "600" },
+    infoBanner: {
+      backgroundColor: theme.isDark ? "rgba(239,108,0,0.15)" : "#fff4e5",
+      borderRadius: 10,
+      padding: 12,
+      marginBottom: 8,
+    },
+    infoText: { color: "#EF6C00", fontSize: 13, fontWeight: "600" },
+
+    removeBtn: { padding: 6 },
   });
-};
