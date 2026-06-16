@@ -16,6 +16,7 @@ import { MaskedTextInput } from "react-native-mask-text";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
 import { createInputStyles } from "@/styles/input.styles";
+import { PickerModal } from "@/components/pickerModal";
 
 interface ControlledInputProps<
   TFieldValues extends FieldValues,
@@ -25,10 +26,11 @@ interface ControlledInputProps<
   label?: string;
   errorMessage?: string;
   iconName?: React.ComponentProps<typeof FontAwesome6>["name"];
-  variant?: "text" | "select" | "switch" | "date" | "numeric";
+  variant?: "text" | "select" | "switch" | "date" | "numeric" | "dropDownList";
   options?: { label: string; value: any }[];
   mask?: string;
   disabled?: boolean;
+  placeholder?: string;
 }
 
 export function ControlledInput<TFieldValues extends FieldValues>({
@@ -49,6 +51,7 @@ export function ControlledInput<TFieldValues extends FieldValues>({
   const styles = createInputStyles(theme);
   const [passwordHidden, setPasswordHidden] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [ddOpen, setDdOpen] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -58,7 +61,6 @@ export function ControlledInput<TFieldValues extends FieldValues>({
         control={control}
         name={name}
         render={({ field: { onChange, value } }) => {
-          // 1. VARIANT: SWITCH
           if (variant === "switch") {
             return (
               <View style={{ marginVertical: 8 }}>
@@ -71,7 +73,6 @@ export function ControlledInput<TFieldValues extends FieldValues>({
             );
           }
 
-          // 2. VARIANT: SELECT (Lista de botões)
           if (variant === "select") {
             return (
               <View
@@ -111,7 +112,58 @@ export function ControlledInput<TFieldValues extends FieldValues>({
             );
           }
 
-          // 3. VARIANT: DATE
+          if (variant === "dropDownList") {
+            const selected = options?.find((o: any) => o.value === value);
+            return (
+              <View style={{ marginTop: 8 }}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => setDdOpen(true)}
+                  style={styles.inputWrapper}
+                >
+                  <FontAwesome6
+                    name={iconName ?? "list"}
+                    size={16}
+                    color={theme.isDark ? theme.textSecondary : theme.text}
+                  />
+                  <Text
+                    style={{
+                      flex: 1,
+                      color: theme.isDark ? theme.textSecondary : theme.text,
+                      marginLeft: 8,
+                    }}
+                    numberOfLines={1}
+                  >
+                    {selected ? selected.label : "Selecionar..."}
+                  </Text>
+                  <FontAwesome6
+                    name="chevron-down"
+                    size={14}
+                    color={theme.isDark ? theme.textSecondary : theme.text}
+                  />
+                </TouchableOpacity>
+
+                {!!errorMessage && (
+                  <Text style={styles.errorText}>{errorMessage}</Text>
+                )}
+
+                <PickerModal
+                  visible={ddOpen}
+                  title={label ?? "Selecionar"}
+                  onClose={() => setDdOpen(false)}
+                  onSelect={(opt) => onChange(opt.id)}
+                  load={async () =>
+                    (options ?? []).map((o: any) => ({
+                      id: o.value,
+                      label: o.label,
+                      sublabel: o.sublabel,
+                    }))
+                  }
+                />
+              </View>
+            );
+          }
+
           if (variant === "date") {
             if (variant === "date" && Platform.OS === "web") {
               return (
@@ -156,7 +208,6 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                   </Text>
                 </TouchableOpacity>
 
-                {/* Renderize fora do container se necessário, ou garanta a visibilidade */}
                 {showDatePicker && (
                   <DateTimePicker
                     value={value ? new Date(value) : new Date()}
@@ -177,7 +228,7 @@ export function ControlledInput<TFieldValues extends FieldValues>({
             );
           }
 
-          // 4. VARIANT: TEXT / NUMERIC / MASK
+          // 4. VARIANT: TEXT / NUMERIC
           return (
             <View
               style={[

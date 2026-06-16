@@ -1,79 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
   ScrollView,
-  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
   useWindowDimensions,
 } from "react-native";
-import { api } from "@/services/api";
 import { Feather } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { useForm } from "react-hook-form";
 import { useTheme } from "@/contexts/themeContext";
+import { api } from "@/services/api";
 import { orderService, STATUS_CODE } from "@/services/orders";
 import { OrderTypeSchema } from "@/schemas/enumSchema";
-import { createOrderFormStyles } from "@/styles/ordens.styles";
+import { ControlledInput } from "@/components/controllerInput";
+import { AddInvoiceItems, OrderItemDraft } from "@/components/addinvoiceitems";
+import { createOrdersListStyles } from "@/styles/orders.styles";
 import { Loadding } from "@/components/loadding";
 import rollback from "@/services/rollback";
 
-import { AddInvoiceItems, OrderItemDraft } from "@/components/Addinvoiceitems";
-import { PickerModal, PickerOption } from "@/components/Pickermodal";
+const typeOptions: string[] = (OrderTypeSchema as any).options ?? [];
 
-const typeOptions: string[] = (OrderTypeSchema as any).options ?? [
-  "Coleta",
-  "Entrega",
-  "Devolução",
-  "Reentrega",
-  "Avarias",
-];
-
-const pad = (n: number) => String(n).padStart(2, "0");
-const fmtBR = (iso?: string) => {
-  if (!iso) return "";
-  const d = new Date(iso);
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
-};
-const fmtDateTimeBR = (iso?: string) => {
-  if (!iso) return "";
-  const d = new Date(iso);
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(
-    d.getHours(),
-  )}:${pad(d.getMinutes())}`;
-};
-function parseBR(s: string): Date | null {
-  const m = s.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!m) return null;
-  const d = new Date(+m[3], +m[2] - 1, +m[1]);
-  return isNaN(d.getTime()) ? null : d;
-}
-function parseDateTimeBR(s: string): Date | null {
-  const m = s
-    .trim()
-    .match(/^(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}))?$/);
-  if (!m) return null;
-  const d = new Date(
-    +m[3],
-    +m[2] - 1,
-    +m[1],
-    m[4] ? +m[4] : 0,
-    m[5] ? +m[5] : 0,
-  );
-  return isNaN(d.getTime()) ? null : d;
-}
-
-interface VehiclePick {
-  id: string;
-  label: string;
-  role: "Cavalo" | "carreta";
+interface EditForm {
+  driver_id: string;
+  vehicle1: string;
+  vehicle2: string;
+  vehicle3: string;
+  delivery_date: string;
+  scheduled_start: string;
+  notes: string;
 }
 
 export default function EditOrderScreen() {
   const { theme } = useTheme();
   const isMobile = useWindowDimensions().width < 768;
-  const styles = createOrderFormStyles(theme, isMobile);
+  const styles = createOrdersListStyles(theme, isMobile);
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
 
@@ -81,69 +44,82 @@ export default function EditOrderScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [openStatusId, setOpenStatusId] = useState<string | null>(null);
 
-  const [statusCode, setStatusCode] = useState<number | undefined>();
   const [finalized, setFinalized] = useState(false);
   const [started, setStarted] = useState(false);
 
-  const [driver, setDriver] = useState<PickerOption | null>(null);
-  const [vehicles, setVehicles] = useState<VehiclePick[]>([]);
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [scheduledStart, setScheduledStart] = useState("");
-  const [notes, setNotes] = useState("");
+  const [drivers, setDrivers] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
   const [items, setItems] = useState<OrderItemDraft[]>([]);
 
-  // snapshots iniciais p/ detectar mudanças e remoções
-  const [initialDriverId, setInitialDriverId] = useState<string | null>(null);
+  const [loadedDriverName, setLoadedDriverName] = useState("");
+  const [loadedVehicles, setLoadedVehicles] = useState<
+    { label: string; role: string }[]
+  >([]);
+
+  const [initialDriverId, setInitialDriverId] = useState("");
   const [initialVehicleIds, setInitialVehicleIds] = useState<string[]>([]);
   const [initialItemIds, setInitialItemIds] = useState<string[]>([]);
 
-  const [driverOpen, setDriverOpen] = useState(false);
-  const [vehicleOpen, setVehicleOpen] = useState(false);
+  const { control, handleSubmit, watch, setValue, reset } = useForm<EditForm>({
+    defaultValues: {
+      driver_id: "",
+      vehicle1: "",
+      vehicle2: "",
+      vehicle3: "",
+      delivery_date: "",
+      scheduled_start: "",
+      notes: "",
+    },
+  });
+
+  const vehicle1 = watch("vehicle1");
+  const vehicle2 = watch("vehicle2");
+  const v1 = vehicles.find((v) => v.id === vehicle1);
+  const pullsTrailers = v1?.type === "Cavalo";
+
+  const editableHeader = !finalized; // datas/notas/itens
+  const editableFleet = !finalized && !started; // motorista/veículos
 
   const load = async () => {
     try {
-      const [order, statusRes] = await Promise.all([
+      const [order, statusRes, drvRes, vehRes] = await Promise.all([
         orderService.getOrderById(id),
         api.get("/status"),
+        api.get("/drivers"),
+        api.get("/vehicles"),
       ]);
 
       const open = (Array.isArray(statusRes.data) ? statusRes.data : []).find(
         (s: any) => s.code === 100,
       );
       if (open) setOpenStatusId(open.id);
+      setDrivers(Array.isArray(drvRes.data) ? drvRes.data : []);
+      setVehicles(Array.isArray(vehRes.data) ? vehRes.data : []);
 
       const code = order.status?.code;
-      setStatusCode(code);
-      const isFin = !!order.finaled_at || code === STATUS_CODE.CONCLUIDO;
-      setFinalized(isFin);
+      setFinalized(!!order.finaled_at || code === STATUS_CODE.CONCLUIDO);
       setStarted(code !== STATUS_CODE.EM_ABERTO);
 
-      // motorista
-      const dId = order.drivers?.id ?? order.driver_id ?? null;
-      const dName =
-        order.drivers?.users?.name_user ??
-        order.drivers?.name_user ??
-        "Motorista";
-      if (dId) setDriver({ id: dId, label: dName });
+      const dId = order.drivers?.id ?? order.driver_id ?? "";
       setInitialDriverId(dId);
+      setLoadedDriverName(
+        order.drivers?.users?.name_user ?? order.drivers?.name_user ?? "—",
+      );
 
-      // veículos
-      const vlist: VehiclePick[] = (order.ordervehicles ?? [])
-        .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
-        .map((ov: any) => ({
-          id: ov.vehicles?.id,
+      const ovs = (order.ordervehicles ?? []).sort(
+        (a: any, b: any) => (a.position ?? 0) - (b.position ?? 0),
+      );
+      const vIds: string[] = ovs
+        .map((ov: any) => ov.vehicles?.id)
+        .filter(Boolean);
+      setInitialVehicleIds(vIds);
+      setLoadedVehicles(
+        ovs.map((ov: any) => ({
           label: ov.vehicles?.license_plate ?? "Veículo",
-          role: (ov.role as "Cavalo" | "carreta") ?? "Cavalo",
-        }))
-        .filter((v: VehiclePick) => !!v.id);
-      setVehicles(vlist);
-      setInitialVehicleIds(vlist.map((v) => v.id));
+          role: ov.role ?? "Cavalo",
+        })),
+      );
 
-      setDeliveryDate(fmtBR(order.delivery_date));
-      setScheduledStart(fmtDateTimeBR(order.scheduled_start));
-      setNotes(order.notes ?? "");
-
-      // itens existentes
       const existing: OrderItemDraft[] = (order.order_add_itens ?? [])
         .map((l: any) => l.orderitem)
         .filter(Boolean)
@@ -168,12 +144,21 @@ export default function EditOrderScreen() {
                 : undefined
               : oi.collections?.clients?.name_client,
             type_orders: oi.type_orders ?? typeOptions[0],
-            tracking: oi.tracking ?? "",
             locked: oi.status?.code === STATUS_CODE.CONCLUIDO,
           } as OrderItemDraft;
         });
       setItems(existing);
       setInitialItemIds(existing.map((i) => i.orderItemId!).filter(Boolean));
+
+      reset({
+        driver_id: dId,
+        vehicle1: vIds[0] ?? "",
+        vehicle2: vIds[1] ?? "",
+        vehicle3: vIds[2] ?? "",
+        delivery_date: order.delivery_date ?? "",
+        scheduled_start: order.scheduled_start ?? "",
+        notes: order.notes ?? "",
+      });
     } catch {
       Alert.alert("Erro", "Viagem não encontrada.");
       rollback();
@@ -186,82 +171,81 @@ export default function EditOrderScreen() {
     load();
   }, [id]);
 
-  const addVehicle = (opt: PickerOption) => {
-    if (vehicles.length >= 3) {
-      Alert.alert("Limite", "A composição aceita no máximo 3 veículos.");
-      return;
+  const driverOptions = useMemo(
+    () =>
+      drivers.map((d: any) => ({
+        label: d.users?.name_user ?? d.name_user ?? d.name ?? "Motorista",
+        value: d.id,
+      })),
+    [drivers],
+  );
+  const v1Options = useMemo(
+    () =>
+      vehicles
+        .filter((v: any) => v.is_active && v.type !== "Carreta")
+        .map((v: any) => ({
+          label: `${v.license_plate} · ${v.type}`,
+          value: v.id,
+        })),
+    [vehicles],
+  );
+  const carretaOptions = useMemo(
+    () =>
+      vehicles
+        .filter((v: any) => v.is_active && v.type === "Carreta")
+        .map((v: any) => ({
+          label: `${v.license_plate} · ${v.type}`,
+          value: v.id,
+        })),
+    [vehicles],
+  );
+  const v3Options = useMemo(
+    () => carretaOptions.filter((o) => o.value !== vehicle2),
+    [carretaOptions, vehicle2],
+  );
+
+  useEffect(() => {
+    if (editableFleet && !pullsTrailers) {
+      setValue("vehicle2", "");
+      setValue("vehicle3", "");
     }
-    if (vehicles.some((v) => v.id === opt.id)) return;
-    const role: "Cavalo" | "carreta" =
-      vehicles.length === 0 ? "Cavalo" : "carreta";
-    setVehicles([...vehicles, { id: opt.id, label: opt.label, role }]);
-  };
+  }, [pullsTrailers, editableFleet]);
 
-  const removeVehicle = (idx: number) => {
-    const next = vehicles.filter((_, i) => i !== idx);
-    setVehicles(
-      next.map((v, i) => ({ ...v, role: i === 0 ? "Cavalo" : "carreta" })),
-    );
-  };
+  const onSubmit = async (data: EditForm) => {
+    const payload: any = { notes: data.notes };
+    if (data.delivery_date) payload.delivery_date = data.delivery_date;
+    payload.scheduled_start = data.scheduled_start || null;
 
-  const onSubmit = async () => {
-    const dd = parseBR(deliveryDate);
-    if (deliveryDate.trim() && !dd) {
-      Alert.alert("Atenção", "Data de entrega inválida (DD/MM/AAAA).");
-      return;
-    }
-    let ss: Date | null | undefined = undefined;
-    if (scheduledStart.trim()) {
-      const parsed = parseDateTimeBR(scheduledStart);
-      if (!parsed) {
-        Alert.alert("Atenção", "Início agendado inválido (DD/MM/AAAA HH:mm).");
-        return;
-      }
-      ss = parsed;
-    }
+    if (editableFleet) {
+      if (data.driver_id && data.driver_id !== initialDriverId)
+        payload.driver_id = data.driver_id;
 
-    const payload: any = {
-      notes: notes,
-    };
-    if (dd) payload.delivery_date = dd.toISOString();
-    if (ss !== undefined)
-      payload.scheduled_start = ss ? ss.toISOString() : null;
-
-    // motorista/veículos só se a viagem ainda não foi iniciada
-    if (!started) {
-      if (driver && driver.id !== initialDriverId)
-        payload.driver_id = driver.id;
-
-      const currentVehicleIds = vehicles.map((v) => v.id);
+      const current = [data.vehicle1, data.vehicle2, data.vehicle3].filter(
+        Boolean,
+      );
       const changed =
-        currentVehicleIds.length !== initialVehicleIds.length ||
-        currentVehicleIds.some((cid, i) => cid !== initialVehicleIds[i]);
+        current.length !== initialVehicleIds.length ||
+        current.some((cid, i) => cid !== initialVehicleIds[i]);
       if (changed) {
-        payload.vehicles = vehicles.map((v, i) => ({
-          vehicle_id: v.id,
-          role: v.role,
+        payload.vehicles = current.map((vid, i) => ({
+          vehicle_id: vid,
+          role: i === 0 ? "Cavalo" : "carreta",
           position: i + 1,
         }));
       }
     }
 
-    // itens novos -> add_items
     const newItems = items.filter((i) => !i.existing);
     if (newItems.length > 0) {
-      if (!openStatusId) {
-        Alert.alert("Erro", "Status 'Em Aberto' (100) não encontrado.");
-        return;
-      }
+      if (!openStatusId)
+        return Alert.alert("Erro", "Status 'Em Aberto' (100) não encontrado.");
       payload.add_items = newItems.map((it) => ({
         invoice_id: it.invoice_id,
         collection_id: it.collection_id,
         type_orders: it.type_orders,
         status_id: openStatusId,
-        tracking: it.tracking?.trim() ? it.tracking : undefined,
       }));
     }
-
-    // itens existentes removidos -> remove_item_ids
     const currentExistingIds = items
       .filter((i) => i.existing)
       .map((i) => i.orderItemId!);
@@ -324,7 +308,10 @@ export default function EditOrderScreen() {
         <Text style={styles.title}>Editar Viagem</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scroll}
+      >
         <View style={styles.form}>
           {finalized && (
             <View style={styles.lockedBanner}>
@@ -336,101 +323,97 @@ export default function EditOrderScreen() {
           {!finalized && started && (
             <View style={styles.infoBanner}>
               <Text style={styles.infoText}>
-                Viagem iniciada — motorista e veículos não podem ser alterados.
-                Notas já concluídas não podem ser removidas.
+                Viagem iniciada — motorista e veículos não podem ser alterados;
+                notas concluídas não podem ser removidas.
               </Text>
             </View>
           )}
 
           <Text style={styles.sectionTitle}>Dados gerais</Text>
 
-          <Text style={styles.label}>Motorista</Text>
-          <TouchableOpacity
-            style={[
-              styles.pickerField,
-              (finalized || started) && { opacity: 0.5 },
-            ]}
-            onPress={() => !finalized && !started && setDriverOpen(true)}
-            disabled={finalized || started}
-          >
-            <Feather name="user" size={16} color={theme.textSecondary} />
-            <Text style={driver ? styles.pickerText : styles.pickerPlaceholder}>
-              {driver ? driver.label : "Selecionar motorista"}
-            </Text>
-          </TouchableOpacity>
+          {editableFleet ? (
+            <ControlledInput
+              control={control}
+              name="driver_id"
+              label="Motorista"
+              variant="select"
+              iconName="user"
+              options={driverOptions}
+            />
+          ) : (
+            <>
+              <Text style={styles.label}>Motorista</Text>
+              <View style={styles.readonlyField}>
+                <Text style={styles.readonlyValue}>{loadedDriverName}</Text>
+              </View>
+            </>
+          )}
 
-          <Text style={styles.label}>Data de entrega</Text>
-          <TextInput
-            style={[styles.input, finalized && { opacity: 0.5 }]}
-            value={deliveryDate}
-            onChangeText={setDeliveryDate}
-            placeholder="DD/MM/AAAA"
-            placeholderTextColor={theme.textSecondary}
-            keyboardType="numeric"
-            editable={!finalized}
+          <ControlledInput
+            control={control}
+            name="delivery_date"
+            label="Data de entrega"
+            variant="date"
+            iconName="calendar"
           />
-
-          <Text style={styles.label}>Início agendado</Text>
-          <TextInput
-            style={[styles.input, finalized && { opacity: 0.5 }]}
-            value={scheduledStart}
-            onChangeText={setScheduledStart}
-            placeholder="DD/MM/AAAA HH:mm"
-            placeholderTextColor={theme.textSecondary}
-            editable={!finalized}
+          <ControlledInput
+            control={control}
+            name="scheduled_start"
+            label="Início agendado"
+            variant="date"
+            iconName="clock"
           />
-
-          <Text style={styles.label}>Observações</Text>
-          <TextInput
-            style={[
-              styles.input,
-              styles.multiline,
-              finalized && { opacity: 0.5 },
-            ]}
-            value={notes}
-            onChangeText={setNotes}
+          <ControlledInput
+            control={control}
+            name="notes"
+            label="Observações"
             placeholder="Observações da viagem"
-            placeholderTextColor={theme.textSecondary}
+            iconName="note-sticky"
             multiline
-            editable={!finalized}
           />
 
           <Text style={styles.sectionTitle}>Composição de veículos</Text>
-          {vehicles.map((v, idx) => (
-            <View key={v.id} style={styles.vehicleCard}>
-              <Feather name="truck" size={18} color={theme.textSecondary} />
-              <View style={styles.vehicleInfo}>
-                <Text style={styles.vehiclePlate}>{v.label}</Text>
-                <Text style={styles.vehicleRole}>
-                  {v.role} · posição {idx + 1}
+          {editableFleet ? (
+            <>
+              <ControlledInput
+                control={control}
+                name="vehicle1"
+                label="Veículo principal (líder)"
+                variant="select"
+                iconName="truck"
+                options={v1Options}
+              />
+              {pullsTrailers && (
+                <>
+                  <ControlledInput
+                    control={control}
+                    name="vehicle2"
+                    label="Carreta (2ª placa)"
+                    variant="select"
+                    iconName="trailer"
+                    options={carretaOptions}
+                  />
+                  {!!vehicle2 && (
+                    <ControlledInput
+                      control={control}
+                      name="vehicle3"
+                      label="Carreta (3ª placa)"
+                      variant="select"
+                      iconName="trailer"
+                      options={v3Options}
+                    />
+                  )}
+                </>
+              )}
+            </>
+          ) : (
+            loadedVehicles.map((v, i) => (
+              <View key={i} style={styles.readonlyField}>
+                <Text style={styles.readonlyValue}>
+                  {v.label} · {v.role}
                 </Text>
               </View>
-              {!finalized && !started && (
-                <TouchableOpacity
-                  style={styles.removeBtn}
-                  onPress={() => removeVehicle(idx)}
-                >
-                  <Feather name="trash-2" size={18} color={theme.error} />
-                </TouchableOpacity>
-              )}
-            </View>
-          ))}
-          {!finalized && !started && vehicles.length < 3 && (
-            <TouchableOpacity
-              style={styles.addBtn}
-              onPress={() => setVehicleOpen(true)}
-            >
-              <Feather
-                name="plus"
-                size={16}
-                color={theme.isDark ? theme.link : theme.primary}
-              />
-              <Text style={styles.addBtnText}>
-                {vehicles.length === 0
-                  ? "Adicionar Cavalo"
-                  : "Adicionar carreta"}
-              </Text>
-            </TouchableOpacity>
+            ))
           )}
 
           <Text style={styles.sectionTitle}>Itens da viagem</Text>
@@ -444,7 +427,7 @@ export default function EditOrderScreen() {
           {!finalized && (
             <TouchableOpacity
               style={styles.button}
-              onPress={onSubmit}
+              onPress={handleSubmit(onSubmit)}
               disabled={submitting}
             >
               {submitting ? (
@@ -454,7 +437,6 @@ export default function EditOrderScreen() {
               )}
             </TouchableOpacity>
           )}
-
           {!finalized && (
             <TouchableOpacity style={styles.deleteBtn} onPress={onDelete}>
               <Feather name="trash-2" size={16} color="#fff" />
@@ -463,38 +445,6 @@ export default function EditOrderScreen() {
           )}
         </View>
       </ScrollView>
-
-      <PickerModal
-        visible={driverOpen}
-        title="Selecionar motorista"
-        onClose={() => setDriverOpen(false)}
-        onSelect={setDriver}
-        load={async () => {
-          const { data } = await api.get("/drivers");
-          return (Array.isArray(data) ? data : []).map((d: any) => ({
-            id: d.id,
-            label: d.users?.name_user ?? d.name_user ?? d.name ?? "Motorista",
-            sublabel: d.license_number ?? d.category ?? undefined,
-            raw: d,
-          }));
-        }}
-      />
-
-      <PickerModal
-        visible={vehicleOpen}
-        title="Selecionar veículo"
-        onClose={() => setVehicleOpen(false)}
-        onSelect={addVehicle}
-        load={async () => {
-          const { data } = await api.get("/vehicles");
-          return (Array.isArray(data) ? data : []).map((v: any) => ({
-            id: v.id,
-            label: v.license_plate ?? "Veículo",
-            sublabel: `${v.make ?? ""} ${v.model ?? ""}`.trim() || undefined,
-            raw: v,
-          }));
-        }}
-      />
     </View>
   );
 }

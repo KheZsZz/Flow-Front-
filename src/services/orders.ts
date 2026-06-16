@@ -2,8 +2,8 @@ import { api } from "./api";
 
 export interface OrderVehicleInput {
   vehicle_id: string;
-  role?: "Cavalo" | "carreta";
-  position?: number;
+  role: "Cavalo" | "carreta";
+  position: number;
 }
 
 export interface OrderItemInput {
@@ -11,29 +11,46 @@ export interface OrderItemInput {
   collection_id?: string;
   type_orders: string;
   status_id: string;
-  tracking?: string;
 }
 
 export interface CreateOrderPayload {
   status_id: string;
   driver_id: string;
-  delivery_date: string | Date;
-  scheduled_start?: string | Date | null;
+  delivery_date: string; // ISO
+  scheduled_start?: string | null; // ISO
   notes?: string | null;
   vehicles: OrderVehicleInput[];
-  items?: OrderItemInput[];
+  items: OrderItemInput[];
 }
 
 export interface UpdateOrderPayload {
   driver_id?: string;
   notes?: string;
-  delivery_date?: string | Date;
-  scheduled_start?: string | Date;
+  delivery_date?: string;
+  scheduled_start?: string | null;
   vehicles?: OrderVehicleInput[];
   add_items?: OrderItemInput[];
   remove_item_ids?: string[];
 }
 
+/* ── Códigos de status (etapas do ciclo da viagem) ───────────────────── */
+export const STATUS_CODE = {
+  EM_ABERTO: 100,
+  EM_ANDAMENTO: 101,
+  CONCLUIDO: 102,
+  CANCELADO: 103,
+  EM_ROTA: 110,
+  AGUARDANDO_COMPROVANTE: 200,
+} as const;
+
+export const isFinalized = (order: any) =>
+  !!order?.finaled_at || order?.status?.code === STATUS_CODE.CONCLUIDO;
+
+export const isStarted = (order: any) =>
+  order?.status?.code !== undefined &&
+  order.status.code !== STATUS_CODE.EM_ABERTO;
+
+/* ── Service ─────────────────────────────────────────────────────────── */
 export const orderService = {
   async getOrders() {
     const res = await api.get("/orders");
@@ -55,65 +72,31 @@ export const orderService = {
     return res.data;
   },
 
+  async deleteOrder(id: string) {
+    const res = await api.delete(`/orders/${id}`);
+    return res.data;
+  },
+
   async updateStatus(id: string, status_id: string) {
     const res = await api.patch(`/orders/${id}/status`, { status_id });
     return res.data;
   },
 
-  // baixa: conclui as invoices indicadas; o backend encerra a viagem
-  // quando todas estiverem concluídas.
+  // baixa (conclui) os itens selecionados; quando todos concluem,
+  // o backend finaliza a viagem automaticamente.
   async baixar(id: string, item_ids: string[]) {
     const res = await api.post(`/orders/${id}/baixar`, { item_ids });
     return res.data;
   },
 
-  async deleteOrder(id: string) {
-    await api.delete(`/orders/${id}`);
-  },
-
-  // busca de nota para vincular na ordem
+  // busca de nota para incluir como item
   async findInvoiceByNfe(nfe: string) {
     const res = await api.get(`/invoices/nfe/${nfe}`);
     return res.data;
   },
+
   async findInvoiceByBarcode(barcode: string) {
     const res = await api.get(`/invoices/barcode/${barcode}`);
     return res.data;
   },
 };
-
-// ----- status helpers (códigos definidos no banco) -----
-export const STATUS_CODE = {
-  EM_ABERTO: 100,
-  EM_ANDAMENTO: 101,
-  CONCLUIDO: 102,
-  CANCELADO: 103,
-  EM_ROTA: 110,
-  AGUARDANDO_CANHOTO: 200,
-  CANHOTO_RECEBIDO: 201,
-} as const;
-
-export function statusColor(code?: number): string {
-  switch (code) {
-    case STATUS_CODE.EM_ABERTO:
-      return "#1565C0"; // azul
-    case STATUS_CODE.EM_ROTA:
-    case STATUS_CODE.EM_ANDAMENTO:
-      return "#EF6C00"; // laranja
-    case STATUS_CODE.CONCLUIDO:
-    case STATUS_CODE.CANHOTO_RECEBIDO:
-      return "#2E7D32"; // verde
-    case STATUS_CODE.CANCELADO:
-      return "#C62828"; // vermelho
-    case STATUS_CODE.AGUARDANDO_CANHOTO:
-      return "#6A1B9A"; // roxo
-    default:
-      return "#616161";
-  }
-}
-
-export const isFinalized = (order: any): boolean =>
-  !!order?.finaled_at || order?.status?.code === STATUS_CODE.CONCLUIDO;
-
-export const isStarted = (order: any): boolean =>
-  order?.status?.code !== STATUS_CODE.EM_ABERTO;

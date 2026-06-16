@@ -6,7 +6,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   ModalProps,
   useWindowDimensions,
 } from "react-native";

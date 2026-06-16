@@ -102,7 +102,11 @@ export function PickerModal({
             }}
           >
             <Text
-              style={{ color: theme.text, fontSize: 16, fontWeight: "bold" }}
+              style={{
+                color: theme.isDark ? theme.textSecondary : theme.text,
+                fontSize: 16,
+                fontWeight: "bold",
+              }}
             >
               {title}
             </Text>
@@ -114,7 +118,9 @@ export function PickerModal({
           <View style={{ padding: 12 }}>
             <TextInput
               placeholder="Buscar..."
-              placeholderTextColor={theme.textSecondary}
+              placeholderTextColor={
+                theme.isDark ? theme.textSecondary : theme.text
+              }
               value={search}
               onChangeText={setSearch}
               style={{

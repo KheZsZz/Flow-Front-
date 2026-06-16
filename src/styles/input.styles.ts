@@ -26,6 +26,7 @@ export const createInputStyles = (
       height: 50,
       borderRadius: 12,
       borderWidth: 1,
+      paddingHorizontal: 8,
       backgroundColor: theme.isDark
         ? "rgba(255, 255, 255, 0.08)"
         : "rgba(255, 255, 255, 0.8)",
