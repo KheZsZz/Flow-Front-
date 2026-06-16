@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTheme } from "@/contexts/themeContext";
 import { ControlledInput } from "@/components/controllerInput";
-import { ClientPickerModal, PickedClient } from "@/components/clientpicker";
+import { ClientPickerModal, PickedClient } from "@/components/clientPicker";
 import {
   collectionFormSchema,
   CollectionFormInput,
@@ -67,6 +67,15 @@ export default function EditCollectionScreen() {
       }
       reset({
         client_id: data.clients?.id ?? "",
+        collection_address: data.collection_address ?? "",
+        quantity:
+          data.quantity !== null && data.quantity !== undefined
+            ? String(data.quantity)
+            : "",
+        weight:
+          data.weight !== null && data.weight !== undefined
+            ? String(data.weight)
+            : "",
         description: data.description ?? "",
         scheduled_date: data.scheduled_date ?? "",
       });
@@ -92,6 +101,11 @@ export default function EditCollectionScreen() {
     try {
       await collectionService.update(id, {
         client_id: data.client_id,
+        collection_address: data.collection_address?.trim()
+          ? data.collection_address
+          : undefined,
+        quantity: data.quantity ? Number(data.quantity) : undefined,
+        weight: data.weight ? Number(data.weight) : undefined,
         description: data.description?.trim() ? data.description : undefined,
         scheduled_date: data.scheduled_date || undefined,
       });
@@ -195,6 +209,36 @@ export default function EditCollectionScreen() {
 
           <ControlledInput
             control={control}
+            name="collection_address"
+            label="Endereço de coleta"
+            placeholder="Rua, número, bairro, cidade/UF"
+            iconName="map-pin"
+            multiline
+            errorMessage={errors.collection_address?.message as string}
+          />
+
+          <ControlledInput
+            control={control}
+            name="quantity"
+            label="Quantidade (volumes)"
+            placeholder="Ex: 10"
+            iconName="package"
+            variant="numeric"
+            errorMessage={errors.quantity?.message as string}
+          />
+
+          <ControlledInput
+            control={control}
+            name="weight"
+            label="Peso (kg)"
+            placeholder="Ex: 250"
+            iconName="bar-chart-2"
+            variant="numeric"
+            errorMessage={errors.weight?.message as string}
+          />
+
+          <ControlledInput
+            control={control}
             name="scheduled_date"
             label="Data agendada"
             variant="date"
@@ -207,6 +251,7 @@ export default function EditCollectionScreen() {
             label="Descrição"
             placeholder="Observações da coleta (opcional)"
             multiline
+            errorMessage={errors.description?.message as string}
           />
 
           <TouchableOpacity
