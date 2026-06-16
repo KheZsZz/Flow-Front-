@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTheme } from "@/contexts/themeContext";
 import { ControlledInput } from "@/components/controllerInput";
-import { ClientPickerModal, PickedClient } from "@/components/clientPicker";
+import { ClientPickerModal, PickedClient } from "@/components/clientpicker";
 import {
   collectionFormSchema,
   CollectionFormInput,

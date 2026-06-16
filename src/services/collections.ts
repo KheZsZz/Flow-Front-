@@ -2,14 +2,15 @@ import { api } from "./api";
 
 export interface CollectionPayload {
   client_id: string;
-  address_id?: string;
+  collection_address?: string;
+  quantity?: number;
+  weight?: number;
   description?: string;
   scheduled_date?: string | Date;
   status_id?: string;
 }
 
 export const collectionService = {
-  // availableOnly = true -> apenas coletas ainda não vinculadas a uma viagem
   async list(availableOnly = false) {
     const res = await api.get(
       `/collections${availableOnly ? "?available=true" : ""}`,
