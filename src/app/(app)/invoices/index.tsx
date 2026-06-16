@@ -47,8 +47,8 @@ export default function InvoiceScreen() {
     const s = search.toLowerCase();
     return invoices.filter(
       (item: InvoiceTypes) =>
-        item.nfe?.toLowerCase().includes(s) ||
         item.cte?.toLowerCase().includes(s) ||
+        item.nfe?.toLowerCase().includes(s) ||
         item.remetente?.name_client?.toLowerCase().includes(s),
     );
   }, [search, invoices]);
