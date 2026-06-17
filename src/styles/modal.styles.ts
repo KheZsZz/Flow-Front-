@@ -8,6 +8,7 @@ export const createInvoiceListStyles = (
   StyleSheet.create({
     container: {
       flex: 1,
+      width: "60%",
       backgroundColor: theme.background,
     },
     card: {

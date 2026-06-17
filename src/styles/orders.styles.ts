@@ -76,7 +76,7 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
     },
 
     filterLabel: {
-      color: theme.textSecondary,
+      color: theme.isDark ? theme.textSecondary : theme.text,
       fontSize: 13,
       fontWeight: "600",
       marginBottom: 8,
@@ -187,12 +187,14 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       flex: 1,
       backgroundColor: "rgba(0,0,0,0.5)",
       justifyContent: "center",
+      alignItems: "center",
       padding: 20,
     },
     modalCard: {
       backgroundColor: theme.card,
       borderRadius: 14,
-      maxHeight: "80%",
+      maxWidth: isMobile ? "90%" : "60%",
+      maxHeight: "70%",
       borderWidth: 1,
       borderColor: theme.borderColor,
       overflow: "hidden",
@@ -375,4 +377,14 @@ export const createOrdersItensStyles = (theme: AppTheme, isMobile: boolean) =>
 
     chip: {},
     chipActive: {},
+    readonlyField: {},
+    readonlyValue: {},
+
+    button: {
+      width: "90%",
+      padding: 10,
+      margin: 10,
+    },
+    buttonText: {},
+    deleteBtnText: {},
   });
