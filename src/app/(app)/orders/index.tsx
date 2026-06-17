@@ -18,6 +18,7 @@ import { Loadding } from "@/components/loadding";
 import { createOrdersListStyles } from "@/styles/orders.styles";
 
 type DateField = "delivery_date" | "created_at" | "finaled_at";
+
 const DATE_FIELD_OPTIONS = [
   { label: "Entrega", value: "delivery_date" },
   { label: "Emissão", value: "created_at" },

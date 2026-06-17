@@ -22,9 +22,11 @@ export const orderSchema = z.object({
   status_id: z.string().uuid("ID do status inválido"),
   driver_id: z.string().uuid("ID do motorista inválido"),
   delivery_date: z.coerce.date({ error: "Data de entrega inválida" }),
-  notes: z.string().max(500).optional(),
+  notes: z.string().max(500).nullish(), // ← aceita null
   vehicles: z.array(orderVehicleSchema).min(1, "Informe ao menos um veículo"),
   items: z.array(orderItemInputSchema).optional(),
+  scheduled_start: z.coerce.date().nullish(), // ← aceita null
+  finaled_at: z.coerce.date().nullish(),
 });
 
 export const updateOrderStatusSchema = z.object({

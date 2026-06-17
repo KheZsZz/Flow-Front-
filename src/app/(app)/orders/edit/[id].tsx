@@ -16,7 +16,7 @@ import { api } from "@/services/api";
 import { orderService, STATUS_CODE } from "@/services/orders";
 import { OrderTypeSchema } from "@/schemas/enumSchema";
 import { ControlledInput } from "@/components/controllerInput";
-import { AddInvoiceItems, OrderItemDraft } from "@/components/addinvoiceitems";
+import { AddInvoiceItems, OrderItemDraft } from "@/components/addInvoiceItems";
 import { createOrdersListStyles } from "@/styles/orders.styles";
 import { Loadding } from "@/components/loadding";
 import rollback from "@/services/rollback";
@@ -173,10 +173,17 @@ export default function EditOrderScreen() {
 
   const driverOptions = useMemo(
     () =>
-      drivers.map((d: any) => ({
-        label: d.users?.name_user ?? d.name_user ?? d.name ?? "Motorista",
-        value: d.id,
-      })),
+      drivers
+        .map((driver: any) => {
+          const drv = Array.isArray(driver.drivers)
+            ? driver.drivers[0]
+            : driver.drivers;
+          return {
+            label: driver.name_user ?? driver.users?.name_user ?? "Motorista",
+            value: drv?.id ?? "", // Drivers.id — FK de orders.driver_id
+          };
+        })
+        .filter((o: any) => o.value),
     [drivers],
   );
   const v1Options = useMemo(

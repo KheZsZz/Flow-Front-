@@ -7,7 +7,7 @@ import { api } from "@/services/api";
 import { orderService } from "@/services/orders";
 import { OrderTypeSchema } from "@/schemas/enumSchema";
 import { ControlledInput } from "@/components/controllerInput";
-import { AddInvoiceItems, OrderItemDraft } from "@/components/addinvoiceitems";
+import { AddInvoiceItems, OrderItemDraft } from "@/components/addInvoiceItems";
 import { createOrdersListStyles } from "@/styles/orders.styles";
 import rollback from "@/services/rollback";
 import {
@@ -93,14 +93,17 @@ export default function CreateOrderScreen() {
 
   const driverOptions = useMemo(
     () =>
-      drivers.map((driver: any) => ({
-        label:
-          driver.users?.name_user ??
-          driver.name_user ??
-          driver.name ??
-          "Motorista",
-        value: driver.id,
-      })),
+      drivers
+        .map((driver: any) => {
+          const drv = Array.isArray(driver.drivers)
+            ? driver.drivers[0]
+            : driver.drivers;
+          return {
+            label: driver.name_user ?? driver.users?.name_user ?? "Motorista",
+            value: drv?.id ?? "", // Drivers.id — FK de orders.driver_id
+          };
+        })
+        .filter((o: any) => o.value),
     [drivers],
   );
 
@@ -178,6 +181,13 @@ export default function CreateOrderScreen() {
       Alert.alert("Sucesso", "Viagem emitida com sucesso!");
       router.push("/orders");
     } catch (e: any) {
+      console.log("createOrder error:", e?.response?.data ?? e?.message ?? e);
+      Alert.alert(
+        "Erro",
+        e?.response?.data?.error ||
+          e?.response?.data?.message ||
+          "Não foi possível emitir a viagem.",
+      );
     } finally {
       setSubmitting(false);
     }
