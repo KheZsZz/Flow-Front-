@@ -53,22 +53,35 @@ export default function EditUserScreen() {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<UpdateUserType>({
     resolver: zodResolver(UpdateUserSchema),
   });
 
+  const isDriver = watch("profile_user") === "Driver";
   const fetchUser = async () => {
     try {
       const { data } = await api.get(`/users/${id}`);
       const u = Array.isArray(data) ? data[0] : data;
       if (!u) throw new Error("not found");
+      const drv = Array.isArray(u.drivers) ? u.drivers[0] : u.drivers;
       reset({
         name_user: u.name_user,
         email_user: u.email_user,
         phone_user: u.phone_user,
         profile_user: u.profile_user ?? "Commum",
         is_active: u.is_active,
+        cnh: drv?.cnh ?? "",
+        validade_cnh: drv?.validade_cnh ?? "",
+        categoria_cnh: drv?.categoria_cnh
+          ? String(drv.categoria_cnh)
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
+        mopp: !!drv?.mopp,
+        moop_validade: drv?.moop_validade ?? "",
       });
     } catch {
       Alert.alert("Erro", "Usuário não encontrado.");
@@ -85,14 +98,29 @@ export default function EditUserScreen() {
   const onSubmit = async (data: UpdateUserType) => {
     setSubmitting(true);
     try {
-      const profile_user = isManager ? data.profile_user : data.profile_user;
-      await api.put(`/users/${id}`, {
+      const profile_user = isManager
+        ? data.profile_user
+        : ALLOWED_NON_MANAGER.includes(data.profile_user as string)
+          ? data.profile_user
+          : "Commum";
+
+      const payload: any = {
         name_user: data.name_user,
         email_user: data.email_user,
         phone_user: data.phone_user,
         profile_user,
         is_active: data.is_active,
-      });
+      };
+
+      if (profile_user === "Driver") {
+        payload.cnh = data.cnh;
+        payload.validade_cnh = data.validade_cnh;
+        payload.categoria_cnh = (data.categoria_cnh ?? []).join(",");
+        payload.mopp = !!data.mopp;
+        payload.moop_validade = data.moop_validade || null;
+      }
+
+      await api.put(`/users/${id}`, payload);
       Alert.alert("Sucesso", "Usuário atualizado com sucesso!");
       rollback();
     } catch {
@@ -166,6 +194,50 @@ export default function EditUserScreen() {
             options={roleOptions}
             errorMessage={errors.profile_user?.message as string}
           />
+          {isDriver && (
+            <>
+              <View style={styles.divider} />
+              <Text style={styles.sectionTitle}>Dados do Motorista</Text>
+
+              <ControlledInput
+                control={control}
+                name="cnh"
+                label="CNH"
+                placeholder="Número da CNH"
+                iconName="id-card"
+                errorMessage={errors.cnh?.message as string}
+              />
+              <ControlledInput
+                control={control}
+                name="categoria_cnh"
+                label="Categoria (pode selecionar várias)"
+                variant="multiSelect"
+                options={CNH_CATEGORIES}
+                errorMessage={errors.categoria_cnh?.message as string}
+              />
+              <ControlledInput
+                control={control}
+                name="validade_cnh"
+                label="Validade da CNH"
+                variant="date"
+                iconName="calendar"
+                errorMessage={errors.validade_cnh?.message as string}
+              />
+              <ControlledInput
+                control={control}
+                name="mopp"
+                label="Possui MOPP"
+                variant="switch"
+              />
+              <ControlledInput
+                control={control}
+                name="moop_validade"
+                label="Validade do MOPP (opcional)"
+                variant="date"
+                iconName="calendar"
+              />
+            </>
+          )}
 
           <View style={styles.divider} />
 

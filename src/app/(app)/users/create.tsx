@@ -36,6 +36,16 @@ const ADMIN_ROLES = [
   { label: "Motorista", value: "Driver" },
 ];
 
+const CNH_CATEGORIES = [
+  { label: "A", value: "A" },
+  { label: "B", value: "B" },
+  { label: "C", value: "C" },
+  { label: "D", value: "D" },
+  { label: "E", value: "E" },
+];
+
+const ALLOWED_NON_MANAGER = ["Commum", "Driver"];
+
 export default function CreateUserScreen() {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
@@ -52,27 +62,45 @@ export default function CreateUserScreen() {
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterUserType>({
     resolver: zodResolver(RegisterUserSchema),
     defaultValues: {
-      profile_user: "Commum", // todo novo usuário nasce como "Usuário"
+      profile_user: "Commum",
+      mopp: false,
+      categoria_cnh: [],
     },
   });
+  const isDriver = watch("profile_user") === "Driver";
 
   const onSubmit = async (data: RegisterUserType) => {
     setLoading(true);
     try {
-      // Reforço no cliente: quem não é Gerente não eleva perfil
-      const profile_user = isManager ? data.profile_user : "Commum";
-      await api.post("/users", {
+      const profile_user = isManager
+        ? data.profile_user
+        : ALLOWED_NON_MANAGER.includes(data.profile_user as string)
+          ? data.profile_user
+          : "Commum";
+
+      const payload: any = {
         name_user: data.name_user,
         email_user: data.email_user,
         password_user: data.password_user,
         phone_user: data.phone_user,
         profile_user,
         created_by: user?.user.id,
-      });
+      };
+
+      if (profile_user === "Driver") {
+        payload.cnh = data.cnh;
+        payload.validade_cnh = data.validade_cnh;
+        payload.categoria_cnh = (data.categoria_cnh ?? []).join(",");
+        payload.mopp = !!data.mopp;
+        payload.moop_validade = data.moop_validade || null;
+      }
+
+      await api.post("/users", payload);
       Alert.alert("Sucesso", "Usuário cadastrado com sucesso!");
       rollback();
     } catch {
@@ -150,6 +178,50 @@ export default function CreateUserScreen() {
             options={roleOptions}
             errorMessage={errors.profile_user?.message as string}
           />
+          {isDriver && (
+            <>
+              <View style={styles.divider} />
+              <Text style={styles.sectionTitle}>Dados do Motorista</Text>
+
+              <ControlledInput
+                control={control}
+                name="cnh"
+                label="CNH"
+                placeholder="Número da CNH"
+                iconName="id-card"
+                errorMessage={errors.cnh?.message as string}
+              />
+              <ControlledInput
+                control={control}
+                name="categoria_cnh"
+                label="Categoria (pode selecionar várias)"
+                variant="multiSelect"
+                options={CNH_CATEGORIES}
+                errorMessage={errors.categoria_cnh?.message as string}
+              />
+              <ControlledInput
+                control={control}
+                name="validade_cnh"
+                label="Validade da CNH"
+                variant="date"
+                iconName="calendar"
+                errorMessage={errors.validade_cnh?.message as string}
+              />
+              <ControlledInput
+                control={control}
+                name="mopp"
+                label="Possui MOPP"
+                variant="switch"
+              />
+              <ControlledInput
+                control={control}
+                name="moop_validade"
+                label="Validade do MOPP (opcional)"
+                variant="date"
+                iconName="calendar"
+              />
+            </>
+          )}
 
           <TouchableOpacity
             style={styles.button}

@@ -26,7 +26,14 @@ interface ControlledInputProps<
   label?: string;
   errorMessage?: string;
   iconName?: React.ComponentProps<typeof FontAwesome6>["name"];
-  variant?: "text" | "select" | "switch" | "date" | "numeric" | "dropDownList";
+  variant?:
+    | "text"
+    | "select"
+    | "switch"
+    | "date"
+    | "numeric"
+    | "dropDownList"
+    | "multiSelect";
   options?: { label: string; value: any }[];
   mask?: string;
   disabled?: boolean;
@@ -225,6 +232,48 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                   />
                 )}
               </>
+            );
+          }
+
+          if (variant === "multiSelect") {
+            const arr: any[] = Array.isArray(value) ? value : [];
+            const toggle = (v: any) =>
+              arr.includes(v)
+                ? onChange(arr.filter((x) => x !== v))
+                : onChange([...arr, v].sort());
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  marginVertical: 8,
+                }}
+              >
+                {options.map((opt) => {
+                  const active = arr.includes(opt.value);
+                  return (
+                    <TouchableOpacity
+                      key={String(opt.value)}
+                      onPress={() => toggle(opt.value)}
+                      style={{
+                        paddingHorizontal: 16,
+                        paddingVertical: 10,
+                        backgroundColor: active
+                          ? theme.primary
+                          : theme.isDark
+                            ? "#333"
+                            : "#EEE",
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Text style={{ color: active ? "#FFF" : theme.text }}>
+                        {opt.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             );
           }
 
