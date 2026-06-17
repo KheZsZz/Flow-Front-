@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   ScrollView,
   useWindowDimensions,
-  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -82,7 +80,7 @@ export default function VehiclesScreen() {
               <View
                 style={[
                   styles.imagePlaceholder,
-                  { borderBottomColor: item.is_active ? "#3b82f6" : "#ef4444" },
+                  { borderBottomColor: item.is_active ? "#79a5ed" : "#ef4444" },
                 ]}
               >
                 <Feather name="truck" size={50} color="#666" />
@@ -91,7 +89,7 @@ export default function VehiclesScreen() {
               <View
                 style={[
                   styles.titleBar,
-                  { backgroundColor: item.is_active ? "#3b82f6" : "#ef4444" },
+                  { backgroundColor: item.is_active ? "#79a5ed" : "#ef4444" },
                 ]}
               >
                 <Text style={styles.titleText}>{item.model.toUpperCase()}</Text>

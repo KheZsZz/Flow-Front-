@@ -51,7 +51,7 @@ export const createVehicleListStyles = (theme: AppTheme, isMobile: boolean) =>
       backgroundColor: theme.card,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: "#333",
+      borderColor: theme.borderColor,
       overflow: "hidden",
     },
 
