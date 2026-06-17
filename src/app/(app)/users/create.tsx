@@ -19,6 +19,7 @@ import { ControlledInput } from "@/components/controllerInput";
 import { usersFormStyles } from "@/styles/users.styles";
 import rollback from "@/services/rollback";
 import { api } from "@/services/api";
+import { CNH_CATEGORIES, ALLOWED_NON_MANAGER } from "@/constants/colors";
 
 /** Gerente pode atribuir qualquer perfil. */
 const MANAGER_ROLES = [
@@ -35,16 +36,6 @@ const ADMIN_ROLES = [
   { label: "Usuário", value: "Commum" },
   { label: "Motorista", value: "Driver" },
 ];
-
-const CNH_CATEGORIES = [
-  { label: "A", value: "A" },
-  { label: "B", value: "B" },
-  { label: "C", value: "C" },
-  { label: "D", value: "D" },
-  { label: "E", value: "E" },
-];
-
-const ALLOWED_NON_MANAGER = ["Commum", "Driver"];
 
 export default function CreateUserScreen() {
   const { theme } = useTheme();

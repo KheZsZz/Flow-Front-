@@ -20,6 +20,7 @@ import { Loadding } from "@/components/loadding";
 import { usersFormStyles } from "@/styles/users.styles";
 import rollback from "@/services/rollback";
 import { api } from "@/services/api";
+import { CNH_CATEGORIES, ALLOWED_NON_MANAGER } from "@/constants/colors";
 
 const MANAGER_ROLES = [
   { label: "Usuário", value: "Commum" },

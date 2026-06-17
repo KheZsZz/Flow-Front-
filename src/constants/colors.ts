@@ -109,3 +109,13 @@ export const PERIODS: { key: Period; label: string }[] = [
   { key: "7d", label: "7 dias" },
   { key: "30d", label: "30 dias" },
 ];
+
+export const CNH_CATEGORIES = [
+  { label: "A", value: "A" },
+  { label: "B", value: "B" },
+  { label: "C", value: "C" },
+  { label: "D", value: "D" },
+  { label: "E", value: "E" },
+];
+
+export const ALLOWED_NON_MANAGER = ["Commum", "Driver"];
