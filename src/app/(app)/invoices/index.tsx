@@ -14,7 +14,7 @@ import {
   Text,
   TextInput,
 } from "react-native";
-import { set } from "zod/v3";
+
 import { Loadding } from "@/components/loadding";
 
 export default function InvoiceScreen() {

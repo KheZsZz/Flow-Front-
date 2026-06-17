@@ -117,15 +117,33 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       gap: 10,
     },
     cardHeaderText: { flex: 1 },
-    trackingText: { color: theme.text, fontWeight: "bold", fontSize: 15 },
+
+    trackingText: {
+      color: theme.text,
+      fontWeight: "bold",
+      fontSize: 15,
+    },
+
     driverName: {
       color: theme.isDark ? "#aaa" : "#666",
       fontSize: 12,
       marginTop: 2,
     },
-    badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 },
-    badgeText: { fontSize: 11, fontWeight: "bold" },
-    cardBody: { padding: 14 },
+
+    badge: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 20,
+    },
+
+    badgeText: {
+      fontSize: 11,
+      fontWeight: "bold",
+    },
+
+    cardBody: {
+      padding: 14,
+    },
     infoRow: {
       flexDirection: "row",
       alignItems: "center",

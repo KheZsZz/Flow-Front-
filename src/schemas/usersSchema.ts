@@ -91,11 +91,11 @@ export const UserSchema = z.object({
   profile_user: UserTypeSchema.default("Commum").optional(),
   corporation_id: z.string().uuid().optional(),
 
-  cnh: z.string().trim().max(20).optional(),
-  validade_cnh: z.string().optional(), // ISO vindo do date input
+  cnh: z.string().trim().max(11).optional(),
+  validade_cnh: z.string().optional(),
   categoria_cnh: z.array(z.enum(["A", "B", "C", "D", "E"])).optional(),
   mopp: z.boolean().optional(),
-  moop_validade: z.string().nullish(), // sempre opcional
+  moop_validade: z.string().nullish(),
 });
 const requireDriverFields = (data: any, ctx: z.RefinementCtx) => {
   if (data.profile_user !== "Driver") return;

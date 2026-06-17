@@ -76,8 +76,8 @@ export default function SatusScreen() {
           <View key={index} style={styles.listItem}>
             <View style={styles.listItemContent}>
               <View style={styles.listItemTitleContainer}>
-                <Text style={styles.listItemTitle}>{item.code}</Text>
                 <Text style={styles.listItemTitle}>{item.name}</Text>
+                <Text style={styles.listItemTitle}>{item.code}</Text>
               </View>
 
               <Text style={styles.listItemDescription}>
@@ -86,22 +86,20 @@ export default function SatusScreen() {
             </View>
             <View style={styles.listItemActions}>
               <TouchableOpacity
-                style={[styles.icon, { backgroundColor: theme.primary }]}
+                style={[styles.icon, styles.editBtn]}
                 onPress={() => router.push(`/(app)/status/edit/${item.id}`)}
               >
-                <Feather
-                  name="edit"
-                  size={24}
-                  color={
-                    theme.isDark ? theme.textSecondary : theme.textSecondary
-                  }
-                />
+                <Text style={styles.editText}>
+                  <Feather name="edit" size={24} /> Editar
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {}}
-                style={[styles.icon, { backgroundColor: theme.error }]}
+                style={[styles.icon, styles.deleteBtn]}
               >
-                <Feather name="trash-2" size={24} color="#FFF" />
+                <Text style={styles.deleteText}>
+                  <Feather name="trash-2" size={24} /> Excluir
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

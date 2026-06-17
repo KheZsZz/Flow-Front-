@@ -140,7 +140,7 @@ export default function EditInvoiceScreen() {
         <TouchableOpacity onPress={rollback}>
           <Feather
             style={styles.backButton}
-            name="arrow-left"
+            name="chevron-left"
             size={24}
             color={theme.isDark ? theme.textSecondary : "#FFF"}
           />

@@ -68,6 +68,7 @@ export const createStatusStyles = (
       padding: 10,
       marginBottom: 10,
     },
+
     listItem: {
       flex: 1,
       flexDirection: "row",
@@ -78,6 +79,8 @@ export const createStatusStyles = (
       borderRadius: 12,
       boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.1)",
       marginBottom: 10,
+      flexDirection: isMobile ? "column" : "row",
+      // overflow: "scroll",
     },
 
     listItemContent: {
@@ -88,6 +91,7 @@ export const createStatusStyles = (
 
     listItemTitleContainer: {
       flexDirection: "row",
+      justifyContent: "space-between",
       flexWrap: "wrap",
       gap: 10,
     },
@@ -112,10 +116,36 @@ export const createStatusStyles = (
       justifyContent: "center",
       flexDirection: "row",
       gap: 10,
+      marginLeft: 20,
     },
 
     icon: {
-      padding: 4,
+      width: isMobile ? "50%" : 100,
+      padding: 6,
       borderRadius: 8,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+
+    deleteBtn: {
+      backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2",
+    },
+    deleteText: { color: "#ef4444", fontWeight: "600", fontSize: 13 },
+
+    baixarBtn: { backgroundColor: theme.isDark ? "#14532d" : "#dcfce7" },
+    baixarText: {
+      color: theme.isDark ? "#4ade80" : "#15803d",
+      fontWeight: "600",
+      fontSize: 13,
+    },
+
+    editBtn: {
+      backgroundColor: theme.isDark ? "#1e2640" : "#e8f0fe",
+    },
+
+    editText: {
+      color: theme.isDark ? "#60a5fa" : "#1a73e8",
+      fontWeight: "600",
+      fontSize: 13,
     },
   });

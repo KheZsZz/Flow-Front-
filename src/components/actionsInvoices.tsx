@@ -1,33 +1,48 @@
 import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { createInvoiceListStyles } from "@/styles/invoices.styles";
+import { useTheme } from "@/contexts/themeContext";
 
 export function InvoiceActions({ onEdit, onDelete, onView }: any) {
+  const { theme } = useTheme();
+  const isMobile = useWindowDimensions().width < 820;
+  const styles = createInvoiceListStyles(theme, isMobile);
+
   return (
     <View style={styles.actionsContainer}>
-      {/*<TouchableOpacity onPress={onView} style={styles.btnAction}>
-        <Feather name="eye" size={18} color="#3b82f6" />
+      {/*<TouchableOpacity
+        onPress={onView}
+        style={[styles.btnAction, styles.baixarBtn]}
+      >
+        <Feather
+          name="eye"
+          size={18}
+          color={theme.isDark ? "#4ade80" : "#15803d"}
+        />
       </TouchableOpacity>*/}
-      <TouchableOpacity onPress={onEdit} style={styles.btnAction}>
-        <Feather name="edit-2" size={18} color="#f59e0b" />
+
+      <TouchableOpacity
+        onPress={onEdit}
+        style={[styles.editBtn, styles.btnAction]}
+      >
+        <Feather
+          name="edit-2"
+          size={18}
+          color={theme.isDark ? "#60a5fa" : "#1a73e8"}
+        />
       </TouchableOpacity>
-      <TouchableOpacity onPress={onDelete} style={styles.btnAction}>
+      <TouchableOpacity
+        onPress={onDelete}
+        style={[styles.deleteBtn, styles.btnAction]}
+      >
         <Feather name="trash-2" size={18} color="#ef4444" />
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  actionsContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 10,
-    justifyContent: "flex-end",
-  },
-  btnAction: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: "rgba(0,0,0,0.05)",
-  },
-});

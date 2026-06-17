@@ -282,11 +282,39 @@ export const createInvoiceListStyles = (theme: AppTheme, isMobile: boolean) =>
       paddingTop: 10,
       alignItems: "center",
     },
+
     btnAction: {
+      flex: 1,
       padding: 8,
-      borderRadius: 6,
-      backgroundColor: theme.isDark ? "#1f1f1f" : "#f0f0f0",
+      borderRadius: 8,
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "center",
+      width: "100%",
+      gap: 6,
     },
+
+    baixarBtn: {
+      backgroundColor: theme.isDark ? "#14532d" : "#dcfce7",
+    },
+
+    baixarText: {
+      color: theme.isDark ? "#4ade80" : "#15803d",
+      fontWeight: "600",
+      fontSize: 13,
+    },
+
+    editBtn: {
+      backgroundColor: theme.isDark ? "#1e2640" : "#e8f0fe",
+    },
+
+    editText: {
+      color: theme.isDark ? "#60a5fa" : "#1a73e8",
+      fontWeight: "600",
+      fontSize: 13,
+    },
+    deleteBtn: { backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2" },
+    deleteText: { color: "#ef4444", fontWeight: "600", fontSize: 13 },
   });
 
 export const createInvoiceUpdateStyles = (theme: AppTheme, isMobile: boolean) =>

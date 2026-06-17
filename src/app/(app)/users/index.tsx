@@ -18,6 +18,7 @@ import { UserTypeEnum } from "@/schemas/enumSchema";
 import { Loadding } from "@/components/loadding";
 import { createUsersStyles } from "@/styles/users.styles";
 import { ROLE_LABEL, ROLE_COLOR } from "@/constants/colors";
+import { usersService } from "@/services/users";
 
 export default function UsersListScreen() {
   const { theme } = useTheme();
@@ -34,7 +35,7 @@ export default function UsersListScreen() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get("/users");
+      const data = await usersService.list();
       setUsers(data);
       setFiltered(data);
     } finally {
@@ -72,13 +73,12 @@ export default function UsersListScreen() {
           style: turningOff ? "destructive" : "default",
           onPress: async () => {
             try {
-              await api.patch(`/users/${user.id}`, {
-                is_active: !user.is_active,
-              });
+              await usersService.toggleActive(
+                user.id as string,
+                !user.is_active,
+              );
               fetchUsers();
-            } catch {
-              /* interceptor exibe o erro */
-            }
+            } catch {}
           },
         },
       ],

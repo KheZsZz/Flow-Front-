@@ -21,6 +21,7 @@ import { usersFormStyles } from "@/styles/users.styles";
 import rollback from "@/services/rollback";
 import { api } from "@/services/api";
 import { CNH_CATEGORIES, ALLOWED_NON_MANAGER } from "@/constants/colors";
+import { usersService } from "@/services/users";
 
 const MANAGER_ROLES = [
   { label: "Usuário", value: "Commum" },
@@ -61,10 +62,11 @@ export default function EditUserScreen() {
   });
 
   const isDriver = watch("profile_user") === "Driver";
+
   const fetchUser = async () => {
     try {
       const { data } = await api.get(`/users/${id}`);
-      const u = Array.isArray(data) ? data[0] : data;
+      const u = await usersService.getById(id);
       if (!u) throw new Error("not found");
       const drv = Array.isArray(u.drivers) ? u.drivers[0] : u.drivers;
       reset({
@@ -121,7 +123,7 @@ export default function EditUserScreen() {
         payload.moop_validade = data.moop_validade || null;
       }
 
-      await api.put(`/users/${id}`, payload);
+      await usersService.update(id, payload);
       Alert.alert("Sucesso", "Usuário atualizado com sucesso!");
       rollback();
     } catch {
@@ -141,7 +143,7 @@ export default function EditUserScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
           <Feather
-            name="arrow-left"
+            name="chevron-left"
             size={20}
             color={theme.isDark ? theme.text : "#fff"}
           />
@@ -206,6 +208,7 @@ export default function EditUserScreen() {
                 label="CNH"
                 placeholder="Número da CNH"
                 iconName="id-card"
+                maxLength={11}
                 errorMessage={errors.cnh?.message as string}
               />
               <ControlledInput

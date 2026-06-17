@@ -20,6 +20,7 @@ import { usersFormStyles } from "@/styles/users.styles";
 import rollback from "@/services/rollback";
 import { api } from "@/services/api";
 import { CNH_CATEGORIES, ALLOWED_NON_MANAGER } from "@/constants/colors";
+import { usersService } from "@/services/users";
 
 /** Gerente pode atribuir qualquer perfil. */
 const MANAGER_ROLES = [
@@ -91,7 +92,7 @@ export default function CreateUserScreen() {
         payload.moop_validade = data.moop_validade || null;
       }
 
-      await api.post("/users", payload);
+      await usersService.create(payload);
       Alert.alert("Sucesso", "Usuário cadastrado com sucesso!");
       rollback();
     } catch {

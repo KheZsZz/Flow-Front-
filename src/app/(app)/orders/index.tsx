@@ -157,11 +157,7 @@ export default function OrdersListScreen() {
           style={styles.addBtn}
           onPress={() => router.push("/orders/create")}
         >
-          <Feather
-            name="plus"
-            size={24}
-            color={theme.isDark ? theme.textSecondary : theme.text}
-          />
+          <Feather name="plus" size={24} color={theme.textSecondary} />
         </TouchableOpacity>
       </View>
 

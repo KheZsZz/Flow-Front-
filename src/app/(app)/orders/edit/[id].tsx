@@ -20,6 +20,7 @@ import { AddInvoiceItems, OrderItemDraft } from "@/components/addInvoiceItems";
 import { createOrdersListStyles } from "@/styles/orders.styles";
 import { Loadding } from "@/components/loadding";
 import rollback from "@/services/rollback";
+import { usersService } from "@/services/users";
 
 const typeOptions: string[] = (OrderTypeSchema as any).options ?? [];
 
@@ -77,8 +78,8 @@ export default function EditOrderScreen() {
   const v1 = vehicles.find((v) => v.id === vehicle1);
   const pullsTrailers = v1?.type === "Cavalo";
 
-  const editableHeader = !finalized; // datas/notas/itens
-  const editableFleet = !finalized && !started; // motorista/veículos
+  const editableHeader = !finalized;
+  const editableFleet = !finalized && !started;
 
   const load = async () => {
     try {
@@ -172,34 +173,23 @@ export default function EditOrderScreen() {
   }, [id]);
 
   const driverOptions = useMemo(
-    () =>
-      drivers
-        .map((driver: any) => {
-          const drv = Array.isArray(driver.drivers)
-            ? driver.drivers[0]
-            : driver.drivers;
-          return {
-            label: driver.name_user ?? driver.users?.name_user ?? "Motorista",
-            value: drv?.id ?? "", // Drivers.id — FK de orders.driver_id
-          };
-        })
-        .filter((o: any) => o.value),
+    () => usersService.driverOptions(drivers),
     [drivers],
   );
-  const v1Options = useMemo(
+  const carretaOptions = useMemo(
     () =>
       vehicles
-        .filter((v: any) => v.is_active && v.type !== "Carreta")
+        .filter((v: any) => v.is_active && v.type === "Carreta")
         .map((v: any) => ({
           label: `${v.license_plate} · ${v.type}`,
           value: v.id,
         })),
     [vehicles],
   );
-  const carretaOptions = useMemo(
+  const v1Options = useMemo(
     () =>
       vehicles
-        .filter((v: any) => v.is_active && v.type === "Carreta")
+        .filter((v: any) => v.is_active && v.type !== "Carreta")
         .map((v: any) => ({
           label: `${v.license_plate} · ${v.type}`,
           value: v.id,
@@ -306,11 +296,7 @@ export default function EditOrderScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
-          <Feather
-            name="arrow-left"
-            size={22}
-            color={theme.isDark ? theme.textSecondary : theme.text}
-          />
+          <Feather name="chevron-left" size={22} color={theme.textSecondary} />
         </TouchableOpacity>
         <Text style={styles.title}>Editar Viagem</Text>
       </View>

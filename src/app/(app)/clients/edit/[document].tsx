@@ -122,7 +122,7 @@ export default function EditClientScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
           <Feather
-            name="arrow-left"
+            name="chevron-left"
             size={20}
             color={theme.isDark ? theme.primary : "#fff"}
           />
@@ -306,18 +306,19 @@ export default function EditClientScreen() {
             iconName="info"
             errorMessage={errors.address?.complement?.message as string}
           />
+
+          <ControlledInput
+            control={control}
+            name="is_active"
+            label="Cliente ativo:"
+            iconName="info"
+            variant="switch"
+            // onPress={handleToggleStatus}
+            errorMessage={errors.address?.complement?.message as string}
+          />
         </View>
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={handleToggleStatus}
-          >
-            <Text style={styles.deleteButtonText}>
-              {client?.is_active ? "Desativar" : "Ativar"}
-            </Text>
-          </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.button}
             onPress={handleSubmit(onSubmit)}

@@ -125,17 +125,17 @@ export default function CollectionsListScreen() {
           style={styles.addBtn}
           onPress={() => router.push("/collections/create")}
         >
-          <Feather
-            name="plus"
-            size={24}
-            color={theme.isDark ? theme.textSecondary : theme.text}
-          />
+          <Feather name="plus" size={24} color={theme.textSecondary} />
         </TouchableOpacity>
       </View>
 
       {/* Busca: número da coleta / cliente / documento */}
       <View style={styles.searchContainer}>
-        <Feather name="search" size={18} color={theme.textSecondary} />
+        <Feather
+          name="search"
+          size={18}
+          color={theme.isDark ? theme.textSecondary : theme.text}
+        />
         <TextInput
           placeholder="Buscar por nº da coleta, cliente ou documento..."
           placeholderTextColor={theme.isDark ? theme.textSecondary : theme.text}

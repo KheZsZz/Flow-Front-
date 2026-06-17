@@ -61,7 +61,7 @@ export default function CreateClientScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
           <Feather
-            name="arrow-left"
+            name="chevron-left"
             size={20}
             color={theme.isDark ? theme.primary : "#fff"}
           />

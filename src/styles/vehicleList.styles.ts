@@ -102,27 +102,35 @@ export const createVehicleListStyles = (theme: AppTheme, isMobile: boolean) =>
       fontSize: 12,
     },
 
-    btnText: {
-      color: "#FFF",
-      fontSize: 12,
-    },
-
     toggleBtn: {
       margin: 5,
       alignItems: "center",
-      backgroundColor: theme.isDark ? theme.link : theme.primary,
+      // backgroundColor: theme.isDark ? theme.link : theme.primary,
       padding: 8,
       borderRadius: 4,
       width: isMobile ? "30%" : 70,
     },
 
-    editBtn: {
-      margin: 5,
-      backgroundColor: "#444",
-      padding: 8,
-      borderRadius: 4,
-      width: isMobile ? "30%" : 70,
+    deleteBtn: { backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2" },
+    deleteText: { color: "#ef4444", fontWeight: "600", fontSize: 13 },
+
+    baixarBtn: { backgroundColor: theme.isDark ? "#14532d" : "#dcfce7" },
+    baixarText: {
+      color: theme.isDark ? "#4ade80" : "#15803d",
+      fontWeight: "600",
+      fontSize: 13,
     },
+
+    editBtn: {
+      backgroundColor: theme.isDark ? "#1e2640" : "#e8f0fe",
+    },
+
+    editText: {
+      color: theme.isDark ? "#60a5fa" : "#1a73e8",
+      fontWeight: "600",
+      fontSize: 13,
+    },
+
     footer: {
       marginTop: 10,
       borderTopWidth: 1,

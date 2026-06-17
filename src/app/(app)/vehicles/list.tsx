@@ -70,11 +70,7 @@ export default function VehiclesScreen() {
           style={styles.addBtn}
           onPress={() => router.push("/vehicles/create")}
         >
-          <Feather
-            name="plus"
-            size={24}
-            color={theme.isDark ? theme.textSecondary : theme.primary}
-          />
+          <Feather name="plus" size={24} color={theme.textSecondary} />
         </TouchableOpacity>
       </View>
       {vehicles.length === 0 ? (
@@ -105,15 +101,18 @@ export default function VehiclesScreen() {
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Placa: {item.license_plate}</Text>
                   <TouchableOpacity
-                    style={[
-                      styles.toggleBtn,
-                      {
-                        backgroundColor: item.is_active ? "#ef4444" : "#22c55e",
-                      },
-                    ]}
+                    style={
+                      item.is_active
+                        ? [styles.toggleBtn, styles.deleteBtn]
+                        : [styles.toggleBtn, styles.baixarBtn]
+                    }
                     onPress={() => toggleStatus(item)}
                   >
-                    <Text style={styles.btnText}>
+                    <Text
+                      style={
+                        item.is_active ? styles.deleteText : styles.baixarText
+                      }
+                    >
                       {item.is_active ? "Desativar" : "Ativar"}
                     </Text>
                   </TouchableOpacity>
@@ -125,10 +124,10 @@ export default function VehiclesScreen() {
                   </Text>
 
                   <TouchableOpacity
-                    style={styles.editBtn}
+                    style={[styles.editBtn, styles.toggleBtn]}
                     onPress={() => handleEdit(item)}
                   >
-                    <Text style={styles.btnText}>
+                    <Text style={styles.editText}>
                       Alterar <Feather name="edit-2" size={10} />
                     </Text>
                   </TouchableOpacity>

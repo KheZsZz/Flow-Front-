@@ -60,11 +60,7 @@ export default function CreateVehicleScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
-          <Feather
-            name="arrow-left"
-            size={24}
-            color={theme.isDark ? theme.textSecondary : theme.text}
-          />
+          <Feather name="chevron-left" size={24} color={theme.textSecondary} />
         </TouchableOpacity>
         <Text style={styles.title}>Novo Veículo</Text>
       </View>
