@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
+  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -45,6 +46,10 @@ export default function EditVehicleScreen() {
       capacity_fuel: "",
       type: "Truck",
       is_active: false,
+      crlv_validade: null,
+      seguro_validade: null,
+      antt_validade: null,
+      tacografo_validade: null,
     },
   });
 
@@ -116,72 +121,125 @@ export default function EditVehicleScreen() {
         <Text style={styles.title}>Editar Veículo</Text>
       </View>
 
-      <ControlledInput
-        control={control}
-        name="license_plate"
-        label="Placa"
-        iconName={"filter"}
-        errorMessage={errors.license_plate?.message as string}
-      />
-      <ControlledInput
-        control={control}
-        name="model"
-        label="Modelo"
-        iconName={"filter"}
-        errorMessage={errors.model?.message as string}
-      />
-      <ControlledInput
-        control={control}
-        name="make"
-        label="Marca"
-        iconName={"filter"}
-        errorMessage={errors.make?.message as string}
-      />
-      <ControlledInput
-        control={control}
-        name="capacity_fuel"
-        label="Capacidade de Combustível (L)"
-        iconName="droplet"
-        variant="numeric"
-        errorMessage={errors.capacity_fuel?.message as string}
-      />
+      <ScrollView
+        style={{ width: "100%" }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.form}>
+          <ControlledInput
+            control={control}
+            name="license_plate"
+            label="Placa"
+            iconName={"filter"}
+            errorMessage={errors.license_plate?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="model"
+            label="Modelo"
+            iconName={"filter"}
+            errorMessage={errors.model?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="make"
+            label="Marca"
+            iconName={"filter"}
+            errorMessage={errors.make?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="capacity_fuel"
+            label="Capacidade de Combustível (L)"
+            iconName="droplet"
+            variant="numeric"
+            errorMessage={errors.capacity_fuel?.message as string}
+          />
 
-      <ControlledInput
-        control={control}
-        name="year"
-        label="Ano"
-        iconName="calendar"
-        variant="numeric"
-        maxLength={4}
-        errorMessage={errors.year?.message as string}
-      />
+          <ControlledInput
+            control={control}
+            name="year"
+            label="Ano"
+            iconName="calendar"
+            variant="numeric"
+            maxLength={4}
+            errorMessage={errors.year?.message as string}
+          />
 
-      <ControlledInput
-        control={control}
-        name="type"
-        label="Tipo (Ex: Caminhão, Van)"
-        iconName="truck"
-        variant="select"
-        options={vehicleOptions}
-        errorMessage={errors.type?.message as string}
-      />
+          <ControlledInput
+            control={control}
+            name="type"
+            label="Tipo (Ex: Caminhão, Van)"
+            iconName="truck"
+            variant="select"
+            options={vehicleOptions}
+            errorMessage={errors.type?.message as string}
+          />
 
-      <ControlledInput
-        control={control}
-        name="is_active"
-        label="Status Ativo (true/false)"
-        iconName="check-circle"
-        variant="switch"
-        errorMessage={errors.is_active?.message as string}
-      />
+          {/* ─── Documentos ─────────────────────────────────────── */}
+          <View style={styles.divider} />
+          <Text style={styles.sectionTitle}>Documentos</Text>
+          <Text style={styles.sectionHint}>
+            Datas opcionais — usadas para alertar sobre vencimentos próximos.
+          </Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-        {submitting ? (
-          <ActivityIndicator color="#FFF" />
-        ) : (
-          <Text style={styles.buttonText}>Salvar</Text>
-        )}
-      </TouchableOpacity>
+          <ControlledInput
+            control={control}
+            name="crlv_validade"
+            label="CRLV / Licenciamento"
+            variant="date"
+            iconName="calendar"
+            errorMessage={errors.crlv_validade?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="seguro_validade"
+            label="Seguro"
+            variant="date"
+            iconName="calendar"
+            errorMessage={errors.seguro_validade?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="antt_validade"
+            label="ANTT / RNTRC"
+            variant="date"
+            iconName="calendar"
+            errorMessage={errors.antt_validade?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="tacografo_validade"
+            label="Tacógrafo"
+            variant="date"
+            iconName="calendar"
+            errorMessage={errors.tacografo_validade?.message as string}
+          />
+
+          <View style={styles.divider} />
+          <Text style={styles.sectionTitle}>Status</Text>
+          <ControlledInput
+            control={control}
+            name="is_active"
+            label="Status Ativo"
+            iconName="check-circle"
+            variant="switch"
+            errorMessage={errors.is_active?.message as string}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit(onSubmit)}
+        >
+          {submitting ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Salvar</Text>
+          )}
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }

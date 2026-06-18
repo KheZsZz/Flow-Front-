@@ -38,10 +38,41 @@ export const createVehicleStyles = (theme: AppTheme, isMobile: boolean) =>
       fontWeight: "bold",
     },
 
+    // Container de scroll (telas com muitos campos)
+    scrollContent: {
+      width: "100%",
+      alignItems: "center",
+      paddingBottom: 40,
+    },
+
     form: {
       width: isMobile ? "100%" : "50%",
       paddingHorizontal: 20,
       paddingVertical: 20,
+    },
+
+    // Cabeçalho de seção (ex.: "Documentos")
+    sectionTitle: {
+      color: theme.isDark ? theme.link : theme.primary,
+      fontSize: 13,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: 6,
+      marginTop: 4,
+    },
+
+    sectionHint: {
+      color: theme.isDark ? "#aaa" : "#666",
+      fontSize: 12,
+      fontStyle: "italic",
+      marginBottom: 14,
+    },
+
+    divider: {
+      height: 1,
+      backgroundColor: theme.borderColor,
+      marginVertical: 16,
     },
 
     button: {

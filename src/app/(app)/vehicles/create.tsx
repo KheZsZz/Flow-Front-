@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   View,
   Text,
+  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -64,78 +65,125 @@ export default function CreateVehicleScreen() {
         </TouchableOpacity>
         <Text style={styles.title}>Novo Veículo</Text>
       </View>
-      <View style={styles.form}>
-        <ControlledInput
-          control={control}
-          name="license_plate"
-          label="Placa"
-          placeholder="Ex: ABC1D34"
-          mask="AAA9A99"
-          iconName={"filter"}
-          errorMessage={errors.license_plate?.message as string}
-        />
-        <ControlledInput
-          control={control}
-          name="model"
-          label="Modelo"
-          iconName={"filter"}
-          placeholder="Ex: FH 540"
-          errorMessage={errors.model?.message as string}
-        />
-        <ControlledInput
-          control={control}
-          name="make"
-          label="Marca"
-          placeholder="Ex: Scania"
-          iconName={"filter"}
-          errorMessage={errors.make?.message as string}
-        />
-        <ControlledInput
-          control={control}
-          name="capacity_fuel"
-          label="Capacidade de Combustível (L)"
-          iconName="droplet"
-          placeholder="Ex: 50"
-          variant="numeric"
-          errorMessage={errors.capacity_fuel?.message as string}
-        />
 
-        <ControlledInput
-          control={control}
-          name="year"
-          label="Ano"
-          iconName="calendar"
-          placeholder="Ex: "
-          variant="numeric"
-          maxLength={4}
-          errorMessage={errors.year?.message as string}
-        />
-
-        <ControlledInput
-          control={control}
-          name="type"
-          label="Tipo"
-          placeholder="Ex: Caminhão, Van"
-          iconName="truck"
-          variant="select"
-          options={vehicleOptions}
-          errorMessage={errors.type?.message as string}
-        />
-      </View>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleSubmit(onSubmit)}
-        disabled={loading}
+      <ScrollView
+        style={{ width: "100%" }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        {loading ? (
-          <ActivityIndicator
-            color={theme.isDark ? theme.textSecondary : theme.text}
+        <View style={styles.form}>
+          <ControlledInput
+            control={control}
+            name="license_plate"
+            label="Placa"
+            placeholder="Ex: ABC1D34"
+            mask="AAA9A99"
+            iconName={"filter"}
+            errorMessage={errors.license_plate?.message as string}
           />
-        ) : (
-          <Text style={styles.buttonText}>Cadastrar</Text>
-        )}
-      </TouchableOpacity>
+          <ControlledInput
+            control={control}
+            name="model"
+            label="Modelo"
+            iconName={"filter"}
+            placeholder="Ex: FH 540"
+            errorMessage={errors.model?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="make"
+            label="Marca"
+            placeholder="Ex: Scania"
+            iconName={"filter"}
+            errorMessage={errors.make?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="capacity_fuel"
+            label="Capacidade de Combustível (L)"
+            iconName="droplet"
+            placeholder="Ex: 50"
+            variant="numeric"
+            errorMessage={errors.capacity_fuel?.message as string}
+          />
+
+          <ControlledInput
+            control={control}
+            name="year"
+            label="Ano"
+            iconName="calendar"
+            placeholder="Ex: "
+            variant="numeric"
+            maxLength={4}
+            errorMessage={errors.year?.message as string}
+          />
+
+          <ControlledInput
+            control={control}
+            name="type"
+            label="Tipo"
+            placeholder="Ex: Caminhão, Van"
+            iconName="truck"
+            variant="select"
+            options={vehicleOptions}
+            errorMessage={errors.type?.message as string}
+          />
+
+          {/* ─── Documentos ─────────────────────────────────────── */}
+          <View style={styles.divider} />
+          <Text style={styles.sectionTitle}>Documentos</Text>
+          <Text style={styles.sectionHint}>
+            Datas opcionais — usadas para alertar sobre vencimentos próximos.
+          </Text>
+
+          <ControlledInput
+            control={control}
+            name="crlv_validade"
+            label="CRLV / Licenciamento"
+            variant="date"
+            iconName="calendar"
+            errorMessage={errors.crlv_validade?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="seguro_validade"
+            label="Seguro"
+            variant="date"
+            iconName="calendar"
+            errorMessage={errors.seguro_validade?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="antt_validade"
+            label="ANTT / RNTRC"
+            variant="date"
+            iconName="calendar"
+            errorMessage={errors.antt_validade?.message as string}
+          />
+          <ControlledInput
+            control={control}
+            name="tacografo_validade"
+            label="Tacógrafo"
+            variant="date"
+            iconName="calendar"
+            errorMessage={errors.tacografo_validade?.message as string}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit(onSubmit)}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator
+              color={theme.isDark ? theme.textSecondary : theme.text}
+            />
+          ) : (
+            <Text style={styles.buttonText}>Cadastrar</Text>
+          )}
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
