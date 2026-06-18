@@ -55,7 +55,7 @@ const MENU_ITEMS: MenuItem[] = [
     name: "Configurações",
     path: "/settings",
     icon: "settings",
-    minRole: "Manager",
+    minRole: "Commum",
   },
 ];
 

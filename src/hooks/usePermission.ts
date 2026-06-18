@@ -13,9 +13,15 @@ const ROLE_LEVEL: Record<UserTypeEnum, number> = {
 export const ROLE_ALLOWED_ROUTES: Record<UserTypeEnum, string[]> = {
   Manager: ["*"],
   Admin: ["*"],
-  Financer: ["/dashboard", "/finance", "/invoices", "/collections"],
-  Requestor: ["/orders/create", "/orders", "/status"],
-  Driver: ["/driver"],
+  Financer: [
+    "/dashboard",
+    "/finance",
+    "/invoices",
+    "/collections",
+    "/settings",
+  ],
+  Requestor: ["/orders/create", "/orders", "/status", "/settings"],
+  Driver: ["/driver", "/settings"],
   Commum: [
     "/orders",
     "/invoices",
@@ -24,6 +30,7 @@ export const ROLE_ALLOWED_ROUTES: Record<UserTypeEnum, string[]> = {
     "/orders/create",
     "/invoices/create",
     "/collections/create",
+    "/settings",
   ],
 };
 
