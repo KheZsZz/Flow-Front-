@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { z } from "zod";
@@ -11,6 +17,7 @@ import { useAuth } from "@/contexts/authContext";
 import { createSettingsStyles } from "@/styles/settings.styles";
 import { ControlledInput } from "@/components/controllerInput";
 import { api } from "@/services/api";
+import { buildUploadForm } from "@/services/upload";
 
 const passwordSchema = z
   .object({
@@ -75,22 +82,25 @@ export function AccountSection() {
     const asset = result.assets[0];
     const ext = asset.uri.split(".").pop() || "jpg";
 
-    const form = new FormData();
-    form.append("avatar", {
-      uri: asset.uri,
-      name: `avatar.${ext}`,
-      type: asset.mimeType || "image/jpeg",
-    } as any);
-
     setUploading(true);
     try {
+      const form = await buildUploadForm(
+        "avatar",
+        {
+          uri: asset.uri,
+          name: `avatar.${ext}`,
+          mimeType: asset.mimeType || "image/jpeg",
+        },
+        "image/jpeg",
+      );
+
       const res = await api.post("/users/avatar", form, {
         headers: { "Content-Type": "multipart/form-data" },
+        transformRequest: [(data) => data], // <-- crucial p/ web
       });
       if (res.data?.avatar_url) setAvatar(res.data.avatar_url);
       Alert.alert("Sucesso", "Foto de perfil atualizada!");
-    } catch (err) {
-      // O interceptor do api já exibe o toast de erro
+    } catch {
     } finally {
       setUploading(false);
     }
