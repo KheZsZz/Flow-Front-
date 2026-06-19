@@ -64,43 +64,31 @@ export default function EditClientScreen() {
   };
 
   const onSubmit = async (data: ClientType) => {
-    // console.log(data);
     setSubmitting(true);
     try {
-      await api.put(`/clients/${data.id}`, data);
+      const payload = {
+        id: data.id,
+        document: data.document,
+        name_client: data.name_client,
+        email: data.email,
+        phone: data.phone,
+        is_active: data.is_active,
+        address: data.address,
+      };
+
+      await api.put(`/clients/${data.id}`, payload);
       Alert.alert("Sucesso", "Cliente atualizado com sucesso!");
       rollback();
     } catch (e: any) {
       Alert.alert(
         "Erro",
-        e.response?.data?.message || "Não foi possível atualizar o cliente.",
+        e.response?.data?.message ||
+          e.response?.data?.error ||
+          "Não foi possível atualizar o cliente.",
       );
     } finally {
       setSubmitting(false);
     }
-  };
-  const handleToggleStatus = (id: string) => {
-    Alert.alert(
-      client?.is_active ? "Desativar Cliente" : "Ativar Cliente",
-      `Deseja realmente ${client?.is_active ? "desativar" : "ativar"} este cliente?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Confirmar",
-          style: client?.is_active ? "destructive" : "default",
-          onPress: async () => {
-            try {
-              await api.patch(`/clients/${id}`, {
-                is_active: !client?.is_active,
-              });
-              fetchClient();
-            } catch {
-              Alert.alert("Erro", "Não foi possível alterar o status.");
-            }
-          },
-        },
-      ],
-    );
   };
 
   useEffect(() => {
