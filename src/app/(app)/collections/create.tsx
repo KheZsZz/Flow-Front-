@@ -69,12 +69,6 @@ export default function CreateCollectionScreen() {
       Alert.alert("Sucesso", "Coleta emitida com sucesso!");
       rollback();
     } catch (e: any) {
-      Alert.alert(
-        "Erro",
-        e.response?.data?.error ||
-          e.response?.data?.message ||
-          "Falha ao emitir a coleta.",
-      );
     } finally {
       setSubmitting(false);
     }

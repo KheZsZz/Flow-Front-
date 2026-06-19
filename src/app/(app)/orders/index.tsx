@@ -66,7 +66,6 @@ export default function OrdersListScreen() {
       const data = await orderService.getOrders();
       setOrders(Array.isArray(data) ? data : []);
     } catch {
-      Alert.alert("Erro", "Não foi possível carregar as viagens.");
     } finally {
       setLoading(false);
     }
@@ -86,12 +85,7 @@ export default function OrdersListScreen() {
           try {
             await orderService.deleteOrder(order.id);
             fetchOrders();
-          } catch (e: any) {
-            Alert.alert(
-              "Erro",
-              e?.response?.data?.error || "Não foi possível excluir.",
-            );
-          }
+          } catch (e: any) {}
         },
       },
     ]);

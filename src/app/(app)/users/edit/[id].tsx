@@ -87,8 +87,6 @@ export default function EditUserScreen() {
         moop_validade: drv?.moop_validade ?? "",
       });
     } catch {
-      Alert.alert("Erro", "Usuário não encontrado.");
-      rollback();
     } finally {
       setLoading(false);
     }

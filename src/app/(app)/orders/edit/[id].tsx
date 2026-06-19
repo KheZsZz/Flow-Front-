@@ -161,7 +161,6 @@ export default function EditOrderScreen() {
         notes: order.notes ?? "",
       });
     } catch {
-      Alert.alert("Erro", "Viagem não encontrada.");
       rollback();
     } finally {
       setLoading(false);
@@ -279,12 +278,7 @@ export default function EditOrderScreen() {
             await orderService.deleteOrder(id);
             Alert.alert("Pronto", "Viagem excluída.");
             router.push("/orders");
-          } catch (e: any) {
-            Alert.alert(
-              "Erro",
-              e?.response?.data?.error || "Não foi possível excluir.",
-            );
-          }
+          } catch (e: any) {}
         },
       },
     ]);

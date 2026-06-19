@@ -64,7 +64,6 @@ export default function CollectionsListScreen() {
       const data = await collectionService.list();
       setCollections(Array.isArray(data) ? data : []);
     } catch {
-      Alert.alert("Erro", "Não foi possível carregar as coletas.");
     } finally {
       setLoading(false);
     }
@@ -74,9 +73,7 @@ export default function CollectionsListScreen() {
     try {
       await collectionService.toggle(item.id, !item.is_active);
       fetchCollections();
-    } catch {
-      Alert.alert("Erro", "Não foi possível alterar o status.");
-    }
+    } catch {}
   };
 
   const handleDelete = (item: CollectionRow) => {
@@ -92,13 +89,7 @@ export default function CollectionsListScreen() {
             try {
               await collectionService.remove(item.id);
               fetchCollections();
-            } catch (e: any) {
-              Alert.alert(
-                "Erro",
-                e?.response?.data?.error ||
-                  "Não foi possível excluir a coleta.",
-              );
-            }
+            } catch (e: any) {}
           },
         },
       ],

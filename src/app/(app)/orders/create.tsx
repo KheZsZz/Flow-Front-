@@ -181,13 +181,6 @@ export default function CreateOrderScreen() {
       Alert.alert("Sucesso", "Viagem emitida com sucesso!");
       router.push("/orders");
     } catch (e: any) {
-      console.log("createOrder error:", e?.response?.data ?? e?.message ?? e);
-      Alert.alert(
-        "Erro",
-        e?.response?.data?.error ||
-          e?.response?.data?.message ||
-          "Não foi possível emitir a viagem.",
-      );
     } finally {
       setSubmitting(false);
     }

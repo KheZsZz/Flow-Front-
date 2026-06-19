@@ -56,8 +56,6 @@ export default function EditClientScreen() {
         },
       });
     } catch {
-      Alert.alert("Erro", "Cliente não encontrado.");
-      rollback();
     } finally {
       setLoading(false);
     }
@@ -80,12 +78,6 @@ export default function EditClientScreen() {
       Alert.alert("Sucesso", "Cliente atualizado com sucesso!");
       rollback();
     } catch (e: any) {
-      Alert.alert(
-        "Erro",
-        e.response?.data?.message ||
-          e.response?.data?.error ||
-          "Não foi possível atualizar o cliente.",
-      );
     } finally {
       setSubmitting(false);
     }

@@ -34,7 +34,6 @@ export default function ClientsListScreen() {
       setClients(data);
       setFiltered(data);
     } catch {
-      Alert.alert("Erro", "Não foi possível carregar os clientes.");
     } finally {
       setLoading(false);
     }
@@ -59,9 +58,7 @@ export default function ClientsListScreen() {
         is_active: !client.is_active,
       });
       fetchClients();
-    } catch {
-      Alert.alert("Erro", "Não foi possível alterar o status.");
-    }
+    } catch {}
   };
 
   useEffect(() => {

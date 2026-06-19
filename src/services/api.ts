@@ -58,45 +58,67 @@ const STATUS_MESSAGES: Record<number, { title: string; fallback: string }> = {
   },
 };
 
-// middleware
+function extractServerMessage(data: any): string | null {
+  if (!data) return null;
+
+  if (Array.isArray(data.errors) && data.errors.length > 0) {
+    const parts = data.errors
+      .slice(0, 2)
+      .map((e: any) => (e?.field ? `${e.field}: ${e.message}` : e?.message))
+      .filter(Boolean);
+    const extra = data.errors.length - parts.length;
+    return parts.join(" · ") + (extra > 0 ? ` (+${extra})` : "");
+  }
+
+  return data.message || data.error || null;
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<any>) => {
-    // Caso de Sem Conexão ou Timeout
+    // a tela pediu para tratar o próprio erro? então não duplicamos o toast
+    const silent = (error.config as any)?.silent === true;
+
+    // Sem resposta: Sem Conexão ou Timeout
     if (!error.response) {
-      const isTimeout = error.code === "ECONNABORTED";
-      Toast.show({
-        type: "error",
-        text1: isTimeout ? "Tempo esgotado" : "Sem conexão",
-        text2: isTimeout
-          ? "O servidor demorou para responder."
-          : "Verifique sua internet.",
-        position: "bottom",
-      });
+      if (!silent) {
+        const isTimeout = error.code === "ECONNABORTED";
+        Toast.show({
+          type: "error",
+          text1: isTimeout ? "Tempo esgotado" : "Sem conexão",
+          text2: isTimeout
+            ? "O servidor demorou para responder."
+            : "Verifique sua internet.",
+          position: "bottom",
+        });
+      }
       return Promise.reject(error);
     }
 
     const status = error.response.status;
-    const serverMessage =
-      error.response.data?.message || error.response.data?.error;
+    const serverMessage = extractServerMessage(error.response.data);
 
+    // 401 SEMPRE desloga, mesmo em chamadas silent
     if (status === 401) {
       AsyncStorage.removeItem("@flow:auth_user");
       router.replace("/(auth)/login");
     }
 
-    const mapped = STATUS_MESSAGES[status] ?? {
-      title: `Erro ${status}`,
-      fallback: "Ocorreu um erro inesperado.",
-    };
+    if (!silent) {
+      const mapped = STATUS_MESSAGES[status] ?? {
+        title: `Erro ${status}`,
+        fallback: "Ocorreu um erro inesperado.",
+      };
 
-    Toast.show({
-      type: "error",
-      text1: mapped.title,
-      text2: serverMessage || mapped.fallback,
-      position: "top",
-      visibilityTime: status >= 500 ? 7000 : 5000,
-    });
+      Toast.show({
+        type: "error",
+        text1: mapped.title,
+        // agora mostra o problema REAL (campo/mensagem) e não o genérico
+        text2: serverMessage || mapped.fallback,
+        position: "top",
+        visibilityTime: status >= 500 ? 7000 : 5000,
+      });
+    }
 
     return Promise.reject(error);
   },

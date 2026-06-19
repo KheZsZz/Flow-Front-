@@ -80,8 +80,6 @@ export default function EditCollectionScreen() {
         scheduled_date: data.scheduled_date ?? "",
       });
     } catch {
-      Alert.alert("Erro", "Coleta não encontrada.");
-      rollback();
     } finally {
       setLoading(false);
     }
@@ -112,12 +110,6 @@ export default function EditCollectionScreen() {
       Alert.alert("Sucesso", "Coleta atualizada com sucesso!");
       rollback();
     } catch (e: any) {
-      Alert.alert(
-        "Erro",
-        e.response?.data?.error ||
-          e.response?.data?.message ||
-          "Não foi possível atualizar a coleta.",
-      );
     } finally {
       setSubmitting(false);
     }
@@ -136,9 +128,7 @@ export default function EditCollectionScreen() {
             try {
               await collectionService.toggle(id, !meta.is_active);
               fetchCollection();
-            } catch {
-              Alert.alert("Erro", "Não foi possível alterar o status.");
-            }
+            } catch {}
           },
         },
       ],

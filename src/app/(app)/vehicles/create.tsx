@@ -46,7 +46,6 @@ export default function CreateVehicleScreen() {
       Alert.alert("Sucesso", "Veículo cadastrado!");
       rollback();
     } catch (e) {
-      Alert.alert("Erro", "Falha ao cadastrar.");
     } finally {
       setLoading(false);
     }

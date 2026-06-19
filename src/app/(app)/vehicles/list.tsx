@@ -42,9 +42,7 @@ export default function VehiclesScreen() {
 
       console.log("Sucesso! Status atualizado:", response.data);
       fetchVehicles(); // Recarrega a lista
-    } catch (error: any) {
-      console.error("Erro no Patch:", error.response?.data || error.message);
-    }
+    } catch (error: any) {}
   };
 
   const handleEdit = async (vehicle: VehicleType) => {

@@ -47,10 +47,6 @@ export default function CreateClientScreen() {
       Alert.alert("Sucesso", "Cliente cadastrado com sucesso!");
       rollback();
     } catch (e: any) {
-      Alert.alert(
-        "Erro",
-        e.response?.data?.message || "Falha ao cadastrar o cliente.",
-      );
     } finally {
       setLoading(false);
     }

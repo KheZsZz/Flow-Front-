@@ -70,9 +70,7 @@ export default function EditVehicleScreen() {
         });
         setLoading(false);
       }
-    } catch (err) {
-      Alert.alert("Erro", "Veículo não encontrado.");
-    }
+    } catch (err) {}
   };
 
   const onSubmit = async (data: VehicleType) => {
@@ -90,10 +88,6 @@ export default function EditVehicleScreen() {
       Alert.alert("Sucesso", "Veículo atualizado!");
       rollback();
     } catch (err: any) {
-      Alert.alert(
-        "Erro",
-        err.response?.data?.message || "Não foi possível atualizar o veículo.",
-      );
     } finally {
       setSubmitting(false);
     }
