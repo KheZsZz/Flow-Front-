@@ -37,4 +37,9 @@ export const collectionService = {
     const res = await api.patch(`/collections/${id}`, { is_active });
     return res.data;
   },
+
+  async remove(id: string) {
+    const res = await api.delete(`/collections/${id}`);
+    return res.data;
+  },
 };

@@ -23,6 +23,7 @@ interface CollectionRow {
   created_at?: string;
   finaled_at?: string;
   is_active: boolean;
+  in_order?: boolean; // <-- NOVO (vem do backend)
   status?: { id: string; code: number; name: string };
   clients?: { id: string; name_client: string; document?: string };
 }
@@ -76,6 +77,32 @@ export default function CollectionsListScreen() {
     } catch {
       Alert.alert("Erro", "Não foi possível alterar o status.");
     }
+  };
+
+  const handleDelete = (item: CollectionRow) => {
+    Alert.alert(
+      "Excluir coleta",
+      `Deseja excluir a coleta ${item.code}? Esta ação não pode ser desfeita.`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await collectionService.remove(item.id);
+              fetchCollections();
+            } catch (e: any) {
+              Alert.alert(
+                "Erro",
+                e?.response?.data?.error ||
+                  "Não foi possível excluir a coleta.",
+              );
+            }
+          },
+        },
+      ],
+    );
   };
 
   useEffect(() => {
