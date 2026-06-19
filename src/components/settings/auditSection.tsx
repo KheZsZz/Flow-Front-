@@ -13,9 +13,14 @@ import {
 const ENTITY_FILTERS = [
   { label: "Todas", value: "" },
   { label: "Usuários", value: "users" },
+  { label: "Motoristas", value: "drivers" },
   { label: "Veículos", value: "vehicles" },
-  { label: "Ordens", value: "orders" },
+  { label: "Viagens", value: "orders" },
   { label: "Coletas", value: "collections" },
+  { label: "Notas", value: "invoices" },
+  { label: "Clientes", value: "clients" },
+  { label: "Status", value: "status" },
+  { label: "Abastecimento", value: "fuel" },
   { label: "Metas", value: "goals" },
 ];
 

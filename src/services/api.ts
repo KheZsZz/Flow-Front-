@@ -113,7 +113,6 @@ api.interceptors.response.use(
       Toast.show({
         type: "error",
         text1: mapped.title,
-        // agora mostra o problema REAL (campo/mensagem) e não o genérico
         text2: serverMessage || mapped.fallback,
         position: "top",
         visibilityTime: status >= 500 ? 7000 : 5000,
