@@ -10,7 +10,6 @@ import {
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { vehicleSchema } from "@/schemas/vehicleSchema";
@@ -27,7 +26,6 @@ export default function CreateVehicleScreen() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const styles = createVehicleStyles(theme, isMobile);
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 

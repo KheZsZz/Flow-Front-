@@ -19,6 +19,7 @@ import { vehicleSchema, VehicleType } from "@/schemas/vehicleSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VehicleTypeSchema } from "@/schemas/enumSchema";
 import rollback from "@/services/rollback";
+import { Loadding } from "@/components/loadding";
 
 export default function EditVehicleScreen() {
   const { theme } = useTheme();
@@ -98,13 +99,7 @@ export default function EditVehicleScreen() {
   }, [plate]);
 
   if (loading)
-    return (
-      <ActivityIndicator
-        style={{ flex: 1 }}
-        size="large"
-        color={theme.primary}
-      />
-    );
+    return <Loadding color={theme.isDark ? theme.link : theme.primary} />;
 
   return (
     <View style={styles.container}>

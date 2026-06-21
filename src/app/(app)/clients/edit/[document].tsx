@@ -94,18 +94,14 @@ export default function EditClientScreen() {
 
   if (loading)
     return (
-      <Loadding color={theme.isDark ? theme.link : theme.text} size={50} />
+      <Loadding color={theme.isDark ? theme.link : theme.primary} size={50} />
     );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
-          <Feather
-            name="chevron-left"
-            size={20}
-            color={theme.isDark ? theme.primary : "#fff"}
-          />
+          <Feather name="chevron-left" size={20} color={theme.textSecondary} />
         </TouchableOpacity>
         <Text style={styles.title}>Editar Cliente</Text>
         {client && (

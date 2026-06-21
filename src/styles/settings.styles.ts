@@ -43,6 +43,7 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
       borderWidth: 1,
       borderColor: theme.borderColor,
       backgroundColor: theme.card,
+      height: 40,
     },
     tabActive: {
       backgroundColor: theme.isDark ? theme.link : theme.primary,

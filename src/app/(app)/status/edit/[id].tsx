@@ -73,11 +73,7 @@ export default function SatusCrateScreen() {
     <View style={styles.container}>
       <View style={styles.headers}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
-          <Feather
-            name="arrow-left"
-            size={20}
-            color={theme.isDark ? theme.primary : "#fff"}
-          />
+          <Feather name="chevron-left" size={20} color={theme.textSecondary} />
         </TouchableOpacity>
 
         <Text style={styles.title}>Create status</Text>
