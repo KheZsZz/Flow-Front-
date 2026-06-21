@@ -31,7 +31,7 @@ type MenuItem = {
 };
 
 const MENU_ITEMS: MenuItem[] = [
-  { name: "Painel", path: "/dashboard", icon: "grid", minRole: "Financer" },
+  { name: "Painel", path: "/dashboard", icon: "grid", minRole: "Commum" },
 
   {
     name: "Notas Fiscais",
