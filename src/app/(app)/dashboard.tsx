@@ -31,12 +31,8 @@ import {
   collectionIsFinalized,
   formatBRL,
 } from "@/services/dashboard";
+import { Loadding } from "@/components/loadding";
 
-/* ─────────────────────────────────────────────────────────────────────────
- *  Fallback para perfis sem acesso às RPCs Admin-only (ex.: Financer).
- *  Não chama /dashboard/* — só listagens — evitando o 403.
- *  O painel financeiro completo entra numa próxima leva (fase C).
- * ──────────────────────────────────────────────────────────────────────── */
 function OperationalFallback({ isMobile }: { isMobile: boolean }) {
   const { theme } = useTheme();
   const styles = createDashboardStyles(theme, isMobile);
@@ -62,14 +58,7 @@ function OperationalFallback({ isMobile }: { isMobile: boolean }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={accent} />
-        <Text style={styles.emptyText}>Carregando o painel…</Text>
-      </View>
-    );
-  }
+  if (loading) return <Loadding color={accent} size={50} />;
 
   const invValue = sumBy(invoices, invoiceValue);
   const invWaiting = invoices.filter(

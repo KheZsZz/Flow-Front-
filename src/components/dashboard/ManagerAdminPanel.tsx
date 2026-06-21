@@ -45,6 +45,7 @@ import {
   type FuelSummary,
   type VehicleEfficiency,
 } from "@/services/dashboard";
+import { Loadding } from "../loadding";
 
 type FilterForm = {
   start_date?: string;
@@ -75,7 +76,6 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
   });
   const filters = watch();
 
-  /* ── Carga inicial ──────────────────────────────────────────────────── */
   const loadAll = async () => {
     setLoading(true);
     try {
@@ -239,14 +239,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
   const hasFilters =
     !!filters.start_date || !!filters.end_date || !!filters.status;
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={accent} />
-        <Text style={styles.emptyText}>Carregando o painel…</Text>
-      </View>
-    );
-  }
+  if (loading) return <Loadding color={accent} size={50} />;
 
   return (
     <View style={{ gap: 18 }}>

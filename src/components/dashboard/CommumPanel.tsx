@@ -26,6 +26,7 @@ import {
   collectionStatusName,
   collectionIsFinalized,
 } from "@/services/dashboard";
+import { Loadding } from "../loadding";
 
 type FilterForm = {
   start_date?: string;
@@ -49,7 +50,6 @@ export function CommumPanel({ isMobile }: { isMobile: boolean }) {
   const filters = watch();
 
   useEffect(() => {
-    // Apenas listagens — o Commum não pode tocar nas RPCs /dashboard/* (Admin-only).
     Promise.all([
       dashboardService.getOrders(),
       dashboardService.getInvoices(),
@@ -64,7 +64,6 @@ export function CommumPanel({ isMobile }: { isMobile: boolean }) {
       .finally(() => setLoading(false));
   }, []);
 
-  /* ── Filtragem client-side ──────────────────────────────────────────── */
   const fOrders = useMemo(
     () =>
       orders
@@ -136,18 +135,10 @@ export function CommumPanel({ isMobile }: { isMobile: boolean }) {
   const hasFilters =
     !!filters.start_date || !!filters.end_date || !!filters.status;
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={accent} />
-        <Text style={styles.emptyText}>Carregando o painel…</Text>
-      </View>
-    );
-  }
+  if (loading) return <Loadding color={accent} size={50} />;
 
   return (
     <View style={{ gap: 18 }}>
-      {/* ── Filtros ─────────────────────────────────────────────────── */}
       <View style={styles.filterBar}>
         <Text style={styles.filterTitle}>Filtros</Text>
         <View style={styles.filterRow}>

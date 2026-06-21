@@ -34,6 +34,7 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
       paddingVertical: 12,
     },
     tab: {
+      flex: 1,
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
