@@ -27,9 +27,7 @@ type DateRange = { start_date?: string; end_date?: string };
 export const dashboardService = {
   async getFuelSummary(range?: DateRange): Promise<FuelSummary> {
     const { data } = await api.get("/dashboard/summary", { params: range });
-    return (
-      data ?? { total_spent: 0, total_liters: 0, avg_price_per_liter: 0 }
-    );
+    return data ?? { total_spent: 0, total_liters: 0, avg_price_per_liter: 0 };
   },
 
   async getVehicleEfficiency(): Promise<VehicleEfficiency[]> {
@@ -79,7 +77,10 @@ export function sumBy<T>(arr: T[], fn: (x: T) => number): number {
   return arr.reduce((acc, x) => acc + (Number(fn(x)) || 0), 0);
 }
 
-export function countBy<T>(arr: T[], keyFn: (x: T) => string): Record<string, number> {
+export function countBy<T>(
+  arr: T[],
+  keyFn: (x: T) => string,
+): Record<string, number> {
   return arr.reduce<Record<string, number>>((acc, x) => {
     const k = keyFn(x) || "—";
     acc[k] = (acc[k] ?? 0) + 1;
@@ -138,7 +139,10 @@ export const orderItems = (o: any): any[] =>
     .filter(Boolean);
 
 /* ── Notas fiscais ─────────────────────────────────────────────────────── */
-export type InvoiceSituation = "Finalizada" | "Aguardando comprovante" | "Pendente";
+export type InvoiceSituation =
+  | "Finalizada"
+  | "Aguardando comprovante"
+  | "Pendente";
 
 export const invoiceSituation = (inv: any): InvoiceSituation => {
   if (inv?.delivery_status === "finalizada") return "Finalizada";
@@ -168,3 +172,163 @@ export const formatNumber = (n: number, digits = 0): string =>
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   });
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  Frete (CT-e) e documentação das notas
+ *  Pegadinhas do schema:
+ *    - cte é NOT NULL; o import por XML grava "AGUARDANDO" quando não há CT-e.
+ *    - cte_value / value_nfe têm DEFAULT 0.00 — "sem valor" = <= 0.
+ *    - comprovante_url preenchido = canhoto recebido.
+ * ──────────────────────────────────────────────────────────────────────── */
+export const invoiceCte = (inv: any): string => String(inv?.cte ?? "").trim();
+
+export const invoiceHasCte = (inv: any): boolean => {
+  const c = invoiceCte(inv).toUpperCase();
+  return !!c && c !== "AGUARDANDO";
+};
+
+export const invoiceFreight = (inv: any): number =>
+  Number(inv?.cte_value ?? 0) || 0;
+
+export const invoiceHasFreight = (inv: any): boolean => invoiceFreight(inv) > 0;
+
+export const invoiceHasReceipt = (inv: any): boolean => !!inv?.comprovante_url;
+
+/** Mapa invoiceId -> valor de frete, para somar frete por viagem sem novo endpoint. */
+export function buildInvoiceFreightMap(
+  invoices: any[],
+): Record<string, number> {
+  const m: Record<string, number> = {};
+  for (const inv of invoices) if (inv?.id) m[inv.id] = invoiceFreight(inv);
+  return m;
+}
+
+/** Frete total de uma viagem = soma do cte_value das notas anexadas. */
+export function orderFreight(
+  order: any,
+  freightMap: Record<string, number>,
+): number {
+  return orderItems(order).reduce((acc, it) => {
+    const invId = pickOne(it?.invoices)?.id;
+    return acc + (invId ? (freightMap[invId] ?? 0) : 0);
+  }, 0);
+}
+
+export type DocCounter = {
+  key: string;
+  label: string;
+  ok: number;
+  total: number;
+  missing: number;
+  missingLabel: string;
+  color: string;
+};
+
+/** Contadores estilo "Status de Documentação". */
+export function buildDocCounters(invoices: any[]): DocCounter[] {
+  const total = invoices.length;
+  const cteOk = invoices.filter(invoiceHasCte).length;
+  const freightOk = invoices.filter(invoiceHasFreight).length;
+  const receiptOk = invoices.filter(invoiceHasReceipt).length;
+
+  return [
+    {
+      key: "cte",
+      label: "CT-e lançado",
+      ok: cteOk,
+      total,
+      missing: total - cteOk,
+      missingLabel: `${total - cteOk} sem CT-e`,
+      color: "#60a5fa",
+    },
+    {
+      key: "freight",
+      label: "Valor de frete",
+      ok: freightOk,
+      total,
+      missing: total - freightOk,
+      missingLabel: `${total - freightOk} sem valor de frete`,
+      color: "#f97316",
+    },
+    {
+      key: "receipt",
+      label: "Canhoto recebido",
+      ok: receiptOk,
+      total,
+      missing: total - receiptOk,
+      missingLabel: `${total - receiptOk} sem canhoto`,
+      color: "#34d399",
+    },
+  ];
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  Séries temporais (últimos N dias) — para o gráfico de barras + linha
+ * ──────────────────────────────────────────────────────────────────────── */
+function localDayKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+export type DayBucket = { key: string; label: string };
+
+export function lastNDays(n = 7): DayBucket[] {
+  const out: DayBucket[] = [];
+  const today = new Date();
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    out.push({
+      key: localDayKey(d),
+      label: `${String(d.getDate()).padStart(2, "0")}/${String(
+        d.getMonth() + 1,
+      ).padStart(2, "0")}`,
+    });
+  }
+  return out;
+}
+
+/** Conta linhas por dia (data local), alinhado aos buckets informados. */
+export function bucketByDay(
+  rows: any[],
+  getDate: (r: any) => string | null | undefined,
+  days: DayBucket[],
+): number[] {
+  const idx: Record<string, number> = {};
+  days.forEach((d, i) => (idx[d.key] = i));
+  const out = new Array(days.length).fill(0);
+  for (const r of rows) {
+    const raw = getDate(r);
+    if (!raw) continue;
+    const key = localDayKey(new Date(raw));
+    if (key in idx) out[idx[key]]++;
+  }
+  return out;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  Paleta de gráficos + conversão para fatias de donut
+ * ──────────────────────────────────────────────────────────────────────── */
+export const CHART_PALETTE = [
+  "#1E73FF",
+  "#34d399",
+  "#fbbf24",
+  "#f87171",
+  "#a78bfa",
+  "#60a5fa",
+  "#f97316",
+  "#10b981",
+  "#e879f9",
+  "#22d3ee",
+];
+
+export type Slice = { label: string; value: number; color: string };
+
+export function toSlices(rec: Record<string, number>): Slice[] {
+  return recordToBars(rec).map((b, i) => ({
+    ...b,
+    color: CHART_PALETTE[i % CHART_PALETTE.length],
+  }));
+}

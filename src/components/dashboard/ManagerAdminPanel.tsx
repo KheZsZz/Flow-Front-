@@ -18,12 +18,20 @@ import {
   StatusBadge,
   FilterChip,
 } from "@/components/dashboard/primitives";
+import { DonutChart, BarLineChart } from "@/components/dashboard/charts";
+import { DocumentationStatus } from "@/components/dashboard/DocumentationStatus";
 import {
   dashboardService,
   withinRange,
   countBy,
   recordToBars,
+  toSlices,
   sumBy,
+  lastNDays,
+  bucketByDay,
+  buildInvoiceFreightMap,
+  orderFreight,
+  invoiceFreight,
   orderIsFinalized,
   orderStatusName,
   orderPlates,
@@ -67,15 +75,15 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
   });
   const filters = watch();
 
-  /* ── Carga inicial (listas + RPCs) ──────────────────────────────────── */
-  const loadAll = async (range?: { start_date?: string; end_date?: string }) => {
+  /* ── Carga inicial ──────────────────────────────────────────────────── */
+  const loadAll = async () => {
     setLoading(true);
     try {
       const [ord, inv, col, sum, eff, rank] = await Promise.all([
         dashboardService.getOrders(),
         dashboardService.getInvoices(),
         dashboardService.getCollections(),
-        dashboardService.getFuelSummary(range),
+        dashboardService.getFuelSummary(),
         dashboardService.getVehicleEfficiency(),
         dashboardService.getDriverRanking(8),
       ]);
@@ -97,20 +105,19 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // O resumo de combustível usa filtro real de data no backend.
+  // Resumo de combustível: filtro real de data no backend.
   useEffect(() => {
-    const range = {
-      start_date: filters.start_date?.slice(0, 10),
-      end_date: filters.end_date?.slice(0, 10),
-    };
     dashboardService
-      .getFuelSummary(range)
+      .getFuelSummary({
+        start_date: filters.start_date?.slice(0, 10),
+        end_date: filters.end_date?.slice(0, 10),
+      })
       .then(setFuel)
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.start_date, filters.end_date]);
 
-  /* ── Filtragem client-side (data por created_at + status da viagem) ──── */
+  /* ── Filtragem client-side ──────────────────────────────────────────── */
   const fOrders = useMemo(
     () =>
       orders
@@ -139,51 +146,73 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     [collections, filters.start_date, filters.end_date],
   );
 
-  /* ── KPIs derivados ─────────────────────────────────────────────────── */
+  /* ── Frete ──────────────────────────────────────────────────────────── */
+  const freightMap = useMemo(
+    () => buildInvoiceFreightMap(invoices),
+    [invoices],
+  );
+  const freightTotal = useMemo(
+    () => sumBy(fInvoices, invoiceFreight),
+    [fInvoices],
+  );
+
+  /* ── KPIs ───────────────────────────────────────────────────────────── */
   const k = useMemo(() => {
     const ordersFinalized = fOrders.filter(orderIsFinalized).length;
-    const ordersOpen = fOrders.length - ordersFinalized;
-
-    const invFinalized = fInvoices.filter(
-      (i) => invoiceSituation(i) === "Finalizada",
-    ).length;
     const invWaiting = fInvoices.filter(
       (i) => invoiceSituation(i) === "Aguardando comprovante",
     ).length;
     const invValue = sumBy(fInvoices, invoiceValue);
-
     const colFinalized = fCollections.filter(collectionIsFinalized).length;
-    const colOpen = fCollections.length - colFinalized;
-
     return {
       ordersTotal: fOrders.length,
-      ordersOpen,
+      ordersOpen: fOrders.length - ordersFinalized,
       ordersFinalized,
       invTotal: fInvoices.length,
-      invFinalized,
       invWaiting,
       invValue,
       colTotal: fCollections.length,
-      colOpen,
+      colOpen: fCollections.length - colFinalized,
       colFinalized,
     };
   }, [fOrders, fInvoices, fCollections]);
 
-  /* ── Breakdowns para as MiniBars ────────────────────────────────────── */
-  const ordersByStatus = useMemo(
-    () => recordToBars(countBy(fOrders, orderStatusName)),
+  /* ── Donuts ─────────────────────────────────────────────────────────── */
+  const ordersStatusSlices = useMemo(
+    () => toSlices(countBy(fOrders, orderStatusName)),
     [fOrders],
   );
-  const invoicesBySituation = useMemo(
+  const collectionsStatusSlices = useMemo(
+    () => toSlices(countBy(fCollections, collectionStatusName)),
+    [fCollections],
+  );
+  const invoicesSituationBars = useMemo(
     () => recordToBars(countBy(fInvoices, invoiceSituation)),
     [fInvoices],
   );
-  const collectionsByStatus = useMemo(
-    () => recordToBars(countBy(fCollections, collectionStatusName)),
-    [fCollections],
+
+  /* ── Séries de 7 dias (janela própria, independente do filtro) ──────── */
+  const days = useMemo(() => lastNDays(7), []);
+  const dayLabels = days.map((d) => d.label);
+
+  const ordersCreated = useMemo(
+    () => bucketByDay(orders, (o) => o.created_at, days),
+    [orders, days],
+  );
+  const ordersDelivered = useMemo(
+    () => bucketByDay(orders, (o) => o.finaled_at, days),
+    [orders, days],
+  );
+  const collectionsCreated = useMemo(
+    () => bucketByDay(collections, (c) => c.created_at, days),
+    [collections, days],
+  );
+  const collectionsFinalized = useMemo(
+    () => bucketByDay(collections, (c) => c.finaled_at, days),
+    [collections, days],
   );
 
-  /* ── Opções de status para o filtro (derivadas do dado real) ────────── */
+  /* ── Opções de status ───────────────────────────────────────────────── */
   const statusOptions = useMemo(() => {
     const names = Array.from(new Set(orders.map(orderStatusName)));
     return [
@@ -192,7 +221,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     ];
   }, [orders]);
 
-  /* ── Eficiência por veículo (com filtro de chips) ───────────────────── */
+  /* ── Eficiência por veículo ─────────────────────────────────────────── */
   const effFiltered = useMemo(() => {
     if (vehicleFilter === "TODOS") return efficiency;
     return efficiency.filter((e) => e.vehicle_id?.startsWith(vehicleFilter));
@@ -221,7 +250,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
 
   return (
     <View style={{ gap: 18 }}>
-      {/* ── Filtros interativos ─────────────────────────────────────── */}
+      {/* ── Filtros ─────────────────────────────────────────────────── */}
       <View style={styles.filterBar}>
         <Text style={styles.filterTitle}>Filtros</Text>
         <View style={styles.filterRow}>
@@ -285,11 +314,10 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
           accent="#34d399"
         />
         <KpiCard
-          icon="box"
-          label="Coletas abertas"
-          value={k.colOpen}
-          sub={`${k.colFinalized} finalizadas`}
-          accent="#fbbf24"
+          icon="dollar-sign"
+          label="Valor de frete (CT-e)"
+          value={formatBRL(freightTotal)}
+          accent="#f97316"
         />
         <KpiCard
           icon="file-text"
@@ -299,14 +327,21 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
           accent="#a78bfa"
         />
         <KpiCard
-          icon="dollar-sign"
+          icon="box"
+          label="Coletas abertas"
+          value={k.colOpen}
+          sub={`${k.colFinalized} finalizadas`}
+          accent="#fbbf24"
+        />
+        <KpiCard
+          icon="tag"
           label="Valor em notas"
           value={formatBRL(k.invValue)}
           accent="#34d399"
         />
       </View>
 
-      {/* ── KPIs de combustível (RPC com filtro de data real) ───────── */}
+      {/* ── KPIs de combustível ─────────────────────────────────────── */}
       <View style={styles.kpiGrid}>
         <KpiCard
           icon="trending-down"
@@ -328,30 +363,104 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </View>
 
-      {/* ── Breakdowns ──────────────────────────────────────────────── */}
+      {/* ── Status de documentação (CT-e / frete / canhoto) ─────────── */}
       <SectionCard
-        title="Viagens por status"
-        icon="bar-chart-2"
-        hint="Distribuição das viagens no período filtrado"
+        title="Status de Documentação"
+        icon="file-text"
+        hint="Notas pendentes de CT-e, valor de frete e canhoto"
+        right={
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <View
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: "#34d399",
+              }}
+            />
+            <Text
+              style={{ color: theme.isDark ? "#aaa" : "#666", fontSize: 12 }}
+            >
+              Ao vivo
+            </Text>
+          </View>
+        }
       >
-        <MiniBars data={ordersByStatus} />
+        <DocumentationStatus invoices={fInvoices} />
       </SectionCard>
 
+      {/* ── Distribuição por status (donut) ─────────────────────────── */}
       <SectionCard
-        title="Notas por situação de entrega"
-        icon="file-text"
+        title="Distribuição por status"
+        icon="pie-chart"
+        hint="Viagens por status no período filtrado"
       >
+        <DonutChart
+          data={ordersStatusSlices}
+          centerValue={k.ordersTotal}
+          centerLabel="viagens"
+        />
+      </SectionCard>
+
+      {/* ── Volume últimos 7 dias (barras + linha de tendência) ─────── */}
+      <SectionCard
+        title="Volume — Últimos 7 dias"
+        icon="bar-chart-2"
+        hint="Viagens entregues (barras) × lançadas (linha)"
+      >
+        <BarLineChart
+          labels={dayLabels}
+          bars={ordersDelivered}
+          line={ordersCreated}
+          barLabel="Entregues"
+          lineLabel="Lançadas"
+        />
+      </SectionCard>
+
+      {/* ── Notas por situação ──────────────────────────────────────── */}
+      <SectionCard title="Notas por situação de entrega" icon="file-text">
         <MiniBars
-          data={invoicesBySituation}
+          data={invoicesSituationBars}
           palette={["#34d399", "#fbbf24", "#f87171"]}
         />
       </SectionCard>
 
-      <SectionCard title="Coletas por status" icon="box">
-        <MiniBars data={collectionsByStatus} />
+      {/* ── Coletas: donut + volume 7 dias ──────────────────────────── */}
+      <SectionCard
+        title="Coletas por status"
+        icon="pie-chart"
+        hint="Distribuição das coletas no período filtrado"
+      >
+        <DonutChart
+          data={collectionsStatusSlices}
+          centerValue={k.colTotal}
+          centerLabel="coletas"
+        />
       </SectionCard>
 
-      {/* ── Eficiência por veículo (com filtro de chips) ────────────── */}
+      <SectionCard
+        title="Coletas — Últimos 7 dias"
+        icon="bar-chart-2"
+        hint="Criadas (barras) × finalizadas (linha)"
+      >
+        <BarLineChart
+          labels={dayLabels}
+          bars={collectionsCreated}
+          line={collectionsFinalized}
+          barLabel="Criadas"
+          lineLabel="Finalizadas"
+          barColor="#fbbf24"
+          lineColor="#34d399"
+        />
+      </SectionCard>
+
+      {/* ── Eficiência por veículo ──────────────────────────────────── */}
       <SectionCard
         title="Eficiência por veículo (km/L)"
         icon="truck"
@@ -387,7 +496,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
-      {/* ── Ranking de motoristas (defensivo quanto ao shape) ───────── */}
+      {/* ── Ranking de motoristas ───────────────────────────────────── */}
       {ranking.length > 0 && (
         <SectionCard title="Ranking de motoristas" icon="award">
           <View style={{ gap: 0 }}>
@@ -420,10 +529,11 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         </SectionCard>
       )}
 
-      {/* ── Atividade recente ───────────────────────────────────────── */}
+      {/* ── Viagens recentes (com valor de frete por viagem) ────────── */}
       <SectionCard title="Viagens recentes" icon="clock">
         {fOrders.slice(0, 8).map((o) => {
           const plates = orderPlates(o);
+          const freight = orderFreight(o, freightMap);
           return (
             <View key={o.id} style={styles.listRow}>
               <View style={styles.listIcon}>
@@ -437,7 +547,10 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
                   {plates.length ? plates.join(" • ") : "Sem veículos"}
                 </Text>
               </View>
-              <StatusBadge label={orderStatusName(o)} />
+              <View style={{ alignItems: "flex-end", gap: 5 }}>
+                <Text style={styles.barValue}>{formatBRL(freight)}</Text>
+                <StatusBadge label={orderStatusName(o)} />
+              </View>
             </View>
           );
         })}
