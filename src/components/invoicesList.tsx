@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useTheme } from "@/contexts/themeContext";
 import { createInvoiceListStyles } from "@/styles/invoices.styles";
 import { router } from "expo-router";
+import { Feather } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
 import { InvoiceActions } from "@/components/actionsInvoices";
 import { invoiceService } from "@/services/invoices";
 import { formatCurrency, formatCurrencyCTe } from "@/services/formatMoney";
@@ -29,6 +31,12 @@ export const InvoiceList = ({
 
   const [modalVisible, setModalVisible] = useState(false);
   const [idToDelete, setIdToDelete] = useState<string | null>(null);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+
+  const refresh = () => {
+    if (onRefresh) onRefresh();
+    else if (onDeleteSuccess) onDeleteSuccess();
+  };
 
   const handleDelete = async () => {
     if (idToDelete) {
@@ -37,6 +45,74 @@ export const InvoiceList = ({
       setModalVisible(false);
     }
   };
+
+  const handleUploadComprovante = async (item: any) => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ["image/*", "application/pdf"],
+      copyToCacheDirectory: true,
+    });
+    if (result.canceled || !result.assets?.[0]) return;
+
+    const asset = result.assets[0];
+    setUploadingId(item.id);
+    try {
+      await invoiceService.uploadComprovante(item.id, {
+        uri: asset.uri,
+        name: asset.name ?? `comprovante-${item.nfe}`,
+        mimeType: asset.mimeType,
+      });
+      refresh();
+    } catch {
+      // toast via interceptor
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
+  // status de entrega no lugar da data de emissão
+  const renderDeliveryStatus = (item: any) => {
+    if (item.delivery_status === "finalizada") {
+      return (
+        <View style={[styles.badge, { backgroundColor: "#dcfce7" }]}>
+          <Text style={[styles.badgeText, { color: "#15803d" }]}>
+            Finalizada
+          </Text>
+        </View>
+      );
+    }
+
+    if (item.delivery_status === "aguardando_comprovante") {
+      const busy = uploadingId === item.id;
+      return (
+        <TouchableOpacity
+          style={[
+            styles.badge,
+            {
+              backgroundColor: "#ffedd5",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+            },
+          ]}
+          onPress={() => handleUploadComprovante(item)}
+          disabled={busy}
+        >
+          <Feather name="upload" size={12} color="#c2410c" />
+          <Text style={[styles.badgeText, { color: "#c2410c" }]}>
+            {busy ? "Enviando..." : "Aguardando comprovante"}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    // nota ainda não entregue na viagem -> mantém a data de emissão
+    return (
+      <Text style={styles.dateText}>
+        {new Date(item.issue_date).toLocaleDateString("pt-BR")}
+      </Text>
+    );
+  };
+
   return (
     <FlatList
       data={data}
@@ -81,9 +157,7 @@ export const InvoiceList = ({
           <View
             style={[styles.actionsContainer, { zIndex: 1000, elevation: 10 }]}
           >
-            <Text style={styles.dateText}>
-              {new Date(item.issue_date).toLocaleDateString("pt-BR")}
-            </Text>
+            {renderDeliveryStatus(item)}
 
             <InvoiceActions
               onEdit={() => router.push(`/(app)/invoices/edit/${item.id}`)}

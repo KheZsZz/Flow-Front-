@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { buildUploadForm } from "./upload";
 
 export type UploadStatus = "success" | "duplicate" | "error";
 
@@ -87,12 +88,28 @@ export const invoiceService = {
 
   async getInvoiceById(id: string) {
     const response = await api.get(`/invoices/${id}`);
-    // console.log(response.data);
     return response.data;
   },
 
   async updateInvoice(id: string, data: any) {
     const response = await api.put(`/invoices/${id}`, data);
     return response.data;
+  },
+
+  async uploadComprovante(
+    id: string,
+    file: { uri: string; name: string; mimeType?: string },
+  ) {
+    const form = await buildUploadForm(
+      "comprovante",
+      { uri: file.uri, name: file.name, mimeType: file.mimeType },
+      "image/jpeg",
+    );
+
+    const res = await api.post(`/invoices/${id}/comprovante`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+      transformRequest: [(data) => data],
+    });
+    return res.data;
   },
 };
