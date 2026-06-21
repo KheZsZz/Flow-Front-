@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "@/contexts/authContext";
 import { ThemeProvider, useTheme } from "@/contexts/themeContext";
 import { usePermissions, HOME_BY_ROLE } from "@/hooks/usePermission";
 import { UserTypeEnum } from "@/schemas/enumSchema";
+import { Loadding } from "@/components/loadding";
 
 // ─── Navigation Guard ─────────────────────────────────────────────────────────
 
@@ -31,7 +32,7 @@ function NavigationGuard() {
     }
 
     if (user && (inAuthGroup || !segments[0] || segments[0] === "index")) {
-      const profile = (user.user.profile_user ?? "Commum") as UserTypeEnum;
+      const profile = (user.user?.profile_user ?? "Commum") as UserTypeEnum;
       router.replace(HOME_BY_ROLE[profile] as any);
       return;
     }
@@ -40,27 +41,16 @@ function NavigationGuard() {
     if (user && inAppGroup) {
       const currentPath = "/" + segments.slice(1).join("/");
       if (!canAccess(currentPath)) {
-        const profile = (user.user.profile_user ?? "Commum") as UserTypeEnum;
+        const profile = (user.user?.profile_user ?? "Commum") as UserTypeEnum;
         router.replace(HOME_BY_ROLE[profile] as any);
       }
     }
   }, [user, loading, segments]);
 
-  if (loading) {
+  if (loading)
     return (
-      <View
-        style={[
-          styles.loadingContainer,
-          { backgroundColor: theme.background ?? "#ffffff" },
-        ]}
-      >
-        <ActivityIndicator
-          size="large"
-          color={theme.isDark ? theme.link : theme.primary}
-        />
-      </View>
+      <Loadding color={theme.isDark ? theme.link : theme.primary} size={50} />
     );
-  }
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>

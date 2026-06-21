@@ -16,6 +16,8 @@ import {
   useWindowDimensions,
   TouchableOpacity,
   Alert,
+  Platform,
+  Linking,
 } from "react-native";
 import { ConfirmModal } from "@/components/modal";
 
@@ -46,6 +48,20 @@ export const InvoiceList = ({
     }
   };
 
+  // abre o canhoto/comprovante (imagem ou PDF) — URL pública do bucket
+  const openComprovante = async (item: any) => {
+    if (!item.comprovante_url) return;
+    try {
+      if (Platform.OS === "web") {
+        window.open(item.comprovante_url, "_blank");
+      } else {
+        await Linking.openURL(item.comprovante_url);
+      }
+    } catch {
+      Alert.alert("Erro", "Não foi possível abrir o comprovante.");
+    }
+  };
+
   const handleUploadComprovante = async (item: any) => {
     const result = await DocumentPicker.getDocumentAsync({
       type: ["image/*", "application/pdf"],
@@ -72,12 +88,25 @@ export const InvoiceList = ({
   // status de entrega no lugar da data de emissão
   const renderDeliveryStatus = (item: any) => {
     if (item.delivery_status === "finalizada") {
+      // toca pra abrir o canhoto
       return (
-        <View style={[styles.badge, { backgroundColor: "#dcfce7" }]}>
+        <TouchableOpacity
+          style={[
+            styles.badge,
+            {
+              backgroundColor: "#dcfce7",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+            },
+          ]}
+          onPress={() => openComprovante(item)}
+        >
+          <Feather name="eye" size={12} color="#15803d" />
           <Text style={[styles.badgeText, { color: "#15803d" }]}>
             Finalizada
           </Text>
-        </View>
+        </TouchableOpacity>
       );
     }
 
@@ -160,8 +189,9 @@ export const InvoiceList = ({
             {renderDeliveryStatus(item)}
 
             <InvoiceActions
+              hasComprovante={!!item.comprovante_url}
+              onViewComprovante={() => openComprovante(item)}
               onEdit={() => router.push(`/(app)/invoices/edit/${item.id}`)}
-              onView={() => router.push(`/(app)/invoices/${item.id}`)}
               onDelete={() => {
                 setIdToDelete(item.id);
                 setModalVisible(true);

@@ -121,12 +121,12 @@ function UserBadge() {
   const { theme } = useTheme();
   const styles = createNavbarStyles(theme);
 
-  if (!user) return null;
+  if (!user?.user) return null;
 
   const profile = (user.user.profile_user ?? "Commum") as UserTypeEnum;
   const roleColor = ROLE_COLOR[profile];
   const roleLabel = ROLE_LABEL[profile];
-  const initials = user.user.name_user
+  const initials = (user.user.name_user ?? "")
     .split(" ")
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase())
@@ -148,7 +148,7 @@ function UserBadge() {
         </View>
       )}
       <Text style={styles.userName} numberOfLines={1}>
-        {user.user.name_user}
+        {user.user.name_user ?? ""}
       </Text>
       <View
         style={[
