@@ -19,7 +19,7 @@ import {
   FilterChip,
 } from "@/components/dashboard/primitives";
 import { DonutChart, BarLineChart } from "@/components/dashboard/charts";
-import { DocumentationStatus } from "@/components/dashboard/DocumentationStatus";
+import { DocumentationStatus } from "@/components/dashboard/documentationStatus";
 import {
   dashboardService,
   withinRange,
