@@ -31,7 +31,7 @@ type MenuItem = {
 };
 
 const MENU_ITEMS: MenuItem[] = [
-  { name: "Dashboard", path: "/dashboard", icon: "grid", minRole: "Financer" },
+  { name: "Painel", path: "/dashboard", icon: "grid", minRole: "Financer" },
 
   {
     name: "Notas Fiscais",
@@ -39,7 +39,7 @@ const MENU_ITEMS: MenuItem[] = [
     icon: "file-text",
     minRole: "Commum",
   },
-  { name: "Collections", path: "/collections", icon: "box", minRole: "Admin" },
+  { name: "Coletas", path: "/collections", icon: "box", minRole: "Commum" },
   {
     name: "Cargas / Rotas",
     path: "/orders",
@@ -48,8 +48,8 @@ const MENU_ITEMS: MenuItem[] = [
   },
   { name: "Frota", path: "/vehicles/list", icon: "truck", minRole: "Admin" },
   { name: "Manutenção", path: "/fuel", icon: "tool", minRole: "Financer" },
-  { name: "Usuarios", path: "/users", icon: "users", minRole: "Financer" },
   { name: "Clientes", path: "/clients", icon: "briefcase", minRole: "Admin" },
+  { name: "Usuarios", path: "/users", icon: "users", minRole: "Financer" },
   { name: "Status", path: "/status", icon: "check-circle", minRole: "Admin" },
   {
     name: "Configurações",
