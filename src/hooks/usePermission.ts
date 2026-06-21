@@ -23,6 +23,7 @@ export const ROLE_ALLOWED_ROUTES: Record<UserTypeEnum, string[]> = {
   Requestor: ["/orders/create", "/orders", "/status", "/settings"],
   Driver: ["/driver", "/settings"],
   Commum: [
+    "/dashboard",
     "/orders",
     "/invoices",
     "/collections",

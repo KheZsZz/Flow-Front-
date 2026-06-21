@@ -13,6 +13,7 @@ import { createDashboardStyles } from "@/styles/dashboard.styles";
 import { ROLE_LABEL, ROLE_COLOR } from "@/constants/colors";
 import { UserTypeEnum } from "@/schemas/enumSchema";
 import { ManagerAdminPanel } from "@/components/dashboard/ManagerAdminPanel";
+import { CommumPanel } from "@/components/dashboard/CommumPanel";
 import {
   KpiCard,
   SectionCard,
@@ -160,6 +161,8 @@ export default function DashboardScreen() {
 
         {isAdmin ? (
           <ManagerAdminPanel isMobile={isMobile} />
+        ) : profile === "Commum" ? (
+          <CommumPanel isMobile={isMobile} />
         ) : (
           <OperationalFallback isMobile={isMobile} />
         )}
