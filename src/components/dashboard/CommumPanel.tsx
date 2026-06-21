@@ -1,10 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useForm } from "react-hook-form";
 import { useTheme } from "@/contexts/themeContext";
@@ -16,7 +11,7 @@ import {
   StatusBadge,
 } from "@/components/dashboard/primitives";
 import { DonutChart, BarLineChart } from "@/components/dashboard/charts";
-import { DocumentationStatus } from "@/components/dashboard/DocumentationStatus";
+import { DocumentationStatus } from "@/components/dashboard/documentationStatus";
 import {
   dashboardService,
   withinRange,
