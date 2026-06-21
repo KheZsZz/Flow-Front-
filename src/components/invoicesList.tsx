@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { InvoiceActions } from "@/components/actionsInvoices";
+import { InvoiceDetailsModal } from "@/components/invoiceDetailsModal";
 import { invoiceService } from "@/services/invoices";
 import { formatCurrency, formatCurrencyCTe } from "@/services/formatMoney";
 
@@ -34,6 +35,7 @@ export const InvoiceList = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [idToDelete, setIdToDelete] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [detailsItem, setDetailsItem] = useState<any | null>(null);
 
   const refresh = () => {
     if (onRefresh) onRefresh();
@@ -143,71 +145,78 @@ export const InvoiceList = ({
   };
 
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.id}
-      refreshControl={
-        <RefreshControl refreshing={loading} onRefresh={onRefresh} />
-      }
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.invoiceNumber}>NFe: {item.nfe}</Text>
-            <Text style={styles.invoiceValue}>
-              {formatCurrency(item.value_nfe)}
+    <>
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+        }
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.invoiceNumber}>NFe: {item.nfe}</Text>
+              <Text style={styles.invoiceValue}>
+                {formatCurrency(item.value_nfe)}
+              </Text>
+            </View>
+            <Text style={styles.issuerText}>
+              Remetente: {item.remetente?.name_client}
             </Text>
-          </View>
-          <Text style={styles.issuerText}>
-            Remetente: {item.remetente?.name_client}
-          </Text>
-          <Text style={styles.issuerText}>
-            Dest: {item.destinatario?.name_client}
-          </Text>
-          <View style={styles.cardFooter}>
-            <Text
-              style={{
-                color: item.cte === "AGUARDANDO" ? "#EF6C00" : "#2E7D32",
-                fontWeight: "bold",
-              }}
-            >
-              CT-e {item.cte}
+            <Text style={styles.issuerText}>
+              Dest: {item.destinatario?.name_client}
             </Text>
+            <View style={styles.cardFooter}>
+              <Text
+                style={{
+                  color: item.cte === "AGUARDANDO" ? "#EF6C00" : "#2E7D32",
+                  fontWeight: "bold",
+                }}
+              >
+                CT-e {item.cte}
+              </Text>
 
-            <Text
-              style={{
-                color: item.cte === "AGUARDANDO" ? "#EF6C00" : "#2E7D32",
-                fontWeight: "bold",
-                fontSize: 16,
-              }}
+              <Text
+                style={{
+                  color: item.cte === "AGUARDANDO" ? "#EF6C00" : "#2E7D32",
+                  fontWeight: "bold",
+                  fontSize: 16,
+                }}
+              >
+                {formatCurrencyCTe(item.cte_value)}
+              </Text>
+            </View>
+            <View
+              style={[styles.actionsContainer, { zIndex: 1000, elevation: 10 }]}
             >
-              {formatCurrencyCTe(item.cte_value)}
-            </Text>
-          </View>
-          <View
-            style={[styles.actionsContainer, { zIndex: 1000, elevation: 10 }]}
-          >
-            {renderDeliveryStatus(item)}
+              {renderDeliveryStatus(item)}
 
-            <InvoiceActions
-              hasComprovante={!!item.comprovante_url}
-              onViewComprovante={() => openComprovante(item)}
-              onEdit={() => router.push(`/(app)/invoices/edit/${item.id}`)}
-              onDelete={() => {
-                setIdToDelete(item.id);
-                setModalVisible(true);
-              }}
+              <InvoiceActions
+                onViewDetails={() => setDetailsItem(item)}
+                onEdit={() => router.push(`/(app)/invoices/edit/${item.id}`)}
+                onDelete={() => {
+                  setIdToDelete(item.id);
+                  setModalVisible(true);
+                }}
+              />
+            </View>
+
+            <ConfirmModal
+              visible={modalVisible}
+              title="Confirmar exclusão"
+              message="Tem certeza que deseja eliminar esta nota? Esta ação não pode ser desfeita."
+              onConfirm={handleDelete}
+              onCancel={() => setModalVisible(false)}
             />
           </View>
+        )}
+      />
 
-          <ConfirmModal
-            visible={modalVisible}
-            title="Confirmar exclusão"
-            message="Tem certeza que deseja eliminar esta nota? Esta ação não pode ser desfeita."
-            onConfirm={handleDelete}
-            onCancel={() => setModalVisible(false)}
-          />
-        </View>
-      )}
-    />
+      <InvoiceDetailsModal
+        visible={!!detailsItem}
+        invoice={detailsItem}
+        onClose={() => setDetailsItem(null)}
+      />
+    </>
   );
 };
