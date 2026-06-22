@@ -31,7 +31,7 @@ type MenuItem = {
 };
 
 const MENU_ITEMS: MenuItem[] = [
-  { name: "Dashboard", path: "/dashboard", icon: "grid", minRole: "Financer" },
+  { name: "Painel", path: "/dashboard", icon: "grid", minRole: "Commum" },
 
   {
     name: "Notas Fiscais",
@@ -39,7 +39,7 @@ const MENU_ITEMS: MenuItem[] = [
     icon: "file-text",
     minRole: "Commum",
   },
-  { name: "Collections", path: "/collections", icon: "box", minRole: "Admin" },
+  { name: "Coletas", path: "/collections", icon: "box", minRole: "Commum" },
   {
     name: "Cargas / Rotas",
     path: "/orders",
@@ -48,8 +48,8 @@ const MENU_ITEMS: MenuItem[] = [
   },
   { name: "Frota", path: "/vehicles/list", icon: "truck", minRole: "Admin" },
   { name: "Manutenção", path: "/fuel", icon: "tool", minRole: "Financer" },
-  { name: "Usuarios", path: "/users", icon: "users", minRole: "Financer" },
   { name: "Clientes", path: "/clients", icon: "briefcase", minRole: "Admin" },
+  { name: "Usuarios", path: "/users", icon: "users", minRole: "Financer" },
   { name: "Status", path: "/status", icon: "check-circle", minRole: "Admin" },
   {
     name: "Configurações",
@@ -121,12 +121,12 @@ function UserBadge() {
   const { theme } = useTheme();
   const styles = createNavbarStyles(theme);
 
-  if (!user) return null;
+  if (!user?.user) return null;
 
   const profile = (user.user.profile_user ?? "Commum") as UserTypeEnum;
   const roleColor = ROLE_COLOR[profile];
   const roleLabel = ROLE_LABEL[profile];
-  const initials = user.user.name_user
+  const initials = (user.user.name_user ?? "")
     .split(" ")
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase())
@@ -148,7 +148,7 @@ function UserBadge() {
         </View>
       )}
       <Text style={styles.userName} numberOfLines={1}>
-        {user.user.name_user}
+        {user.user.name_user ?? ""}
       </Text>
       <View
         style={[

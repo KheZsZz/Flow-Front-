@@ -13,7 +13,7 @@ interface CompanySession {
 interface UserSession {
   user: UserType;
   company?: CompanySession;
-  token: string; // ✨ Adicionado explicitamente aqui para facilitar o acesso
+  token: string;
 }
 
 interface AuthContextType {
@@ -34,32 +34,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserSession | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const singIn = async (serverPayload: SingInParams) => {
-    try {
-      // Define o token temporário para a requisição de perfil
-      api.defaults.headers.common["Authorization"] =
-        `Bearer ${serverPayload.token}`;
-
-      const response = await api.get("/auth/me");
-
-      // Monta a sessão incluindo o token explicitamente na raiz
-      const completeSession: UserSession = {
-        company: response.data.company,
-        user: response.data.user,
-        token: serverPayload.token,
-      };
-
-      setUser(completeSession);
-      await AsyncStorage.setItem(
-        "@flow:auth_user",
-        JSON.stringify(completeSession),
-      );
-    } catch (error) {
-      console.error("Erro ao processar o login no frontend:", error);
-      throw error;
-    }
-  };
-
   const singOut = async () => {
     try {
       api.defaults.headers.common["Authorization"] = "";
@@ -70,6 +44,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const singIn = async (serverPayload: SingInParams) => {
+    try {
+      // token temporário para a requisição de perfil
+      api.defaults.headers.common["Authorization"] =
+        `Bearer ${serverPayload.token}`;
+
+      const response = await api.get("/auth/me");
+      const me = response.data;
+
+      // INVARIANTE: nunca montar sessão parcial.
+      // Sem `user` válido => sessão inválida (não deixa user.user = undefined).
+      if (!me?.user) {
+        throw new Error("Perfil inválido retornado por /auth/me");
+      }
+
+      const completeSession: UserSession = {
+        user: me.user,
+        company: me.company,
+        token: serverPayload.token,
+      };
+
+      setUser(completeSession);
+      await AsyncStorage.setItem(
+        "@flow:auth_user",
+        JSON.stringify(completeSession),
+      );
+    } catch (error) {
+      console.error("Erro ao processar o login no frontend:", error);
+      await singOut(); // garante que não fica sessão pela metade
+      throw error;
+    }
+  };
+
   const loadStorageData = async () => {
     try {
       const storagedUser = await AsyncStorage.getItem("@flow:auth_user");
@@ -77,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (storagedUser) {
         const parsedUser = JSON.parse(storagedUser) as UserSession;
 
-        if (!parsedUser.token) {
+        if (!parsedUser?.token) {
           throw new Error("Token não encontrado no armazenamento local.");
         }
 
@@ -85,10 +92,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           `Bearer ${parsedUser.token}`;
 
         const response = await api.get("/auth/me");
+        const me = response.data;
+
+        if (!me?.user) {
+          throw new Error("Perfil inválido retornado por /auth/me");
+        }
 
         const updatedSession: UserSession = {
-          user: response.data.user,
-          company: response.data.company,
+          user: me.user,
+          company: me.company,
           token: parsedUser.token,
         };
 

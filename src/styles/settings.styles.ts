@@ -34,6 +34,7 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
       paddingVertical: 12,
     },
     tab: {
+      flex: 1,
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
@@ -43,6 +44,7 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
       borderWidth: 1,
       borderColor: theme.borderColor,
       backgroundColor: theme.card,
+      height: 40,
     },
     tabActive: {
       backgroundColor: theme.isDark ? theme.link : theme.primary,

@@ -4,6 +4,7 @@
   "main": "expo-router/entry",
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@shopify/react-native-skia",
       "msgpackr-extract"
     ],
     "overrides": {
