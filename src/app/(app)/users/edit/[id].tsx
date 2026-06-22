@@ -22,6 +22,7 @@ import rollback from "@/services/rollback";
 import { api } from "@/services/api";
 import { CNH_CATEGORIES, ALLOWED_NON_MANAGER } from "@/constants/colors";
 import { usersService } from "@/services/users";
+import { DocumentUpload } from "@/components/documentUpload";
 
 const MANAGER_ROLES = [
   { label: "Usuário", value: "Commum" },
@@ -50,6 +51,8 @@ export default function EditUserScreen() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [cnhDocUrl, setCnhDocUrl] = useState<string | null>(null);
+  const [moppDocUrl, setMoppDocUrl] = useState<string | null>(null);
 
   const {
     control,
@@ -86,6 +89,8 @@ export default function EditUserScreen() {
         mopp: !!drv?.mopp,
         moop_validade: drv?.moop_validade ?? "",
       });
+      setCnhDocUrl(drv?.cnh_doc_url ?? null);
+      setMoppDocUrl(drv?.mopp_doc_url ?? null);
     } catch {
     } finally {
       setLoading(false);
@@ -119,6 +124,8 @@ export default function EditUserScreen() {
         payload.categoria_cnh = (data.categoria_cnh ?? []).join(",");
         payload.mopp = !!data.mopp;
         payload.moop_validade = data.moop_validade || null;
+        payload.cnh_doc_url = cnhDocUrl;
+        payload.mopp_doc_url = moppDocUrl;
       }
 
       await usersService.update(id, payload);
@@ -237,6 +244,22 @@ export default function EditUserScreen() {
                 label="Validade do MOPP (opcional)"
                 variant="date"
                 iconName="calendar"
+              />
+              <DocumentUpload
+                label="CNH (PDF ou imagem)"
+                entity="drivers"
+                type="cnh"
+                currentUrl={cnhDocUrl}
+                onUploaded={setCnhDocUrl}
+                theme={theme}
+              />
+              <DocumentUpload
+                label="Certificado MOPP (PDF ou imagem)"
+                entity="drivers"
+                type="mopp"
+                currentUrl={moppDocUrl}
+                onUploaded={setMoppDocUrl}
+                theme={theme}
               />
             </>
           )}

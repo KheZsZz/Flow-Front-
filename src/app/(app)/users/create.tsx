@@ -21,6 +21,7 @@ import rollback from "@/services/rollback";
 import { api } from "@/services/api";
 import { CNH_CATEGORIES, ALLOWED_NON_MANAGER } from "@/constants/colors";
 import { usersService } from "@/services/users";
+import { DocumentUpload } from "@/components/documentUpload";
 
 /** Gerente pode atribuir qualquer perfil. */
 const MANAGER_ROLES = [
@@ -50,6 +51,8 @@ export default function CreateUserScreen() {
   const roleOptions = isManager ? MANAGER_ROLES : ADMIN_ROLES;
 
   const [loading, setLoading] = useState(false);
+  const [cnhDocUrl, setCnhDocUrl] = useState<string | null>(null);
+  const [moppDocUrl, setMoppDocUrl] = useState<string | null>(null);
 
   const {
     control,
@@ -90,6 +93,8 @@ export default function CreateUserScreen() {
         payload.categoria_cnh = (data.categoria_cnh ?? []).join(",");
         payload.mopp = !!data.mopp;
         payload.moop_validade = data.moop_validade || null;
+        payload.cnh_doc_url = cnhDocUrl;
+        payload.mopp_doc_url = moppDocUrl;
       }
 
       await usersService.create(payload);
@@ -211,6 +216,20 @@ export default function CreateUserScreen() {
                 label="Validade do MOPP (opcional)"
                 variant="date"
                 iconName="calendar"
+              />
+              <DocumentUpload
+                label="CNH (PDF ou imagem)"
+                entity="drivers"
+                type="cnh"
+                onUploaded={setCnhDocUrl}
+                theme={theme}
+              />
+              <DocumentUpload
+                label="Certificado MOPP (PDF ou imagem)"
+                entity="drivers"
+                type="mopp"
+                onUploaded={setMoppDocUrl}
+                theme={theme}
               />
             </>
           )}

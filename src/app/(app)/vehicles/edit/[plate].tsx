@@ -19,6 +19,8 @@ import { vehicleSchema, VehicleType } from "@/schemas/vehicleSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VehicleTypeSchema } from "@/schemas/enumSchema";
 import rollback from "@/services/rollback";
+import { Loadding } from "@/components/loadding";
+import { DocumentUpload } from "@/components/documentUpload";
 
 export default function EditVehicleScreen() {
   const { theme } = useTheme();
@@ -30,6 +32,9 @@ export default function EditVehicleScreen() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [vehicle, setVehicle] = useState<VehicleType>();
+  const [crlvDocUrl, setCrlvDocUrl] = useState<string | null>(null);
+  const [seguroDocUrl, setSeguroDocUrl] = useState<string | null>(null);
+  const [tacografoDocUrl, setTacografoDocUrl] = useState<string | null>(null);
 
   const {
     control,
@@ -63,6 +68,9 @@ export default function EditVehicleScreen() {
       const res = await api.get(`/vehicles/plate/${plate}`);
       if (res.data) {
         setVehicle(res.data);
+        setCrlvDocUrl(res.data.crlv_doc_url ?? null);
+        setSeguroDocUrl(res.data.seguro_doc_url ?? null);
+        setTacografoDocUrl(res.data.tacografo_doc_url ?? null);
         reset({
           ...res.data,
           year: String(res.data.year || ""),
@@ -83,7 +91,12 @@ export default function EditVehicleScreen() {
     };
 
     try {
-      await api.put(`/vehicles/${vehicle?.id}`, normalizedData);
+      await api.put(`/vehicles/${vehicle?.id}`, {
+        ...normalizedData,
+        crlv_doc_url: crlvDocUrl,
+        seguro_doc_url: seguroDocUrl,
+        tacografo_doc_url: tacografoDocUrl,
+      });
 
       Alert.alert("Sucesso", "Veículo atualizado!");
       rollback();
@@ -98,13 +111,7 @@ export default function EditVehicleScreen() {
   }, [plate]);
 
   if (loading)
-    return (
-      <ActivityIndicator
-        style={{ flex: 1 }}
-        size="large"
-        color={theme.primary}
-      />
-    );
+    return <Loadding color={theme.isDark ? theme.link : theme.primary} />;
 
   return (
     <View style={styles.container}>
@@ -209,6 +216,33 @@ export default function EditVehicleScreen() {
             variant="date"
             iconName="calendar"
             errorMessage={errors.tacografo_validade?.message as string}
+          />
+
+          <View style={styles.divider} />
+          <Text style={styles.sectionTitle}>Arquivos</Text>
+          <DocumentUpload
+            label="CRLV (PDF ou imagem)"
+            entity="vehicles"
+            type="crlv"
+            currentUrl={crlvDocUrl}
+            onUploaded={setCrlvDocUrl}
+            theme={theme}
+          />
+          <DocumentUpload
+            label="Apólice de Seguro (PDF ou imagem)"
+            entity="vehicles"
+            type="seguro"
+            currentUrl={seguroDocUrl}
+            onUploaded={setSeguroDocUrl}
+            theme={theme}
+          />
+          <DocumentUpload
+            label="Tacógrafo (PDF ou imagem)"
+            entity="vehicles"
+            type="tacografo"
+            currentUrl={tacografoDocUrl}
+            onUploaded={setTacografoDocUrl}
+            theme={theme}
           />
 
           <View style={styles.divider} />

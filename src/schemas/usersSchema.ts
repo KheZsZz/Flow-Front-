@@ -96,6 +96,8 @@ export const UserSchema = z.object({
   categoria_cnh: z.array(z.enum(["A", "B", "C", "D", "E"])).optional(),
   mopp: z.boolean().optional(),
   moop_validade: z.string().nullish(),
+  cnh_doc_url: z.string().url().nullish(),
+  mopp_doc_url: z.string().url().nullish(),
 });
 const requireDriverFields = (data: any, ctx: z.RefinementCtx) => {
   if (data.profile_user !== "Driver") return;

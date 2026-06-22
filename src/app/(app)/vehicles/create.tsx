@@ -10,7 +10,6 @@ import {
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { vehicleSchema } from "@/schemas/vehicleSchema";
@@ -21,15 +20,18 @@ import { ControlledInput } from "@/components/controllerInput";
 import { VehicleTypeSchema } from "@/schemas/enumSchema";
 import rollback from "@/services/rollback";
 import { useAuth } from "@/contexts/authContext";
+import { DocumentUpload } from "@/components/documentUpload";
 
 export default function CreateVehicleScreen() {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const styles = createVehicleStyles(theme, isMobile);
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const [crlvDocUrl, setCrlvDocUrl] = useState<string | null>(null);
+  const [seguroDocUrl, setSeguroDocUrl] = useState<string | null>(null);
+  const [tacografoDocUrl, setTacografoDocUrl] = useState<string | null>(null);
 
   const {
     control,
@@ -42,7 +44,13 @@ export default function CreateVehicleScreen() {
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      await api.post("/vehicles", { ...data, created_by: user?.user.id });
+      await api.post("/vehicles", {
+        ...data,
+        crlv_doc_url: crlvDocUrl,
+        seguro_doc_url: seguroDocUrl,
+        tacografo_doc_url: tacografoDocUrl,
+        created_by: user?.user.id,
+      });
       Alert.alert("Sucesso", "Veículo cadastrado!");
       rollback();
     } catch (e) {
@@ -166,6 +174,30 @@ export default function CreateVehicleScreen() {
             variant="date"
             iconName="calendar"
             errorMessage={errors.tacografo_validade?.message as string}
+          />
+
+          <View style={styles.divider} />
+          <Text style={styles.sectionTitle}>Arquivos</Text>
+          <DocumentUpload
+            label="CRLV (PDF ou imagem)"
+            entity="vehicles"
+            type="crlv"
+            onUploaded={setCrlvDocUrl}
+            theme={theme}
+          />
+          <DocumentUpload
+            label="Apólice de Seguro (PDF ou imagem)"
+            entity="vehicles"
+            type="seguro"
+            onUploaded={setSeguroDocUrl}
+            theme={theme}
+          />
+          <DocumentUpload
+            label="Tacógrafo (PDF ou imagem)"
+            entity="vehicles"
+            type="tacografo"
+            onUploaded={setTacografoDocUrl}
+            theme={theme}
           />
         </View>
 
