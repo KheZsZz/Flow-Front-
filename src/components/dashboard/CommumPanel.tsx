@@ -10,7 +10,9 @@ import {
   SectionCard,
   StatusBadge,
 } from "@/components/dashboard/primitives";
-import { DonutChart, BarLineChart } from "@/components/dashboard/charts";
+import { PieStatusChart } from "@/components/dashboard/charts/PieStatusChart";
+import { DynamicBarChart } from "@/components/dashboard/charts/DynamicBarChart";
+import { FunnelOrderChart } from "@/components/dashboard/charts/FunnelOrderChart";
 import { DocumentationStatus } from "@/components/dashboard/documentationStatus";
 import {
   dashboardService,
@@ -124,6 +126,20 @@ export function CommumPanel({ isMobile }: { isMobile: boolean }) {
     [orders, days],
   );
 
+  const funnelStages = useMemo(() => {
+    const created = fOrders.length;
+    const started = fOrders.filter((o) => {
+      const s = orderStatusName(o).toLowerCase();
+      return s !== "criada" && s !== "pendente";
+    }).length;
+    const finalized = fOrders.filter(orderIsFinalized).length;
+    return [
+      { name: "Criadas", value: created, color: "#60a5fa" },
+      { name: "Em andamento", value: started, color: "#fbbf24" },
+      { name: "Finalizadas", value: finalized, color: "#34d399" },
+    ];
+  }, [fOrders]);
+
   const statusOptions = useMemo(() => {
     const names = Array.from(new Set(orders.map(orderStatusName)));
     return [
@@ -223,16 +239,26 @@ export function CommumPanel({ isMobile }: { isMobile: boolean }) {
         <DocumentationStatus invoices={fInvoices} />
       </SectionCard>
 
+      {/* ── Funil de viagens ────────────────────────────────────────── */}
+      <SectionCard
+        title="Funil de viagens"
+        icon="filter"
+        hint="Criadas → Em andamento → Finalizadas"
+      >
+        <FunnelOrderChart stages={funnelStages} title="Funil de viagens" />
+      </SectionCard>
+
       {/* ── Distribuição por status (viagens) ───────────────────────── */}
       <SectionCard
         title="Distribuição por status"
         icon="pie-chart"
         hint="Viagens por status no período filtrado"
       >
-        <DonutChart
+        <PieStatusChart
           data={ordersStatusSlices}
           centerValue={k.ordersTotal}
           centerLabel="viagens"
+          title="Distribuição por status"
         />
       </SectionCard>
 
@@ -242,10 +268,11 @@ export function CommumPanel({ isMobile }: { isMobile: boolean }) {
         icon="pie-chart"
         hint="Distribuição das coletas no período filtrado"
       >
-        <DonutChart
+        <PieStatusChart
           data={collectionsStatusSlices}
           centerValue={k.colTotal}
           centerLabel="coletas"
+          title="Coletas por status"
         />
       </SectionCard>
 
@@ -255,12 +282,13 @@ export function CommumPanel({ isMobile }: { isMobile: boolean }) {
         icon="bar-chart-2"
         hint="Viagens entregues (barras) × lançadas (linha)"
       >
-        <BarLineChart
+        <DynamicBarChart
           labels={dayLabels}
           bars={ordersDelivered}
           line={ordersCreated}
           barLabel="Entregues"
           lineLabel="Lançadas"
+          title="Volume — Últimos 7 dias"
         />
       </SectionCard>
 

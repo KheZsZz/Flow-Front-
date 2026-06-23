@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
@@ -27,7 +26,13 @@ import {
   orderDriverId,
   orderPlates,
   orderItems,
+  lastNDays,
+  bucketByDay,
 } from "@/services/dashboard";
+import { Loadding } from "../loadding";
+import { PieStatusChart } from "@/components/dashboard/charts/PieStatusChart";
+import { DynamicBarChart } from "@/components/dashboard/charts/DynamicBarChart";
+import { toSlices } from "@/services/dashboard";
 
 type FilterForm = {
   start_date?: string;
@@ -92,6 +97,21 @@ export function DriverPanel({ isMobile }: { isMobile: boolean }) {
     [fOrders],
   );
 
+  const statusSlices = useMemo(
+    () => toSlices(countBy(fOrders, orderStatusName)),
+    [fOrders],
+  );
+
+  const days7 = useMemo(() => lastNDays(7), []);
+  const myCreated = useMemo(
+    () => bucketByDay(myOrders, (o) => o.created_at, days7),
+    [myOrders, days7],
+  );
+  const myFinalized = useMemo(
+    () => bucketByDay(myOrders, (o) => o.finaled_at, days7),
+    [myOrders, days7],
+  );
+
   const statusOptions = useMemo(() => {
     const names = Array.from(new Set(myOrders.map(orderStatusName)));
     return [
@@ -117,14 +137,7 @@ export function DriverPanel({ isMobile }: { isMobile: boolean }) {
   const hasFilters =
     !!filters.start_date || !!filters.end_date || !!filters.status;
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={accent} />
-        <Text style={styles.emptyText}>Carregando suas viagens…</Text>
-      </View>
-    );
-  }
+  if (loading) return <Loadding color={accent} size={50} />;
 
   return (
     <View style={{ gap: 18 }}>
@@ -233,9 +246,30 @@ export function DriverPanel({ isMobile }: { isMobile: boolean }) {
         )}
       </SectionCard>
 
-      {/* ── Distribuição por status ─────────────────────────────────── */}
-      <SectionCard title="Minhas viagens por status" icon="bar-chart-2">
-        <MiniBars data={byStatus} emptyText="Sem viagens no período" />
+      {/* ── Distribuição por status (pie) ───────────────────────────── */}
+      <SectionCard title="Minhas viagens por status" icon="pie-chart">
+        <PieStatusChart
+          data={statusSlices}
+          centerValue={k.total}
+          centerLabel="viagens"
+          title="Minhas viagens por status"
+        />
+      </SectionCard>
+
+      {/* ── Atividade últimos 7 dias ────────────────────────────────── */}
+      <SectionCard
+        title="Atividade — Últimos 7 dias"
+        icon="bar-chart-2"
+        hint="Viagens lançadas × finalizadas"
+      >
+        <DynamicBarChart
+          labels={days7.map((d) => d.label)}
+          bars={myFinalized}
+          line={myCreated}
+          barLabel="Finalizadas"
+          lineLabel="Lançadas"
+          title="Atividade pessoal"
+        />
       </SectionCard>
 
       {/* ── Lista de viagens ────────────────────────────────────────── */}

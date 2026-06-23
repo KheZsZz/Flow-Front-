@@ -18,7 +18,12 @@ import {
   StatusBadge,
   FilterChip,
 } from "@/components/dashboard/primitives";
-import { DonutChart, BarLineChart } from "@/components/dashboard/charts";
+import { PieStatusChart } from "@/components/dashboard/charts/PieStatusChart";
+import { DynamicBarChart } from "@/components/dashboard/charts/DynamicBarChart";
+import { AreaPiecesChart } from "@/components/dashboard/charts/AreaPiecesChart";
+import { FunnelOrderChart } from "@/components/dashboard/charts/FunnelOrderChart";
+import { GaugeChart } from "@/components/dashboard/charts/GaugeChart";
+import { RadarPerformanceChart } from "@/components/dashboard/charts/RadarPerformanceChart";
 import { DocumentationStatus } from "@/components/dashboard/documentationStatus";
 import {
   dashboardService,
@@ -221,6 +226,67 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     ];
   }, [orders]);
 
+  /* ── Funil de viagens ───────────────────────────────────────────────── */
+  const funnelStages = useMemo(() => {
+    const created = fOrders.length;
+    const started = fOrders.filter((o) => {
+      const s = orderStatusName(o).toLowerCase();
+      return s !== "criada" && s !== "pendente";
+    }).length;
+    const finalized = fOrders.filter(orderIsFinalized).length;
+    return [
+      { name: "Criadas", value: created, color: "#60a5fa" },
+      { name: "Em andamento", value: started, color: "#fbbf24" },
+      { name: "Finalizadas", value: finalized, color: "#34d399" },
+    ];
+  }, [fOrders]);
+
+  /* ── Tendência de frete (30 dias) ───────────────────────────────────── */
+  const freightTrend = useMemo(() => {
+    const d30 = lastNDays(30);
+    const byDay: number[] = d30.map((day) => {
+      const invOfDay = invoices.filter((inv) => {
+        const d = inv.created_at?.slice(0, 10);
+        return d === day.iso;
+      });
+      return invOfDay.reduce((acc, inv) => acc + (invoiceFreight(inv) || 0), 0);
+    });
+    return { labels: d30.map((d) => d.label), values: byDay };
+  }, [invoices]);
+
+  /* ── Taxa de documentação ───────────────────────────────────────────── */
+  const docCompletionRate = useMemo(() => {
+    if (!fInvoices.length) return 0;
+    const complete = fInvoices.filter(
+      (i) => invoiceSituation(i) === "Completa",
+    ).length;
+    return Math.round((complete / fInvoices.length) * 100);
+  }, [fInvoices]);
+
+  /* ── Radar de eficiência da frota ───────────────────────────────────── */
+  const fleetRadarData = useMemo(() => {
+    const top5 = efficiency.slice(0, 5);
+    if (!top5.length) return null;
+    const maxKmL = Math.max(1, ...top5.map((e) => Number(e.km_per_liter)));
+    const maxKm = Math.max(1, ...top5.map((e) => Number(e.kms_driven)));
+    const maxL = Math.max(1, ...top5.map((e) => Number(e.liters)));
+    return {
+      indicators: [
+        { name: "km/L", max: Math.ceil(maxKmL * 1.2) },
+        { name: "Km rodados", max: Math.ceil(maxKm * 1.2) },
+        { name: "Litros", max: Math.ceil(maxL * 1.2) },
+      ],
+      series: top5.map((e) => ({
+        name: `Veíc. ${String(e.vehicle_id).slice(0, 6)}`,
+        values: [
+          Number(e.km_per_liter),
+          Number(e.kms_driven),
+          Number(e.liters),
+        ],
+      })),
+    };
+  }, [efficiency]);
+
   /* ── Eficiência por veículo ─────────────────────────────────────────── */
   const effFiltered = useMemo(() => {
     if (vehicleFilter === "TODOS") return efficiency;
@@ -388,31 +454,72 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         <DocumentationStatus invoices={fInvoices} />
       </SectionCard>
 
+      {/* ── Funil de viagens ────────────────────────────────────────── */}
+      <SectionCard
+        title="Funil de viagens"
+        icon="filter"
+        hint="Criadas → Em andamento → Finalizadas"
+      >
+        <FunnelOrderChart
+          stages={funnelStages}
+          title="Funil de viagens"
+        />
+      </SectionCard>
+
       {/* ── Distribuição por status (donut) ─────────────────────────── */}
       <SectionCard
         title="Distribuição por status"
         icon="pie-chart"
         hint="Viagens por status no período filtrado"
       >
-        <DonutChart
+        <PieStatusChart
           data={ordersStatusSlices}
           centerValue={k.ordersTotal}
           centerLabel="viagens"
+          title="Distribuição por status"
         />
       </SectionCard>
 
-      {/* ── Volume últimos 7 dias (barras + linha de tendência) ─────── */}
+      {/* ── Volume últimos 7 dias ───────────────────────────────────── */}
       <SectionCard
         title="Volume — Últimos 7 dias"
         icon="bar-chart-2"
         hint="Viagens entregues (barras) × lançadas (linha)"
       >
-        <BarLineChart
+        <DynamicBarChart
           labels={dayLabels}
           bars={ordersDelivered}
           line={ordersCreated}
           barLabel="Entregues"
           lineLabel="Lançadas"
+          title="Volume — Últimos 7 dias"
+        />
+      </SectionCard>
+
+      {/* ── Tendência de receita de frete (30 dias) ─────────────────── */}
+      <SectionCard
+        title="Receita de frete — 30 dias"
+        icon="trending-up"
+        hint="Verde acima da média, vermelho abaixo"
+      >
+        <AreaPiecesChart
+          labels={freightTrend.labels}
+          values={freightTrend.values}
+          title="Receita de frete"
+          formatValue={(n) => formatBRL(n)}
+        />
+      </SectionCard>
+
+      {/* ── Taxa de documentação (gauge) ────────────────────────────── */}
+      <SectionCard
+        title="Taxa de documentação completa"
+        icon="check-square"
+        hint="Percentual de NFs com CT-e, frete e canhoto preenchidos"
+      >
+        <GaugeChart
+          value={docCompletionRate}
+          label="%"
+          title="Documentação completa"
         />
       </SectionCard>
 
@@ -430,10 +537,11 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         icon="pie-chart"
         hint="Distribuição das coletas no período filtrado"
       >
-        <DonutChart
+        <PieStatusChart
           data={collectionsStatusSlices}
           centerValue={k.colTotal}
           centerLabel="coletas"
+          title="Coletas por status"
         />
       </SectionCard>
 
@@ -442,7 +550,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         icon="bar-chart-2"
         hint="Criadas (barras) × finalizadas (linha)"
       >
-        <BarLineChart
+        <DynamicBarChart
           labels={dayLabels}
           bars={collectionsCreated}
           line={collectionsFinalized}
@@ -450,8 +558,24 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
           lineLabel="Finalizadas"
           barColor="#fbbf24"
           lineColor="#34d399"
+          title="Coletas — Últimos 7 dias"
         />
       </SectionCard>
+
+      {/* ── Radar de eficiência da frota ────────────────────────────── */}
+      {fleetRadarData && (
+        <SectionCard
+          title="Radar de eficiência da frota"
+          icon="activity"
+          hint="Comparativo km/L, km rodados e consumo por veículo"
+        >
+          <RadarPerformanceChart
+            indicators={fleetRadarData.indicators}
+            series={fleetRadarData.series}
+            title="Radar de eficiência"
+          />
+        </SectionCard>
+      )}
 
       {/* ── Eficiência por veículo ──────────────────────────────────── */}
       <SectionCard
