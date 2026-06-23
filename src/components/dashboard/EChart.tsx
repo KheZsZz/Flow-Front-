@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Modal,
@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
+import { SvgChart } from "@wuba/react-native-echarts";
 import * as echarts from "echarts/core";
-import { SVGRenderer, SvgChart } from "@wuba/react-native-echarts";
 import {
   BarChart,
   LineChart,
@@ -29,6 +29,7 @@ import {
   MarkAreaComponent,
   RadarComponent,
 } from "echarts/components";
+import { SVGRenderer } from "echarts/renderers";
 
 echarts.use([
   SVGRenderer,
@@ -55,64 +56,27 @@ interface EChartProps {
   title?: string;
 }
 
-function ChartInstance({
-  option,
-  width,
-  height,
-  bg,
-}: {
-  option: echarts.EChartsCoreOption;
-  width: number;
-  height: number;
-  bg: string;
-}) {
-  const svgRef = useRef<any>(null);
-  const chartRef = useRef<echarts.ECharts | null>(null);
-
-  useEffect(() => {
-    if (!svgRef.current) return;
-    if (!chartRef.current) {
-      chartRef.current = echarts.init(svgRef.current, undefined, {
-        renderer: "svg",
-        width,
-        height,
-      });
-    }
-    chartRef.current.setOption(option, { notMerge: true });
-  }, [option, width, height]);
-
-  useEffect(() => {
-    return () => {
-      chartRef.current?.dispose();
-      chartRef.current = null;
-    };
-  }, []);
-
-  return <SvgChart ref={svgRef} style={{ backgroundColor: bg }} />;
-}
-
 export function EChart({ option, height = 260, title }: EChartProps) {
   const { theme } = useTheme();
   const { width: winW, height: winH } = useWindowDimensions();
   const [fullscreen, setFullscreen] = useState(false);
   const accent = theme.isDark ? theme.link : theme.primary;
-  const bg = theme.card;
 
   const containerW = Math.max(winW - 40, 260);
   const fsW = winW - 32;
   const fsH = winH - 120;
 
-  const themedOption = applyTheme(option, theme);
+  const themedOption = useMemo(() => applyTheme(option, theme), [option, theme]);
 
   return (
     <View>
       {/* Inline chart */}
-      <View style={[s.wrap, { backgroundColor: bg }]}>
-        <ChartInstance
+      <View style={[s.wrap, { backgroundColor: theme.card }]}>
+        <SvgChart
           option={themedOption}
           width={containerW}
           height={height}
-          bg={bg}
+          style={{ backgroundColor: theme.card }}
         />
         <TouchableOpacity
           style={[s.expandBtn, { backgroundColor: accent + "22" }]}
@@ -146,11 +110,11 @@ export function EChart({ option, height = 260, title }: EChartProps) {
             </TouchableOpacity>
           </View>
           <View style={[s.fsBody, { backgroundColor: theme.card }]}>
-            <ChartInstance
+            <SvgChart
               option={themedOption}
               width={fsW}
               height={fsH}
-              bg={theme.card}
+              style={{ backgroundColor: theme.card }}
             />
           </View>
         </View>
@@ -168,10 +132,9 @@ function applyTheme(
   const splitLine = theme.isDark
     ? "rgba(255,255,255,0.10)"
     : "rgba(0,0,0,0.08)";
-  const bg = theme.card;
 
   return {
-    backgroundColor: bg,
+    backgroundColor: "transparent",
     textStyle: { color: textColor, fontFamily: "System" },
     ...option,
     legend: option.legend
@@ -212,6 +175,7 @@ const s = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
     position: "relative",
+    marginVertical: 8,
   },
   expandBtn: {
     position: "absolute",
@@ -219,6 +183,7 @@ const s = StyleSheet.create({
     right: 8,
     borderRadius: 8,
     padding: 6,
+    zIndex: 10,
   },
   fsContainer: {
     flex: 1,

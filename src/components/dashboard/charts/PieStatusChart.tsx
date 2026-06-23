@@ -28,63 +28,50 @@ export function PieStatusChart({
     () => ({
       tooltip: {
         trigger: "item",
-        formatter: "{b}: {c} ({d}%)",
+        formatter: "{b}: {c}",
       },
       legend: {
-        bottom: 0,
+        bottom: 8,
         left: "center",
         orient: "horizontal",
         data: data.map((d) => d.label),
+        textStyle: { fontSize: 10, color: muted },
       },
-      graphic: [
-        {
-          type: "text",
-          left: "center",
-          top: "38%",
-          style: {
-            text: String(displayCenter),
-            textAlign: "center",
-            fill: theme.text,
-            fontSize: 26,
-            fontWeight: "bold",
-          },
-        },
-        {
-          type: "text",
-          left: "center",
-          top: "47%",
-          style: {
-            text: centerLabel ?? "",
-            textAlign: "center",
-            fill: muted,
-            fontSize: 12,
-          },
-        },
-      ],
       series: [
         {
           name: title,
           type: "pie",
-          radius: ["42%", "68%"],
-          center: ["50%", "45%"],
-          padAngle: 3,
+          radius: ["35%", "65%"],
+          center: ["50%", "40%"],
+          padAngle: 2,
           itemStyle: {
-            borderRadius: 6,
+            borderRadius: 4,
+            borderWidth: 0,
           },
-          label: { show: false },
+          label: {
+            show: false,
+          },
           emphasis: {
-            label: { show: false },
-            scale: true,
-            scaleSize: 6,
+            itemStyle: {
+              borderRadius: 6,
+            },
           },
           data:
             data.length > 0
-              ? data.map((d) => ({ name: d.label, value: d.value, itemStyle: { color: d.color } }))
-              : [{ name: "Sem dados", value: 1, itemStyle: { color: theme.isDark ? "#2d3748" : "#e2e8f0" } }],
+              ? data.map((d) => ({
+                  name: d.label,
+                  value: d.value,
+                  itemStyle: { color: d.color }
+                }))
+              : [{
+                  name: "Sem dados",
+                  value: 1,
+                  itemStyle: { color: theme.isDark ? "#2d3748" : "#e2e8f0" }
+                }],
         },
       ],
     }),
-    [data, displayCenter, centerLabel, title, theme, muted],
+    [data, title, theme, muted],
   );
 
   return (

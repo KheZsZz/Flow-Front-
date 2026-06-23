@@ -52,23 +52,11 @@ export function DynamicBarChart({
         axisLabel: { fontSize: 11 },
         axisTick: { show: false },
       },
-      yAxis: [
-        {
-          type: "value",
-          name: barLabel,
-          nameTextStyle: { fontSize: 10 },
-          splitNumber: 4,
-          axisLabel: { fontSize: 10 },
-        },
-        {
-          type: "value",
-          name: lineLabel,
-          nameTextStyle: { fontSize: 10 },
-          splitNumber: 4,
-          axisLabel: { fontSize: 10 },
-          splitLine: { show: false },
-        },
-      ],
+      yAxis: {
+        type: "value",
+        splitNumber: 4,
+        axisLabel: { fontSize: 10 },
+      },
       series: [
         {
           name: barLabel,
@@ -76,17 +64,18 @@ export function DynamicBarChart({
           data: bars,
           itemStyle: { color: bColor, borderRadius: [4, 4, 0, 0] },
           barMaxWidth: 32,
+          yAxisIndex: 0,
         },
         {
           name: lineLabel,
           type: "line",
-          yAxisIndex: 1,
           data: line,
           smooth: true,
           symbol: "circle",
           symbolSize: 6,
           lineStyle: { color: lColor, width: 2 },
           itemStyle: { color: lColor },
+          yAxisIndex: 0,
           areaStyle: {
             color: {
               type: "linear",

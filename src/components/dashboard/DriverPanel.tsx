@@ -105,11 +105,11 @@ export function DriverPanel({ isMobile }: { isMobile: boolean }) {
   const days7 = useMemo(() => lastNDays(7), []);
   const myCreated = useMemo(
     () => bucketByDay(myOrders, (o) => o.created_at, days7),
-    [myOrders, days7],
+    [myOrders],
   );
   const myFinalized = useMemo(
     () => bucketByDay(myOrders, (o) => o.finaled_at, days7),
-    [myOrders, days7],
+    [myOrders],
   );
 
   const statusOptions = useMemo(() => {

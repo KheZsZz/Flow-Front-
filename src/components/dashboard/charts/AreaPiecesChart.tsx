@@ -23,24 +23,19 @@ export function AreaPiecesChart({
     ? values.reduce((a, b) => a + b, 0) / values.length
     : 0;
 
+  const lineColor = "#34d399";
+  const belowAvgColor = "#f87171";
+
   const option = useMemo(
     () => ({
       tooltip: {
         trigger: "axis",
         formatter: (params: any) => {
+          if (!params || params.length === 0) return "";
           const p = params[0];
           const val = formatValue ? formatValue(p.value) : p.value;
           return `${p.name}<br/>${val}`;
         },
-      },
-      visualMap: {
-        show: false,
-        type: "piecewise",
-        dimension: 1,
-        pieces: [
-          { min: avg, color: "#34d399" },
-          { max: avg, color: "#f87171" },
-        ],
       },
       grid: { left: 50, right: 16, top: 24, bottom: 36 },
       xAxis: {
@@ -65,33 +60,40 @@ export function AreaPiecesChart({
           data: values,
           smooth: true,
           symbol: "circle",
-          symbolSize: 5,
-          lineStyle: { width: 2 },
-          areaStyle: { opacity: 0.3 },
+          symbolSize: 4,
+          lineStyle: { width: 2, color: lineColor },
+          itemStyle: { color: lineColor },
+          areaStyle: {
+            color: {
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: lineColor + "44" },
+                { offset: 1, color: lineColor + "00" },
+              ],
+            },
+          },
           markLine: {
             silent: true,
             lineStyle: {
               type: "dashed",
               color: theme.isDark ? "#60a5fa" : "#1a73e8",
+              width: 1,
             },
-            data: [
-              {
-                type: "average",
-                name: "Média",
-                label: {
-                  formatter: formatValue
-                    ? (p: any) => `Média: ${formatValue(p.value)}`
-                    : "Média: {c}",
-                  color: theme.isDark ? "#60a5fa" : "#1a73e8",
-                  fontSize: 10,
-                },
-              },
-            ],
+            label: {
+              formatter: "Média",
+              color: theme.isDark ? "#60a5fa" : "#1a73e8",
+              fontSize: 9,
+            },
+            data: [{ type: "average", name: "Média" }],
           },
         },
       ],
     }),
-    [labels, values, avg, title, formatValue, theme],
+    [labels, values, title, formatValue, theme, lineColor, belowAvgColor],
   );
 
   return <EChart option={option} height={height} title={title} />;

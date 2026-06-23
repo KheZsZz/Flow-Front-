@@ -247,7 +247,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     const byDay: number[] = d30.map((day) => {
       const invOfDay = invoices.filter((inv) => {
         const d = inv.created_at?.slice(0, 10);
-        return d === day.iso;
+        return d === day.key;
       });
       return invOfDay.reduce((acc, inv) => acc + (invoiceFreight(inv) || 0), 0);
     });

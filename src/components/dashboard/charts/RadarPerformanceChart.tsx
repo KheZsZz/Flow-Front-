@@ -31,19 +31,24 @@ export function RadarPerformanceChart({
       tooltip: { trigger: "item" },
       legend: {
         data: series.map((s) => s.name),
-        bottom: 0,
-        textStyle: { color: muted },
+        bottom: 8,
+        left: "center",
+        textStyle: { color: muted, fontSize: 10 },
       },
       radar: {
         indicator: indicators,
         shape: "polygon",
-        splitNumber: 4,
-        axisName: { color: muted, fontSize: 11 },
+        splitNumber: 3,
+        radius: "70%",
+        axisName: { color: muted, fontSize: 10 },
+        axisLine: { lineStyle: { color: theme.isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)" } },
         splitLine: {
           lineStyle: {
-            color: theme.isDark
-              ? "rgba(255,255,255,0.12)"
-              : "rgba(0,0,0,0.08)",
+            color: [
+              theme.isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+              theme.isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)",
+              theme.isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.12)",
+            ],
           },
         },
         splitArea: { show: false },
@@ -51,13 +56,16 @@ export function RadarPerformanceChart({
       series: [
         {
           type: "radar",
+          symbol: "circle",
+          symbolSize: 4,
           data: series.map((s, i) => ({
             name: s.name,
             value: s.values,
             itemStyle: { color: s.color ?? PALETTE[i % PALETTE.length] },
-            lineStyle: { color: s.color ?? PALETTE[i % PALETTE.length], width: 2 },
+            lineStyle: { color: s.color ?? PALETTE[i % PALETTE.length], width: 1.5 },
             areaStyle: {
-              color: (s.color ?? PALETTE[i % PALETTE.length]) + "33",
+              color: (s.color ?? PALETTE[i % PALETTE.length]) + "22",
+              opacity: 0.5,
             },
           })),
         },
