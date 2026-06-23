@@ -117,7 +117,7 @@ export default function EditOrderScreen() {
       setLoadedVehicles(
         ovs.map((ov: any) => ({
           label: ov.vehicles?.license_plate ?? "Veículo",
-          role: ov.role ?? "Cavalo",
+          role: ov.role === "carreta" ? "Carreta" : (ov.role ?? "Cavalo"),
         })),
       );
 

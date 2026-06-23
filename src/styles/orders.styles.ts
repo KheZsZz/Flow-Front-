@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { lightTheme, darkTheme } from "@/constants/colors";
 
 type AppTheme = typeof lightTheme | typeof darkTheme;
@@ -8,7 +8,7 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
     container: {
       flex: 1,
       backgroundColor: theme.background,
-      paddingTop: isMobile ? 30 : 10,
+      paddingTop: Platform.OS === "ios" ? 10 : isMobile ? 70 : 10,
     },
 
     header: {
@@ -245,6 +245,82 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       justifyContent: "center",
     },
     confirmText: { color: "#FFF", fontWeight: "700", fontSize: 15 },
+
+    lockedBanner: {
+      backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2",
+      borderRadius: 10,
+      padding: 12,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: theme.isDark ? "#7f1d1d" : "#fca5a5",
+    },
+    lockedText: {
+      color: theme.isDark ? "#fca5a5" : "#b91c1c",
+      fontWeight: "600",
+      fontSize: 14,
+      textAlign: "center",
+    },
+    infoBanner: {
+      backgroundColor: theme.isDark ? "#1e2640" : "#e8f0fe",
+      borderRadius: 10,
+      padding: 12,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: theme.isDark ? "#1a73e8" : "#bfdbfe",
+    },
+    infoText: {
+      color: theme.isDark ? "#93c5fd" : "#1a73e8",
+      fontSize: 13,
+    },
+    label: {
+      color: theme.isDark ? theme.textSecondary : theme.text,
+      fontSize: 14,
+      fontWeight: "600",
+      marginBottom: 6,
+    },
+    readonlyField: {
+      flexDirection: "row",
+      alignItems: "center",
+      height: 50,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)",
+      backgroundColor: theme.isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+      paddingHorizontal: 14,
+      marginBottom: 16,
+    },
+    readonlyValue: {
+      color: theme.isDark ? theme.textSecondary : theme.text,
+      fontSize: 15,
+    },
+    button: {
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
+      paddingVertical: 16,
+      borderRadius: 12,
+      alignItems: "center",
+      marginTop: 8,
+      marginBottom: 12,
+    },
+    buttonText: {
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 15,
+    },
+    deleteBtn: {
+      backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2",
+      paddingVertical: 14,
+      borderRadius: 12,
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: 8,
+      marginBottom: 24,
+    },
+    deleteBtnText: {
+      color: "#ef4444",
+      fontWeight: "600",
+      fontSize: 15,
+    },
   });
 
 export const createOrdersItensStyles = (theme: AppTheme, isMobile: boolean) =>

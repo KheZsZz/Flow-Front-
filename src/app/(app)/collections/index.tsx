@@ -4,10 +4,12 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   useWindowDimensions,
   Alert,
 } from "react-native";
+import { useForm } from "react-hook-form";
+import { SearchField } from "@/components/searchField";
+import { ControlledInput } from "@/components/controllerInput";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/themeContext";
@@ -36,14 +38,6 @@ const DATE_FIELDS: { key: DateField; label: string }[] = [
   { key: "finaled_at", label: "Finalização" },
 ];
 
-// "DD/MM/AAAA" -> Date (ou null se incompleto/inválido)
-function parseBR(value: string): Date | null {
-  const m = value.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!m) return null;
-  const dt = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
-  return isNaN(dt.getTime()) ? null : dt;
-}
-
 export default function CollectionsListScreen() {
   const { theme } = useTheme();
   const isMobile = useWindowDimensions().width <= 820;
@@ -55,8 +49,10 @@ export default function CollectionsListScreen() {
 
   const [search, setSearch] = useState("");
   const [dateField, setDateField] = useState<DateField>("scheduled_date");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+
+  const { control, watch } = useForm({ defaultValues: { from: null, to: null } });
+  const fromDate: Date | null = watch("from");
+  const toDate: Date | null = watch("to");
 
   const fetchCollections = async () => {
     try {
@@ -102,10 +98,8 @@ export default function CollectionsListScreen() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const fromD = parseBR(from);
-    const toD = parseBR(to);
-    const toEnd = toD
-      ? new Date(toD.getFullYear(), toD.getMonth(), toD.getDate(), 23, 59, 59)
+    const toEnd = toDate
+      ? new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate(), 23, 59, 59)
       : null;
 
     return collections.filter((c) => {
@@ -116,16 +110,16 @@ export default function CollectionsListScreen() {
         c.clients?.document?.toLowerCase().includes(q);
       if (!matchesText) return false;
 
-      if (fromD || toEnd) {
+      if (fromDate || toEnd) {
         const raw = c[dateField];
         if (!raw) return false;
         const d = new Date(raw);
-        if (fromD && d < fromD) return false;
+        if (fromDate && d < fromDate) return false;
         if (toEnd && d > toEnd) return false;
       }
       return true;
     });
-  }, [collections, search, dateField, from, to]);
+  }, [collections, search, dateField, fromDate, toDate]);
 
   const formatDate = (date?: string) =>
     date ? new Date(date).toLocaleDateString("pt-BR") : "Sem data";
@@ -147,21 +141,7 @@ export default function CollectionsListScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Busca: número da coleta / cliente / documento */}
-      <View style={styles.searchContainer}>
-        <Feather
-          name="search"
-          size={18}
-          color={theme.isDark ? theme.textSecondary : theme.text}
-        />
-        <TextInput
-          placeholder="Buscar por nº da coleta, cliente ou documento..."
-          placeholderTextColor={theme.isDark ? theme.textSecondary : theme.text}
-          style={styles.searchInput}
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
+      <SearchField placeholder="Buscar por nº da coleta, cliente ou documento..." onChange={setSearch} />
 
       {/* Seletor de qual data filtrar */}
       <Text style={styles.filterLabel}>Filtrar por data</Text>
@@ -184,22 +164,24 @@ export default function CollectionsListScreen() {
 
       {/* Intervalo de datas aplicado ao campo selecionado */}
       <View style={styles.dateRow}>
-        <TextInput
-          placeholder="De  DD/MM/AAAA"
-          placeholderTextColor={theme.isDark ? theme.textSecondary : theme.text}
-          style={styles.dateInput}
-          value={from}
-          onChangeText={setFrom}
-          keyboardType="numeric"
-        />
-        <TextInput
-          placeholder="Até  DD/MM/AAAA"
-          placeholderTextColor={theme.isDark ? theme.textSecondary : theme.text}
-          style={styles.dateInput}
-          value={to}
-          onChangeText={setTo}
-          keyboardType="numeric"
-        />
+        <View style={{ flex: 1 }}>
+          <ControlledInput
+            control={control}
+            name="from"
+            label="De"
+            variant="date"
+            iconName="calendar"
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <ControlledInput
+            control={control}
+            name="to"
+            label="Até"
+            variant="date"
+            iconName="calendar"
+          />
+        </View>
       </View>
 
       {filtered.length === 0 ? (

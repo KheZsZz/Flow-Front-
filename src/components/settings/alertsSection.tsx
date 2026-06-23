@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Loadding } from "@/components/loadding";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
 import { createSettingsStyles } from "@/styles/settings.styles";
@@ -85,9 +86,7 @@ export function AlertsSection() {
       </View>
 
       {loading ? (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={theme.primary} />
-        </View>
+        <Loadding color={theme.primary} />
       ) : alerts.length === 0 ? (
         <Text style={styles.emptyText}>
           Nenhum documento vencendo nos próximos {days} dias. 🎉

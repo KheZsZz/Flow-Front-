@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   useWindowDimensions,
   Alert,
 } from "react-native";
@@ -19,6 +18,7 @@ import { Loadding } from "@/components/loadding";
 import { createUsersStyles } from "@/styles/users.styles";
 import { ROLE_LABEL, ROLE_COLOR } from "@/constants/colors";
 import { usersService } from "@/services/users";
+import { SearchField } from "@/components/searchField";
 
 export default function UsersListScreen() {
   const { theme } = useTheme();
@@ -108,20 +108,7 @@ export default function UsersListScreen() {
         )}
       </View>
 
-      <View style={styles.searchContainer}>
-        <Feather
-          name="search"
-          size={18}
-          color={theme.isDark ? "#aaa" : "#666"}
-        />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar por nome ou e-mail"
-          placeholderTextColor={theme.isDark ? "#777" : "#999"}
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
+      <SearchField placeholder="Buscar por nome ou e-mail..." onChange={setSearch} />
 
       {filtered.length === 0 ? (
         <Text style={styles.emptyText}>Nenhum usuário encontrado.</Text>

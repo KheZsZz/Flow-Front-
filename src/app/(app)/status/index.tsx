@@ -10,10 +10,10 @@ import {
   View,
   TouchableOpacity,
   Text,
-  TextInput,
   ScrollView,
   Alert,
 } from "react-native";
+import { SearchField } from "@/components/searchField";
 import { StatusTypes } from "@/schemas/statusSchema";
 import { useRouter } from "expo-router";
 import { createStatusStyles } from "@/styles/status.styles";
@@ -96,12 +96,7 @@ export default function SatusScreen() {
           </TouchableOpacity>
         </View>
 
-        <TextInput
-          placeholder="Pesquisar..."
-          style={styles.search}
-          value={search}
-          onChangeText={setSearch}
-        />
+        <SearchField placeholder="Pesquisar por código, nome ou descrição..." onChange={setSearch} />
       </View>
       <ScrollView style={styles.list}>
         {filteredData.map((item, index) => {

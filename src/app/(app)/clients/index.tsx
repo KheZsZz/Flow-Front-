@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   useWindowDimensions,
   Alert,
 } from "react-native";
@@ -15,6 +14,7 @@ import { api } from "@/services/api";
 import { ClientType } from "@/schemas/clientsSchema";
 import { Loadding } from "@/components/loadding";
 import { createClientsStyles } from "@/styles/clients.styles";
+import { SearchField } from "@/components/searchField";
 
 export default function ClientsListScreen() {
   const { theme } = useTheme();
@@ -23,7 +23,6 @@ export default function ClientsListScreen() {
   const router = useRouter();
 
   const [clients, setClients] = useState<ClientType[]>([]);
-  const [filtered, setFiltered] = useState<ClientType[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
@@ -32,25 +31,21 @@ export default function ClientsListScreen() {
       setLoading(true);
       const { data } = await api.get("/clients");
       setClients(data);
-      setFiltered(data);
     } catch {
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = (text: string) => {
-    setSearch(text);
-    const lower = text.toLowerCase();
-    setFiltered(
-      clients.filter(
-        (c) =>
-          c.name_client.toLowerCase().includes(lower) ||
-          c.document.includes(lower) ||
-          c.email?.toLowerCase().includes(lower),
-      ),
+  const filtered = useMemo(() => {
+    const lower = search.toLowerCase();
+    return clients.filter(
+      (c) =>
+        c.name_client.toLowerCase().includes(lower) ||
+        c.document.includes(lower) ||
+        c.email?.toLowerCase().includes(lower),
     );
-  };
+  }, [search, clients]);
 
   const toggleStatus = async (client: ClientType) => {
     try {
@@ -92,29 +87,7 @@ export default function ClientsListScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchContainer}>
-        <Feather
-          name="search"
-          size={18}
-          color={theme.isDark ? theme.textSecondary : theme.text}
-        />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar por nome, CPF/CNPJ ou e-mail..."
-          placeholderTextColor={theme.isDark ? theme.textSecondary : "#aaa"}
-          value={search}
-          onChangeText={handleSearch}
-        />
-        {search.length > 0 && (
-          <TouchableOpacity onPress={() => handleSearch("")}>
-            <Feather
-              name="x"
-              size={16}
-              color={theme.isDark ? "#aaa" : "#666"}
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+      <SearchField placeholder="Buscar por nome, CPF/CNPJ ou e-mail..." onChange={setSearch} />
 
       {filtered.length === 0 ? (
         <Text style={styles.emptyText}>Nenhum cliente encontrado.</Text>

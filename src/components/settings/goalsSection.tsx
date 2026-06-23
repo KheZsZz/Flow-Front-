@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import { Loadding } from "@/components/loadding";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Feather } from "@expo/vector-icons";
@@ -111,11 +112,7 @@ export function GoalsSection() {
   };
 
   if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={theme.primary} />
-      </View>
-    );
+    return <Loadding color={theme.primary} />;
   }
 
   return (
@@ -144,7 +141,7 @@ export function GoalsSection() {
             control={control}
             name="user_id"
             label="Usuário"
-            variant="select"
+            variant="dropDownList"
             options={users}
             errorMessage={errors.user_id?.message as string}
           />

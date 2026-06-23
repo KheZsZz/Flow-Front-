@@ -1,5 +1,5 @@
 import { darkTheme, lightTheme } from "@/constants/colors";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 type AppTheme = typeof lightTheme | typeof darkTheme;
 
@@ -10,6 +10,7 @@ export const createUsersStyles = (theme: AppTheme, isMobile: boolean) =>
       flex: 1,
       backgroundColor: theme.background,
       padding: 20,
+      paddingTop: Platform.OS === "ios" ? 10 : isMobile ? 70 : 10,
     },
     header: {
       flexDirection: "row",

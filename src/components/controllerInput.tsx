@@ -99,7 +99,7 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                       paddingVertical: 10,
                       backgroundColor:
                         value === opt.value
-                          ? theme.primary
+                          ? theme.isDark ? theme.link : theme.primary
                           : theme.isDark
                             ? "#333"
                             : "#EEE",
@@ -172,18 +172,28 @@ export function ControlledInput<TFieldValues extends FieldValues>({
           }
 
           if (variant === "date") {
-            if (variant === "date" && Platform.OS === "web") {
+            if (Platform.OS === "web") {
               return (
-                <input
-                  type="date"
-                  value={
-                    value ? new Date(value).toISOString().split("T")[0] : ""
-                  }
-                  onChange={(e) =>
-                    onChange(new Date(e.target.value).toISOString())
-                  }
-                  style={styles.inputDate}
-                />
+                <View style={[styles.inputWrapper, style]}>
+                  {iconName && (
+                    <FontAwesome6
+                      name={iconName}
+                      size={18}
+                      color={theme.text}
+                      style={{ marginLeft: 12 }}
+                    />
+                  )}
+                  <input
+                    type="date"
+                    value={
+                      value ? new Date(value).toISOString().split("T")[0] : ""
+                    }
+                    onChange={(e) =>
+                      onChange(new Date(e.target.value).toISOString())
+                    }
+                    style={styles.inputDate as any}
+                  />
+                </View>
               );
             }
             return (
@@ -260,7 +270,7 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                         paddingHorizontal: 16,
                         paddingVertical: 10,
                         backgroundColor: active
-                          ? theme.primary
+                          ? theme.isDark ? theme.link : theme.primary
                           : theme.isDark
                             ? "#333"
                             : "#EEE",

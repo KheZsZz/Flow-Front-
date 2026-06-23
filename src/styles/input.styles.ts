@@ -45,21 +45,14 @@ export const createInputStyles = (
     },
 
     inputDate: {
-      flexDirection: "row",
-      alignItems: "center",
-      width: "100%",
-      height: 50,
-      borderRadius: 12,
-      borderWidth: 1,
-      backgroundColor: theme.isDark
-        ? "rgba(255, 255, 255, 0.08)"
-        : "rgba(255, 255, 255, 0.8)",
-      borderColor: theme.isDark
-        ? "rgba(255, 255, 255, 0.15)"
-        : "rgba(0, 0, 0, 0.12)",
-      paddingHorizontal: 12,
+      flex: 1,
+      height: "100%",
+      fontSize: 15,
+      paddingHorizontal: 8,
+      backgroundColor: "transparent",
+      borderWidth: 0,
       color: theme.isDark ? theme.textSecondary : theme.text,
-    },
+    } as any,
     errorText: {
       fontSize: 12,
       marginTop: 4,

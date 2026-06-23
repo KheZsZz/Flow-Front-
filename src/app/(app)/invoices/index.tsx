@@ -7,15 +7,9 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/themeContext";
 import { useEffect, useMemo, useState } from "react";
-import {
-  useWindowDimensions,
-  View,
-  TouchableOpacity,
-  Text,
-  TextInput,
-} from "react-native";
-
+import { useWindowDimensions, View, TouchableOpacity, Text } from "react-native";
 import { Loadding } from "@/components/loadding";
+import { SearchField } from "@/components/searchField";
 
 export default function InvoiceScreen() {
   const { theme } = useTheme();
@@ -69,12 +63,7 @@ export default function InvoiceScreen() {
             <Feather name="plus" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
-        <TextInput
-          placeholder="Pesquisar..."
-          style={styles.search}
-          value={search}
-          onChangeText={setSearch}
-        />
+        <SearchField placeholder="Pesquisar por CTE, NFE ou remetente..." onChange={setSearch} />
       </View>
 
       <View style={{ flex: 1 }}>
@@ -88,3 +77,4 @@ export default function InvoiceScreen() {
     </View>
   );
 }
+

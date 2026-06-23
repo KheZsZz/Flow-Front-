@@ -8,6 +8,7 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
     container: {
       flex: 1,
       backgroundColor: theme.background,
+      paddingVertical: 20,
     },
     header: {
       paddingHorizontal: 20,
@@ -61,6 +62,7 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
 
     /* ── Conteúdo ─────────────────────────────────────── */
     content: {
+      overflow: "hidden",
       paddingHorizontal: 20,
       paddingBottom: 40,
       width: isMobile ? "100%" : "70%",

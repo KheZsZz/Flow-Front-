@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Loadding } from "@/components/loadding";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
 import { createSettingsStyles } from "@/styles/settings.styles";
@@ -13,14 +14,9 @@ import {
 const ENTITY_FILTERS = [
   { label: "Todas", value: "" },
   { label: "Usuários", value: "users" },
-  { label: "Motoristas", value: "drivers" },
   { label: "Veículos", value: "vehicles" },
-  { label: "Viagens", value: "orders" },
+  { label: "Ordens", value: "orders" },
   { label: "Coletas", value: "collections" },
-  { label: "Notas", value: "invoices" },
-  { label: "Clientes", value: "clients" },
-  { label: "Status", value: "status" },
-  { label: "Abastecimento", value: "fuel" },
   { label: "Metas", value: "goals" },
 ];
 
@@ -82,9 +78,7 @@ export function AuditSection() {
       </View>
 
       {loading ? (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={theme.primary} />
-        </View>
+        <Loadding color={theme.primary} />
       ) : logs.length === 0 ? (
         <Text style={styles.emptyText}>Nenhum evento registrado.</Text>
       ) : (

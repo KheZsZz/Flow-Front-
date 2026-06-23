@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { lightTheme, darkTheme } from "@/constants/colors";
 
 export const createStatusStyles = (
@@ -19,7 +19,7 @@ export const createStatusStyles = (
     },
 
     content: {
-      paddingTop: isMobile ? 10 : 70,
+      paddingTop: Platform.OS === "ios" ? 10 : isMobile ? 70 : 10,
       paddingHorizontal: 10,
       paddingBottom: 10,
     },
