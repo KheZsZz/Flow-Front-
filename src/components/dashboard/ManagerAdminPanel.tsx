@@ -110,7 +110,6 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Resumo de combustível: filtro real de data no backend.
   useEffect(() => {
     dashboardService
       .getFuelSummary({
@@ -460,10 +459,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         icon="filter"
         hint="Criadas → Em andamento → Finalizadas"
       >
-        <FunnelOrderChart
-          stages={funnelStages}
-          title="Funil de viagens"
-        />
+        <FunnelOrderChart stages={funnelStages} title="Funil de viagens" />
       </SectionCard>
 
       {/* ── Distribuição por status (donut) ─────────────────────────── */}

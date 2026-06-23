@@ -11,8 +11,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
 
-// Native: usa @wuba/react-native-echarts com SVG renderer
-import { SvgChart, SVGRenderer } from "@wuba/react-native-echarts";
+// Web: usa echarts puro via canvas
 import * as echarts from "echarts/core";
 import {
   BarChart,
@@ -31,8 +30,10 @@ import {
   MarkAreaComponent,
   RadarComponent,
 } from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
+
 echarts.use([
-  SVGRenderer,
+  CanvasRenderer,
   BarChart,
   LineChart,
   PieChart,
@@ -56,7 +57,7 @@ export interface EChartProps {
   title?: string;
 }
 
-function NativeChart({
+function WebChart({
   option,
   width,
   height,
@@ -67,37 +68,35 @@ function NativeChart({
   height: number;
   bg: string;
 }) {
-  const svgRef = useRef<any>(null);
+  const divRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
 
   useEffect(() => {
-    if (!svgRef.current) return;
-    try {
-      if (!chartRef.current) {
-        chartRef.current = echarts.init(svgRef.current, undefined, {
-          renderer: "svg",
-          width,
-          height,
-        });
-      }
-      chartRef.current.setOption(option, { notMerge: true });
-      chartRef.current.resize({ width, height });
-    } catch (e) {
-      console.error("EChart native error:", e);
+    if (!divRef.current) return;
+    if (!chartRef.current) {
+      chartRef.current = echarts.init(divRef.current, undefined, {
+        renderer: "canvas",
+        width,
+        height,
+      });
     }
+    chartRef.current.setOption(option, { notMerge: true });
+    chartRef.current.resize({ width, height });
+    return () => {};
   }, [option, width, height]);
 
   useEffect(() => {
     return () => {
-      try { chartRef.current?.dispose(); } catch {}
+      chartRef.current?.dispose();
       chartRef.current = null;
     };
   }, []);
 
   return (
-    <View style={{ width, height, backgroundColor: bg, overflow: "hidden" }}>
-      <SvgChart ref={svgRef} />
-    </View>
+    <div
+      ref={divRef}
+      style={{ width, height, backgroundColor: bg, borderRadius: 12 }}
+    />
   );
 }
 
@@ -108,15 +107,16 @@ export function EChart({ option, height = 260, title }: EChartProps) {
   const accent = theme.isDark ? theme.link : theme.primary;
 
   const containerW = Math.max(winW - 40, 260);
-  const fsW = winW - 32;
-  const fsH = winH - 120;
+  const fsW = winW - 64;
+  const fsH = winH - 140;
 
   const themedOption = useMemo(() => applyTheme(option, theme), [option, theme]);
 
   return (
     <View style={{ marginVertical: 8 }}>
+      {/* Inline chart */}
       <View style={[s.wrap, { backgroundColor: theme.card }]}>
-        <NativeChart
+        <WebChart
           option={themedOption}
           width={containerW}
           height={height}
@@ -131,12 +131,12 @@ export function EChart({ option, height = 260, title }: EChartProps) {
         </TouchableOpacity>
       </View>
 
+      {/* Fullscreen modal */}
       <Modal
         visible={fullscreen}
         animationType="fade"
         transparent={false}
         onRequestClose={() => setFullscreen(false)}
-        statusBarTranslucent
       >
         <View style={[s.fsContainer, { backgroundColor: theme.background }]}>
           <View style={[s.fsHeader, { borderBottomColor: theme.borderColor }]}>
@@ -153,7 +153,7 @@ export function EChart({ option, height = 260, title }: EChartProps) {
             </TouchableOpacity>
           </View>
           <View style={[s.fsBody, { backgroundColor: theme.card }]}>
-            <NativeChart
+            <WebChart
               option={themedOption}
               width={fsW}
               height={fsH}
@@ -217,7 +217,7 @@ const s = StyleSheet.create({
   },
   fsContainer: {
     flex: 1,
-    paddingTop: Platform.OS === "ios" ? 50 : 32,
+    paddingTop: 32,
   },
   fsHeader: {
     flexDirection: "row",
