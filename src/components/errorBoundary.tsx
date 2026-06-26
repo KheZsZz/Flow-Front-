@@ -1,15 +1,21 @@
 import React from "react";
 import { View, Text, ScrollView } from "react-native";
 
-type State = { error: Error | null };
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
 
-export class ErrorBoundary extends React.Component
-  { children: React.ReactNode },
-  State
+interface ErrorBoundaryState {
+  error: Error | null;
+}
+
+export class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
 > {
-  state: State = { error: null };
+  state: ErrorBoundaryState = { error: null };
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { error };
   }
 
@@ -20,11 +26,15 @@ export class ErrorBoundary extends React.Component
   render() {
     if (this.state.error) {
       return (
-        <ScrollView style={{ flex: 1, padding: 24, backgroundColor: "#1a1a1a" }}>
+        <ScrollView
+          style={{ flex: 1, padding: 24, backgroundColor: "#1a1a1a" }}
+        >
           <Text style={{ color: "#f87171", fontSize: 16, fontWeight: "700" }}>
             Erro ao renderizar
           </Text>
-          <Text style={{ color: "#fbbf24", marginTop: 12, fontFamily: "monospace" }}>
+          <Text
+            style={{ color: "#fbbf24", marginTop: 12, fontFamily: "monospace" }}
+          >
             {this.state.error.message}
           </Text>
           <Text style={{ color: "#aaa", marginTop: 12, fontSize: 12 }}>
