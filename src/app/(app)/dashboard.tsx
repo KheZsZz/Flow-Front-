@@ -1,19 +1,12 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  ActivityIndicator,
-  useWindowDimensions,
-} from "react-native";
+import React, { useEffect, useState, lazy, Suspense } from "react";
+import { View, Text, ScrollView, useWindowDimensions } from "react-native";
 import { useTheme } from "@/contexts/themeContext";
 import { useAuth } from "@/contexts/authContext";
 import { usePermissions } from "@/hooks/usePermission";
 import { createDashboardStyles } from "@/styles/dashboard.styles";
 import { ROLE_LABEL, ROLE_COLOR } from "@/constants/colors";
 import { UserTypeEnum } from "@/schemas/enumSchema";
-import { ManagerAdminPanel } from "@/components/dashboard/ManagerAdminPanel";
-import { CommumPanel } from "@/components/dashboard/CommumPanel";
+import { ErrorBoundary } from "@/components/errorBoundary";
 import {
   KpiCard,
   SectionCard,
@@ -32,6 +25,17 @@ import {
   formatBRL,
 } from "@/services/dashboard";
 import { Loadding } from "@/components/loadding";
+
+const ManagerAdminPanel = lazy(() =>
+  import("@/components/dashboard/ManagerAdminPanel").then((m) => ({
+    default: m.ManagerAdminPanel,
+  })),
+);
+const CommumPanel = lazy(() =>
+  import("@/components/dashboard/CommumPanel").then((m) => ({
+    default: m.CommumPanel,
+  })),
+);
 
 function OperationalFallback({ isMobile }: { isMobile: boolean }) {
   const { theme } = useTheme();
@@ -118,8 +122,8 @@ export default function DashboardScreen() {
   const styles = createDashboardStyles(theme, isMobile);
 
   const role = profile as UserTypeEnum;
-  const roleColor = ROLE_COLOR[role];
-  const roleLabel = ROLE_LABEL[role];
+  const roleColor = ROLE_COLOR[role] ?? "#999999";
+  const roleLabel = ROLE_LABEL[role] ?? role;
   const isAdmin = hasMinRole("Admin");
 
   return (
@@ -148,13 +152,17 @@ export default function DashboardScreen() {
           </View>
         </View>
 
-        {isAdmin ? (
-          <ManagerAdminPanel isMobile={isMobile} />
-        ) : profile === "Commum" ? (
-          <CommumPanel isMobile={isMobile} />
-        ) : (
-          <OperationalFallback isMobile={isMobile} />
-        )}
+        <ErrorBoundary>
+          <Suspense fallback={<Loadding color={roleColor} size={50} />}>
+            {isAdmin ? (
+              <ManagerAdminPanel isMobile={isMobile} />
+            ) : profile === "Commum" ? (
+              <CommumPanel isMobile={isMobile} />
+            ) : (
+              <OperationalFallback isMobile={isMobile} />
+            )}
+          </Suspense>
+        </ErrorBoundary>
       </ScrollView>
     </View>
   );
