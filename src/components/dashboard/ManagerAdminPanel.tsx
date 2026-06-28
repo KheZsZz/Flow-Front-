@@ -83,26 +83,36 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
 
   const loadAll = async () => {
     setLoading(true);
-    try {
-      const [ord, inv, col, sum, eff, rank] = await Promise.all([
-        dashboardService.getOrders(),
-        dashboardService.getInvoices(),
-        dashboardService.getCollections(),
-        dashboardService.getFuelSummary(),
-        dashboardService.getVehicleEfficiency(),
-        dashboardService.getDriverRanking(8),
-      ]);
-      setOrders(ord);
-      setInvoices(inv);
-      setCollections(col);
-      setFuel(sum);
-      setEfficiency(eff);
-      setRanking(rank);
-    } catch {
-      // o interceptor da api já exibe o toast de erro
-    } finally {
-      setLoading(false);
-    }
+    const r = await Promise.allSettled([
+      dashboardService.getOrders(),
+      dashboardService.getInvoices(),
+      dashboardService.getCollections(),
+      dashboardService.getFuelSummary(),
+      dashboardService.getVehicleEfficiency(),
+      dashboardService.getDriverRanking(8),
+    ]);
+    const [ord, inv, col, sum, eff, rank] = r;
+    if (ord.status === "fulfilled") setOrders(ord.value);
+    if (inv.status === "fulfilled") setInvoices(inv.value);
+    if (col.status === "fulfilled") setCollections(col.value);
+    if (sum.status === "fulfilled") setFuel(sum.value);
+    if (eff.status === "fulfilled") setEfficiency(eff.value);
+    if (rank.status === "fulfilled") setRanking(rank.value);
+
+    const nomes = [
+      "orders",
+      "invoices",
+      "collections",
+      "summary",
+      "efficiency",
+      "ranking",
+    ];
+    r.forEach(
+      (x, i) =>
+        x.status === "rejected" &&
+        console.warn("[dashboard] falhou:", nomes[i], x.reason),
+    );
+    setLoading(false);
   };
 
   useEffect(() => {
