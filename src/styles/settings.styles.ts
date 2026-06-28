@@ -18,8 +18,8 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
       zIndex: 2,
     },
     tabBarScroll: {
-      flexGrow: 0, // a faixa de abas não absorve espaço vertical
-      flexShrink: 0,
+      height: 64, // altura explícita — sem isso o ScrollView horizontal colapsa pra 0 no web
+      flexGrow: 0,
     },
     scrollArea: {
       flex: 1, // ocupa o resto e rola por dentro
