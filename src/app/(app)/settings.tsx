@@ -50,46 +50,56 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Configurações</Text>
-        <Text style={styles.subtitle}>
-          Conta, metas, alertas e histórico de eventos
-        </Text>
+      {/* ── Topo fixo: título + abas ───────────────────────── */}
+      <View style={styles.topbar}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Configurações</Text>
+          <Text style={styles.subtitle}>
+            Conta, metas, alertas e histórico de eventos
+          </Text>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.tabBarScroll}
+          contentContainerStyle={styles.tabBar}
+        >
+          {tabs.map((tab) => {
+            const isActive = active === tab.key;
+            return (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.tab, isActive && styles.tabActive]}
+                onPress={() => setActive(tab.key)}
+              >
+                <Feather
+                  name={tab.icon as any}
+                  size={15}
+                  color={
+                    isActive
+                      ? theme.isDark
+                        ? theme.primary
+                        : "#fff"
+                      : theme.text
+                  }
+                />
+                <Text
+                  style={[styles.tabText, isActive && styles.tabTextActive]}
+                >
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
 
+      {/* ── Área rolável: só o conteúdo ────────────────────── */}
       <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tabBar}
+        style={styles.scrollArea}
+        showsVerticalScrollIndicator={false}
       >
-        {tabs.map((tab) => {
-          const isActive = active === tab.key;
-          return (
-            <TouchableOpacity
-              key={tab.key}
-              style={[styles.tab, isActive && styles.tabActive]}
-              onPress={() => setActive(tab.key)}
-            >
-              <Feather
-                name={tab.icon as any}
-                size={15}
-                color={
-                  isActive
-                    ? theme.isDark
-                      ? theme.primary
-                      : "#fff"
-                    : theme.text
-                }
-              />
-              <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           {active === "account" && <AccountSection />}
           {active === "goals" && isAdmin && <GoalsSection />}

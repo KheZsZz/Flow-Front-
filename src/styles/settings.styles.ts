@@ -8,7 +8,21 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
     container: {
       flex: 1,
       backgroundColor: theme.background,
-      paddingVertical: 20,
+      paddingTop: 20, // era paddingVertical: 20 — tira o padding de baixo pra área rolável ir até o fim
+    },
+    topbar: {
+      flexShrink: 0, // topo nunca encolhe → sempre visível
+      backgroundColor: theme.background,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.borderColor,
+      zIndex: 2,
+    },
+    tabBarScroll: {
+      flexGrow: 0, // a faixa de abas não absorve espaço vertical
+      flexShrink: 0,
+    },
+    scrollArea: {
+      flex: 1, // ocupa o resto e rola por dentro
     },
     header: {
       paddingHorizontal: 20,
@@ -33,6 +47,7 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
       gap: 8,
       paddingHorizontal: 20,
       paddingVertical: 12,
+      position: "absolute",
     },
     tab: {
       flex: 1,
