@@ -8,34 +8,39 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
     container: {
       flex: 1,
       backgroundColor: theme.background,
-      paddingTop: 20, // era paddingVertical: 20 — tira o padding de baixo pra área rolável ir até o fim
+      paddingTop: 20,
     },
+
     topbar: {
-      flexShrink: 0, // topo nunca encolhe → sempre visível
+      flexShrink: 0,
       backgroundColor: theme.background,
       borderBottomWidth: 1,
       borderBottomColor: theme.borderColor,
       zIndex: 2,
     },
+
     tabBarScroll: {
-      height: 64, // altura explícita — sem isso o ScrollView horizontal colapsa pra 0 no web
+      height: 64,
       flexGrow: 0,
     },
+
     scrollArea: {
-      flex: 1, // ocupa o resto e rola por dentro
+      flex: 1,
     },
+
     header: {
       paddingHorizontal: 20,
       paddingTop: isMobile ? 30 : 16,
       paddingBottom: 8,
     },
+
     title: {
       color: theme.text,
       fontSize: 28,
       fontWeight: "bold",
     },
     subtitle: {
-      color: theme.textSecondary,
+      color: theme.text,
       fontSize: 13,
       marginTop: 2,
       opacity: 0.7,

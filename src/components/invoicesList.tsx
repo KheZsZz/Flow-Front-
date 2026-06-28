@@ -50,7 +50,6 @@ export const InvoiceList = ({
     }
   };
 
-  // abre o canhoto/comprovante (imagem ou PDF) — URL pública do bucket
   const openComprovante = async (item: any) => {
     if (!item.comprovante_url) return;
     try {
@@ -87,7 +86,6 @@ export const InvoiceList = ({
     }
   };
 
-  // status de entrega no lugar da data de emissão
   const renderDeliveryStatus = (item: any) => {
     if (item.delivery_status === "finalizada") {
       // toca pra abrir o canhoto
@@ -136,12 +134,7 @@ export const InvoiceList = ({
       );
     }
 
-    // nota ainda não entregue na viagem -> mantém a data de emissão
-    return (
-      <Text style={styles.dateText}>
-        {new Date(item.issue_date).toLocaleDateString("pt-BR")}
-      </Text>
-    );
+    return <Text style={styles.dateText}>{item.delivery_status}</Text>;
   };
 
   return (

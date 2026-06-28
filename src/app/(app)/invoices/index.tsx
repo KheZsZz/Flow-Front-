@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { InvoiceList } from "@/components/invoicesList";
 import { InvoiceTypes } from "@/schemas/invoicesSchema";
 import { invoiceService } from "@/services/invoices";
@@ -7,9 +7,15 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/themeContext";
 import { useEffect, useMemo, useState } from "react";
-import { useWindowDimensions, View, TouchableOpacity, Text } from "react-native";
+import {
+  useWindowDimensions,
+  View,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { Loadding } from "@/components/loadding";
 import { SearchField } from "@/components/searchField";
+import { useFocusEffect } from "expo-router/build/react-navigation";
 
 export default function InvoiceScreen() {
   const { theme } = useTheme();
@@ -33,9 +39,11 @@ export default function InvoiceScreen() {
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, []),
+  );
 
   const filteredData = useMemo(() => {
     const s = search.toLowerCase();
@@ -63,7 +71,10 @@ export default function InvoiceScreen() {
             <Feather name="plus" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
-        <SearchField placeholder="Pesquisar por CTE, NFE ou remetente..." onChange={setSearch} />
+        <SearchField
+          placeholder="Pesquisar por CTE, NFE ou remetente..."
+          onChange={setSearch}
+        />
       </View>
 
       <View style={{ flex: 1 }}>
@@ -77,4 +88,6 @@ export default function InvoiceScreen() {
     </View>
   );
 }
-
+function useEffectFocus(arg0: () => void, arg1: never[]) {
+  throw new Error("Function not implemented.");
+}

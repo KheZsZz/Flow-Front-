@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { useTheme } from "@/contexts/themeContext";
 import { ControlledInput } from "@/components/controllerInput";
@@ -16,6 +16,7 @@ import { orderService, isFinalized } from "@/services/orders";
 import { BaixarViagemModal } from "@/components/baixaModal";
 import { Loadding } from "@/components/loadding";
 import { createOrdersListStyles } from "@/styles/orders.styles";
+import { OrderType } from "@/schemas/ordersSchema";
 
 type DateField = "delivery_date" | "created_at" | "finaled_at";
 
@@ -71,9 +72,11 @@ export default function OrdersListScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
 
   const onDelete = (order: any) => {
     Alert.alert("Excluir viagem", `Excluir a viagem ${order.tracking}?`, [
