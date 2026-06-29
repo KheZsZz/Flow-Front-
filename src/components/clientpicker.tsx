@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
-import { useClients } from "@/hooks/queries/useReferenceData";
+import { useClients } from "@/hooks/querys/useReferenceData";
 
 export interface PickedClient {
   id: string;
