@@ -36,19 +36,38 @@ export interface UpdateOrderPayload {
 /* ── Códigos de status (etapas do ciclo da viagem) ───────────────────── */
 export const STATUS_CODE = {
   EM_ABERTO: 100,
-  EM_ANDAMENTO: 101,
+  FINALIZADO: 101,
   CONCLUIDO: 102,
-  CANCELADO: 103,
   EM_ROTA: 110,
-  AGUARDANDO_COMPROVANTE: 200,
+  CHEGADA_CLIENTE: 111,
+  ENTREGA_REALIZADA: 112,
+  COLETA_REALIZADA: 113,
+  AGUARDANDO_CANHOTO: 200,
+  CANCELADO: 103,
 } as const;
-
 export const isFinalized = (order: any) =>
   !!order?.finaled_at || order?.status?.code === STATUS_CODE.CONCLUIDO;
 
 export const isStarted = (order: any) =>
   order?.status?.code !== undefined &&
   order.status.code !== STATUS_CODE.EM_ABERTO;
+
+export function nextDriverStage(
+  item: any,
+): { code: number; label: string } | null {
+  const code = item?.status?.code;
+  const isColeta = !!item?.collections || !!item?.collection_id;
+
+  if (code === STATUS_CODE.EM_ROTA) {
+    return { code: STATUS_CODE.CHEGADA_CLIENTE, label: "Chegada no Cliente" };
+  }
+  if (code === STATUS_CODE.CHEGADA_CLIENTE) {
+    return isColeta
+      ? { code: STATUS_CODE.COLETA_REALIZADA, label: "Coleta Realizada" }
+      : { code: STATUS_CODE.ENTREGA_REALIZADA, label: "Entrega Realizada" };
+  }
+  return null; // 100 (aguarda Em Rota automático) ou já em 112/113/200/102
+}
 
 /* ── Service ─────────────────────────────────────────────────────────── */
 export const orderService = {
