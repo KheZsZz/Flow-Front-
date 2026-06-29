@@ -98,7 +98,7 @@ export const createSettingsStyles = (theme: AppTheme, isMobile: boolean) =>
       marginTop: 18,
     },
     sectionHint: {
-      color: theme.textSecondary,
+      color: theme.isDark ? theme.textSecondary : theme.text,
       fontSize: 12,
       opacity: 0.7,
       marginBottom: 14,

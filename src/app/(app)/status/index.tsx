@@ -96,7 +96,10 @@ export default function SatusScreen() {
           </TouchableOpacity>
         </View>
 
-        <SearchField placeholder="Pesquisar por código, nome ou descrição..." onChange={setSearch} />
+        <SearchField
+          placeholder="Pesquisar por código, nome ou descrição..."
+          onChange={setSearch}
+        />
       </View>
       <ScrollView style={styles.list}>
         {filteredData.map((item, index) => {
@@ -126,7 +129,7 @@ export default function SatusScreen() {
                 )}
 
                 <Text style={styles.listItemDescription}>
-                  Description: {item.description}
+                  Descrição: {item.description}
                 </Text>
               </View>
               <View style={styles.listItemActions}>

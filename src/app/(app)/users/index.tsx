@@ -99,16 +99,15 @@ export default function UsersListScreen() {
             style={styles.addBtn}
             onPress={() => router.push("/users/create")}
           >
-            <Feather
-              name="plus"
-              size={24}
-              color={theme.isDark ? theme.textSecondary : theme.text}
-            />
+            <Feather name="plus" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
 
-      <SearchField placeholder="Buscar por nome ou e-mail..." onChange={setSearch} />
+      <SearchField
+        placeholder="Buscar por nome ou e-mail..."
+        onChange={setSearch}
+      />
 
       {filtered.length === 0 ? (
         <Text style={styles.emptyText}>Nenhum usuário encontrado.</Text>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { createButtonStyles } from "../styles/colaps.styles";
+import { createButtonStyles } from "../../styles/colaps.styles";
 import { useTheme } from "@/contexts/themeContext";
 
 export function CollapsibleSection({

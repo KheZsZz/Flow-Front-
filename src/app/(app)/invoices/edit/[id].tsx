@@ -19,7 +19,7 @@ import { Loadding } from "@/components/loadding";
 import { Button } from "@/components/button";
 import { ControlledInput } from "@/components/controllerInput";
 import { createInvoiceUpdateStyles } from "@/styles/invoices.styles";
-import { CollapsibleSection } from "@/components/collapsList";
+import { CollapsibleSection } from "@/components/invoices/collapsList";
 import { Feather } from "@expo/vector-icons";
 
 export default function EditInvoiceScreen() {

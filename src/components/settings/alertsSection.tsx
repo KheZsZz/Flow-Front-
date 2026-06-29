@@ -46,7 +46,6 @@ export function AlertsSection() {
     try {
       const res = await api.get(`/alerts/documents?days=${window}`);
       const data: DocumentAlertType[] = res.data ?? [];
-      // Mais urgente primeiro (vencidos no topo)
       data.sort((a, b) => a.days_remaining - b.days_remaining);
       setAlerts(data);
     } catch (err) {

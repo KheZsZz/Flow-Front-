@@ -97,6 +97,7 @@ export const createStatusStyles = (
     },
 
     listItemTitle: {
+      textTransform: "uppercase",
       color: "#8e55de",
       fontSize: 16,
       fontWeight: "bold",

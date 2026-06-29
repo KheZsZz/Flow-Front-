@@ -111,11 +111,7 @@ export default function CreateUserScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={rollback}>
-          <Feather
-            name="arrow-left"
-            size={20}
-            color={theme.isDark ? theme.text : "#fff"}
-          />
+          <Feather name="chevron-left" size={22} color={theme.textSecondary} />
         </TouchableOpacity>
         <Text style={styles.title}>Novo Usuário</Text>
       </View>
