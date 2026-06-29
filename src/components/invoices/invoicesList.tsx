@@ -4,8 +4,8 @@ import { createInvoiceListStyles } from "@/styles/invoices.styles";
 import { router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
-import { InvoiceActions } from "@/components/actionsInvoices";
-import { InvoiceDetailsModal } from "@/components/invoiceDetailsModal";
+import { InvoiceActions } from "@/components/invoices/actionsInvoices";
+import { InvoiceDetailsModal } from "@/components/invoices/invoiceDetailsModal";
 import { invoiceService } from "@/services/invoices";
 import { formatCurrency, formatCurrencyCTe } from "@/services/formatMoney";
 
