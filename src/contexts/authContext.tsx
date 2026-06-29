@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserType } from "@/schemas/usersSchema";
 import { api } from "@/services/api";
+import { queryClient } from "@/lib/queryClient";
 
 interface CompanySession {
   id: string;
@@ -39,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       api.defaults.headers.common["Authorization"] = "";
       setUser(null);
       await AsyncStorage.removeItem("@flow:auth_user");
+      queryClient.clear();
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     }
@@ -46,15 +48,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const singIn = async (serverPayload: SingInParams) => {
     try {
-      // token temporário para a requisição de perfil
       api.defaults.headers.common["Authorization"] =
         `Bearer ${serverPayload.token}`;
 
       const response = await api.get("/auth/me");
       const me = response.data;
 
-      // INVARIANTE: nunca montar sessão parcial.
-      // Sem `user` válido => sessão inválida (não deixa user.user = undefined).
       if (!me?.user) {
         throw new Error("Perfil inválido retornado por /auth/me");
       }
@@ -72,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
     } catch (error) {
       console.error("Erro ao processar o login no frontend:", error);
-      await singOut(); // garante que não fica sessão pela metade
+      await singOut();
       throw error;
     }
   };

@@ -10,6 +10,9 @@ import { usePermissions, HOME_BY_ROLE } from "@/hooks/usePermission";
 import { UserTypeEnum } from "@/schemas/enumSchema";
 import { Loadding } from "@/components/loadding";
 
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+
 // ─── Navigation Guard ─────────────────────────────────────────────────────────
 
 function NavigationGuard() {
@@ -62,12 +65,14 @@ function NavigationGuard() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
-        <AuthProvider>
-          <NavigationGuard />
-          <Toast />
-        </AuthProvider>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <NavigationGuard />
+            <Toast />
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </SafeAreaProvider>
   );
 }

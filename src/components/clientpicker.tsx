@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Modal,
   View,
@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
-import { api } from "@/services/api";
+import { useClients } from "@/hooks/queries/useReferenceData";
 
 export interface PickedClient {
   id: string;
@@ -28,34 +28,16 @@ export function ClientPickerModal({
   onSelect: (client: PickedClient) => void;
 }) {
   const { theme } = useTheme();
-  const [loading, setLoading] = useState(false);
-  const [clients, setClients] = useState<PickedClient[]>([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    if (!visible) return;
-    let active = true;
-    (async () => {
-      setLoading(true);
-      try {
-        const { data } = await api.get("/clients");
-        if (active) setClients(Array.isArray(data) ? data : []);
-      } catch {
-        if (active) setClients([]);
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [visible]);
+  // só busca quando o modal abre; reabrir dentro de 5 min vem do cache
+  const { data: clients = [], isLoading } = useClients({ enabled: visible });
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return clients;
     return clients.filter(
-      (c) =>
+      (c: PickedClient) =>
         c.name_client?.toLowerCase().includes(q) ||
         c.document?.toLowerCase().includes(q),
     );
@@ -124,7 +106,7 @@ export function ClientPickerModal({
             />
           </View>
 
-          {loading ? (
+          {isLoading ? (
             <ActivityIndicator
               style={{ paddingVertical: 30 }}
               color={theme.primary}
