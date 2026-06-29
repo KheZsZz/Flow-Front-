@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -8,15 +8,17 @@ import {
   Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@/contexts/themeContext";
 import { ControlledInput } from "@/components/controllerInput";
 import { orderService, isFinalized } from "@/services/orders";
 import { BaixarViagemModal } from "@/components/baixaModal";
 import { Loadding } from "@/components/loadding";
 import { createOrdersListStyles } from "@/styles/orders.styles";
-import { OrderType } from "@/schemas/ordersSchema";
+import { useOrders, listKeys } from "@/hooks/querys/useListData";
+import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
 
 type DateField = "delivery_date" | "created_at" | "finaled_at";
 
@@ -43,10 +45,12 @@ export default function OrdersListScreen() {
   const isMobile = useWindowDimensions().width <= 820;
   const styles = createOrdersListStyles(theme, isMobile);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [baixarTarget, setBaixarTarget] = useState<any | null>(null);
+
+  const { data: orders = [], isLoading, refetch } = useOrders();
+  useRefreshOnFocus(refetch);
 
   const { control, watch } = useForm<FilterForm>({
     defaultValues: {
@@ -61,23 +65,6 @@ export default function OrdersListScreen() {
   const from = watch("from");
   const to = watch("to");
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const data = await orderService.getOrders();
-      setOrders(Array.isArray(data) ? data : []);
-    } catch {
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchOrders();
-    }, []),
-  );
-
   const onDelete = (order: any) => {
     Alert.alert("Excluir viagem", `Excluir a viagem ${order.tracking}?`, [
       { text: "Cancelar", style: "cancel" },
@@ -87,7 +74,7 @@ export default function OrdersListScreen() {
         onPress: async () => {
           try {
             await orderService.deleteOrder(order.id);
-            fetchOrders();
+            queryClient.invalidateQueries({ queryKey: listKeys.orders });
           } catch (e: any) {}
         },
       },
@@ -141,7 +128,7 @@ export default function OrdersListScreen() {
   const fmt = (iso?: string) =>
     iso ? new Date(iso).toLocaleDateString("pt-BR") : "—";
 
-  if (loading)
+  if (isLoading)
     return (
       <Loadding color={theme.isDark ? theme.link : theme.text} size={50} />
     );
@@ -308,7 +295,9 @@ export default function OrdersListScreen() {
         visible={!!baixarTarget}
         order={baixarTarget}
         onClose={() => setBaixarTarget(null)}
-        onDone={fetchOrders}
+        onDone={() =>
+          queryClient.invalidateQueries({ queryKey: listKeys.orders })
+        }
       />
     </ScrollView>
   );
