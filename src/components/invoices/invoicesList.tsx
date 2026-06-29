@@ -168,12 +168,12 @@ export const InvoiceList = ({
           ]}
         >
           <Feather name="package" size={12} color="#374151" />
-          <Text style={[styles.badgeText, { color: "#374151" }]}>Carga</Text>
+          <Text style={[styles.badgeText, { color: "#374151" }]}>
+            Mercadoria base
+          </Text>
         </View>
       );
     }
-
-    return <Text style={styles.dateText}>{item.delivery_status}</Text>;
   };
 
   return (
