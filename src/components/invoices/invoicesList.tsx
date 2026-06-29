@@ -154,7 +154,7 @@ export const InvoiceList = ({
       );
     }
 
-    if (item.delivery_status === "Carga_base") {
+    if (item.delivery_status === "carga_base") {
       return (
         <View
           style={[
