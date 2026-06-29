@@ -12,7 +12,7 @@ type QueryOpts = { enabled?: boolean };
 
 async function fetchList<T = any>(path: string): Promise<T[]> {
   const { data } = await api.get(path);
-  return Array.isArray(data) ? data :
+  return Array.isArray(data) ? data : [];
 }
 
 export function useClients(options?: QueryOpts) {
