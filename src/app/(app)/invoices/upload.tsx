@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   FlatList,
   useWindowDimensions,
@@ -25,7 +24,6 @@ import {
 import rollback from "@/services/rollback";
 
 export default function UploadScreen() {
-  const router = useRouter();
   const { width } = useWindowDimensions();
   const { theme, isDark } = useTheme();
   const [files, setFiles] = useState<any[]>([]);

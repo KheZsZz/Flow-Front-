@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { InvoiceList } from "@/components/invoicesList";
+import { InvoiceList } from "@/components/invoices/invoicesList";
 import { InvoiceTypes } from "@/schemas/invoicesSchema";
 import { invoiceService } from "@/services/invoices";
 import { createInvoiceListStyles } from "@/styles/invoices.styles";
