@@ -7,7 +7,10 @@ import { api } from "@/services/api";
 import { orderService } from "@/services/orders";
 import { OrderTypeSchema } from "@/schemas/enumSchema";
 import { ControlledInput } from "@/components/controllerInput";
-import { AddInvoiceItems, OrderItemDraft } from "@/components/addInvoiceItems";
+import {
+  AddInvoiceItems,
+  OrderItemDraft,
+} from "@/components/invoices/addInvoiceItems";
 import { createOrdersListStyles } from "@/styles/orders.styles";
 import rollback from "@/services/rollback";
 import {
