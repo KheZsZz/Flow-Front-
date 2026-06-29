@@ -8,7 +8,6 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
 import { useTheme } from "@/contexts/themeContext";
 import {
