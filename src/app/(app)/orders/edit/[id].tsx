@@ -16,7 +16,10 @@ import { api } from "@/services/api";
 import { orderService, STATUS_CODE } from "@/services/orders";
 import { OrderTypeSchema } from "@/schemas/enumSchema";
 import { ControlledInput } from "@/components/controllerInput";
-import { AddInvoiceItems, OrderItemDraft } from "@/components/addInvoiceItems";
+import {
+  AddInvoiceItems,
+  OrderItemDraft,
+} from "@/components/invoices/addInvoiceItems";
 import { createOrdersListStyles } from "@/styles/orders.styles";
 import { Loadding } from "@/components/loadding";
 import rollback from "@/services/rollback";
