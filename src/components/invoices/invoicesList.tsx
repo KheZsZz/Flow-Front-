@@ -88,7 +88,6 @@ export const InvoiceList = ({
 
   const renderDeliveryStatus = (item: any) => {
     if (item.delivery_status === "finalizada") {
-      // toca pra abrir o canhoto
       return (
         <TouchableOpacity
           style={[
@@ -131,6 +130,46 @@ export const InvoiceList = ({
             {busy ? "Enviando..." : "Aguardando comprovante"}
           </Text>
         </TouchableOpacity>
+      );
+    }
+
+    if (item.delivery_status === "em_rota") {
+      return (
+        <View
+          style={[
+            styles.badge,
+            {
+              backgroundColor: "#dbeafe",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+            },
+          ]}
+        >
+          <Feather name="truck" size={12} color="#1d4ed8" />
+          <Text style={[styles.badgeText, { color: "#1d4ed8" }]}>
+            Mercadoria em rota
+          </Text>
+        </View>
+      );
+    }
+
+    if (item.delivery_status === "Carga_base") {
+      return (
+        <View
+          style={[
+            styles.badge,
+            {
+              backgroundColor: "#e5e7eb",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+            },
+          ]}
+        >
+          <Feather name="package" size={12} color="#374151" />
+          <Text style={[styles.badgeText, { color: "#374151" }]}>Carga</Text>
+        </View>
       );
     }
 
