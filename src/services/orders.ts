@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { buildUploadForm } from "./upload";
 
 export interface OrderVehicleInput {
   vehicle_id: string;
@@ -33,7 +34,12 @@ export interface UpdateOrderPayload {
   remove_item_ids?: string[];
 }
 
-/* ── Códigos de status (etapas do ciclo da viagem) ───────────────────── */
+export interface PickedFile {
+  uri: string;
+  name: string;
+  mimeType?: string;
+}
+
 export const STATUS_CODE = {
   EM_ABERTO: 100,
   FINALIZADO: 101,
@@ -45,6 +51,9 @@ export const STATUS_CODE = {
   COLETA_REALIZADA: 113,
   AGUARDANDO_CANHOTO: 200,
 } as const;
+
+export type StatusCode = (typeof STATUS_CODE)[keyof typeof STATUS_CODE];
+
 export const isFinalized = (order: any) =>
   !!order?.finaled_at || order?.status?.code === STATUS_CODE.CONCLUIDO;
 
@@ -69,7 +78,6 @@ export function nextDriverStage(
   return null;
 }
 
-/* ── Service ─────────────────────────────────────────────────────────── */
 export const orderService = {
   async getOrders() {
     const res = await api.get("/orders");
@@ -101,8 +109,52 @@ export const orderService = {
     return res.data;
   },
 
+  async startOrder(id: string) {
+    const res = await api.post(`/orders/${id}/start`);
+    return res.data;
+  },
+
   async baixar(id: string, item_ids: string[]) {
     const res = await api.post(`/orders/${id}/baixar`, { item_ids });
+    return res.data;
+  },
+
+  async concluirOrder(id: string, item_ids?: string[]) {
+    const res = await api.post(
+      `/orders/${id}/concluir`,
+      item_ids?.length ? { item_ids } : {},
+    );
+    return res.data;
+  },
+
+  async updateItemStatus(
+    itemId: string,
+    payload: { status_id: string; location_item?: string },
+  ) {
+    const res = await api.patch(`/orders/items/${itemId}/status`, payload);
+    return res.data;
+  },
+
+  async getItemTracking(itemId: string) {
+    const res = await api.get(`/orders/items/${itemId}/tracking`);
+    return res.data;
+  },
+
+  async getItemReceipts(itemId: string) {
+    const res = await api.get(`/orders/items/${itemId}/receipts`);
+    return res.data;
+  },
+
+  async uploadItemComprovante(itemId: string, file: PickedFile) {
+    const form = await buildUploadForm(
+      "comprovante",
+      { uri: file.uri, name: file.name, mimeType: file.mimeType },
+      "image/jpeg",
+    );
+    const res = await api.post(`/orders/items/${itemId}/comprovante`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+      transformRequest: [(d) => d],
+    });
     return res.data;
   },
 
@@ -113,14 +165,6 @@ export const orderService = {
 
   async findInvoiceByBarcode(barcode: string) {
     const res = await api.get(`/invoices/barcode/${barcode}`);
-    return res.data;
-  },
-
-  async concluirOrder(id: string, item_ids?: string[]) {
-    const res = await api.post(
-      `/orders/${id}/concluir`,
-      item_ids?.length ? { item_ids } : {},
-    );
     return res.data;
   },
 };
