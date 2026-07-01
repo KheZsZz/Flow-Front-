@@ -77,48 +77,17 @@ export default function TrackOrderScreen() {
     try {
       await orderService.startOrder(id);
       await load();
-    } catch (e: any) {
-      Alert.alert(
-        "Não foi possível iniciar a viagem",
-        e?.response?.data?.error || "Erro ao iniciar.",
-      );
+    } catch {
+      /* toast via interceptor */
     } finally {
       setStarting(false);
     }
   };
 
-  const concluir = () => {
-    Alert.alert(
-      "Concluir viagem",
-      "Isso conclui todos os itens pendentes, avançando pelas etapas automaticamente. Continuar?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Concluir",
-          style: "destructive",
-          onPress: async () => {
-            setConcluding(true);
-            try {
-              await orderService.concluirOrder(id);
-              await load();
-            } catch (e: any) {
-              Alert.alert(
-                "Erro",
-                e?.response?.data?.error || "Falha ao concluir.",
-              );
-            } finally {
-              setConcluding(false);
-            }
-          },
-        },
-      ],
-    );
-  };
-
   const advance = async (item: any, nextCode: number, location?: string) => {
     const target = statuses.find((s: any) => s.code === nextCode);
     if (!target) {
-      Alert.alert("Erro", `Status de código ${nextCode} não encontrado.`);
+      Alert.alert("Erro", `Status de código ${nextCode} não encontrado.`); // erro LOCAL, sem request — mantém
       return;
     }
     setBusyItemId(item.id);
@@ -128,13 +97,8 @@ export default function TrackOrderScreen() {
         location_item: location,
       });
       await load();
-    } catch (e: any) {
-      Alert.alert(
-        "Não foi possível avançar a etapa",
-        e?.response?.data?.error ||
-          e?.response?.data?.message ||
-          "Transição inválida.",
-      );
+    } catch {
+      /* toast via interceptor (mostra a mensagem do guard) */
     } finally {
       setBusyItemId(null);
     }
@@ -155,14 +119,36 @@ export default function TrackOrderScreen() {
         mimeType: asset.mimeType,
       });
       await load();
-    } catch (e: any) {
-      Alert.alert(
-        "Erro ao enviar canhoto",
-        e?.response?.data?.error || "Falha no upload.",
-      );
+    } catch {
+      /* toast via interceptor */
     } finally {
       setBusyItemId(null);
     }
+  };
+
+  const concluir = () => {
+    Alert.alert(
+      "Concluir viagem",
+      "Isso conclui todos os itens pendentes, avançando pelas etapas automaticamente. Continuar?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Concluir",
+          style: "destructive",
+          onPress: async () => {
+            setConcluding(true);
+            try {
+              await orderService.concluirOrder(id);
+              await load();
+            } catch {
+              /* toast via interceptor */
+            } finally {
+              setConcluding(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   if (loading) return <Loadding />;

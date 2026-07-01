@@ -66,7 +66,7 @@ export function nextDriverStage(
       ? { code: STATUS_CODE.COLETA_REALIZADA, label: "Coleta Realizada" }
       : { code: STATUS_CODE.ENTREGA_REALIZADA, label: "Entrega Realizada" };
   }
-  return null; // 100 (aguarda Em Rota automático) ou já em 112/113/200/102
+  return null;
 }
 
 /* ── Service ─────────────────────────────────────────────────────────── */
@@ -101,14 +101,11 @@ export const orderService = {
     return res.data;
   },
 
-  // baixa (conclui) os itens selecionados; quando todos concluem,
-  // o backend finaliza a viagem automaticamente.
   async baixar(id: string, item_ids: string[]) {
     const res = await api.post(`/orders/${id}/baixar`, { item_ids });
     return res.data;
   },
 
-  // busca de nota para incluir como item
   async findInvoiceByNfe(nfe: string) {
     const res = await api.get(`/invoices/nfe/${nfe}`);
     return res.data;
