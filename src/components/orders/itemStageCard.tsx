@@ -95,6 +95,7 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
   return (
     <View
       style={{
+        flexGrow: 1,
         backgroundColor: cardBg,
         borderRadius: 12,
         borderWidth: 1,
@@ -118,7 +119,7 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
           {!!sub && (
             <Text
               numberOfLines={1}
-              style={{ color: theme.textSecondary, fontSize: 12, marginTop: 2 }}
+              style={{ color: theme.text, fontSize: 12, marginTop: 2 }}
             >
               {sub}
             </Text>
@@ -167,7 +168,7 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
                 size={16}
                 color="#fff"
               />
-              <Text style={{ color: "#fff", fontWeight: "700" }}>
+              <Text style={{ color: theme.textSecondary, fontWeight: "700" }}>
                 {next.label}
               </Text>
             </>
@@ -201,7 +202,11 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
         </TouchableOpacity>
       ) : (
         <Text
-          style={{ color: theme.textSecondary, fontSize: 12, fontStyle: "italic" }}
+          style={{
+            color: theme.textSecondary,
+            fontSize: 12,
+            fontStyle: "italic",
+          }}
         >
           {code === STATUS_CODE.EM_ABERTO
             ? "Aguardando início da viagem."
@@ -236,7 +241,11 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
             events.map((ev: any) => (
               <View
                 key={ev.id}
-                style={{ flexDirection: "row", gap: 8, alignItems: "flex-start" }}
+                style={{
+                  flexDirection: "row",
+                  gap: 8,
+                  alignItems: "flex-start",
+                }}
               >
                 <View
                   style={{
@@ -244,12 +253,17 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
                     height: 8,
                     borderRadius: 4,
                     marginTop: 5,
-                    backgroundColor: STAGE_COLOR[ev.status?.code]?.fg ?? "#9ca3af",
+                    backgroundColor:
+                      STAGE_COLOR[ev.status?.code]?.fg ?? "#9ca3af",
                   }}
                 />
                 <View style={{ flex: 1 }}>
                   <Text
-                    style={{ color: theme.text, fontSize: 13, fontWeight: "600" }}
+                    style={{
+                      color: theme.text,
+                      fontSize: 13,
+                      fontWeight: "600",
+                    }}
                   >
                     {ev.status?.name ?? ev.description_item ?? "Evento"}
                   </Text>
@@ -280,9 +294,16 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
           }}
         >
           <View
-            style={{ backgroundColor: cardBg, borderRadius: 14, padding: 18, gap: 12 }}
+            style={{
+              backgroundColor: cardBg,
+              borderRadius: 14,
+              padding: 18,
+              gap: 12,
+            }}
           >
-            <Text style={{ fontWeight: "700", fontSize: 16, color: theme.text }}>
+            <Text
+              style={{ fontWeight: "700", fontSize: 16, color: theme.text }}
+            >
               Registrar chegada
             </Text>
             <Text style={{ color: theme.textSecondary, fontSize: 13 }}>
@@ -303,7 +324,11 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
               }}
             />
             <View
-              style={{ flexDirection: "row", gap: 10, justifyContent: "flex-end" }}
+              style={{
+                flexDirection: "row",
+                gap: 10,
+                justifyContent: "flex-end",
+              }}
             >
               <TouchableOpacity
                 onPress={() => {
@@ -325,7 +350,9 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
                   borderRadius: 10,
                 }}
               >
-                <Text style={{ color: "#fff", fontWeight: "700" }}>Confirmar</Text>
+                <Text style={{ color: "#fff", fontWeight: "700" }}>
+                  Confirmar
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

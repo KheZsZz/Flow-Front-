@@ -179,7 +179,7 @@ export default function TrackOrderScreen() {
             marginBottom: 14,
           }}
         >
-          <Feather name="hash" size={16} color={theme.textSecondary} />
+          <Feather name="hash" size={16} color={theme.text} />
           <Text style={{ color: theme.text, fontWeight: "700", fontSize: 16 }}>
             {order?.tracking ?? "—"}
           </Text>
@@ -247,7 +247,7 @@ export default function TrackOrderScreen() {
         )}
 
         {items.length === 0 ? (
-          <Text style={{ color: theme.textSecondary }}>
+          <Text style={{ color: theme.error }}>
             Esta viagem não possui itens.
           </Text>
         ) : (
