@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import * as DocumentPicker from "expo-document-picker";
 import {
   Modal,
   View,
@@ -31,6 +32,7 @@ export function BaixarViagemModal({
 
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
 
   const itens = useMemo(
     () =>
@@ -64,6 +66,28 @@ export function BaixarViagemModal({
     }
   };
 
+  const enviarCanhoto = async (itemId: string) => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ["image/*", "application/pdf"],
+      copyToCacheDirectory: true,
+    });
+    if (result.canceled || !result.assets?.[0]) return;
+    const asset = result.assets[0];
+    setUploadingId(itemId);
+    try {
+      await orderService.uploadItemComprovante(itemId, {
+        uri: asset.uri,
+        name: asset.name ?? `canhoto-${itemId}`,
+        mimeType: asset.mimeType,
+      });
+      onDone();
+    } catch {
+      /* toast via interceptor */
+    } finally {
+      setUploadingId(null);
+    }
+  }; // <-- CORRIGIDO: Chave de fechamento que faltava aqui
+
   return (
     <Modal
       visible={visible}
@@ -94,36 +118,97 @@ export function BaixarViagemModal({
               </Text>
             ) : (
               itens.map((it: any) => {
-                const done = it.status?.code === STATUS_CODE.CONCLUIDO;
-                const label = it.invoices
-                  ? `NFe ${it.invoices?.nfe ?? "—"}`
-                  : (it.collections?.code ?? "Coleta");
-                const sub = it.invoices
-                  ? it.invoices?.value_nfe != null
-                    ? `R$ ${it.invoices.value_nfe}`
-                    : undefined
-                  : it.collections?.clients?.name_client;
-                const on = !!selected[it.id];
+                // CORRIGIDO: Removida a IIFE desnecessária. As constantes rodam direto no map.
+                const code = it.status?.code;
+                const done = code === STATUS_CODE.CONCLUIDO;
+                const canSelect = code === STATUS_CODE.AGUARDANDO_CANHOTO;
+
                 return (
-                  <TouchableOpacity
+                  <View
                     key={it.id}
-                    style={styles.itemRow}
-                    disabled={done}
-                    onPress={() => toggle(it.id)}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                      marginBottom: 12,
+                    }}
                   >
+                    <TouchableOpacity
+                      disabled={!canSelect}
+                      onPress={() => canSelect && toggle(it.id)}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        flex: 1,
+                        opacity: canSelect || done ? 1 : 0.5,
+                      }}
+                    >
+                      <Feather
+                        name={selected[it.id] ? "check-square" : "square"}
+                        size={20}
+                        color={canSelect ? theme.link : theme.textSecondary}
+                      />
+                      <Text style={{ marginLeft: 8, color: theme.text }}>
+                        {it.invoices
+                          ? `NFe ${it.invoices?.nfe ?? "—"}`
+                          : (it.collections?.code ?? "Coleta")}
+                      </Text>
+                    </TouchableOpacity>
+
                     {done ? (
-                      <Feather name="check-circle" size={22} color="#2E7D32" />
+                      <Text
+                        style={{
+                          color: "#15803d",
+                          fontSize: 12,
+                          fontWeight: "700",
+                        }}
+                      >
+                        Concluído
+                      </Text>
+                    ) : canSelect ? (
+                      <TouchableOpacity
+                        disabled={uploadingId === it.id}
+                        onPress={() => enviarCanhoto(it.id)}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 6,
+                          backgroundColor: "#c2410c",
+                          paddingVertical: 8,
+                          paddingHorizontal: 12,
+                          borderRadius: 8,
+                          opacity: uploadingId === it.id ? 0.6 : 1,
+                        }}
+                      >
+                        {uploadingId === it.id ? (
+                          <ActivityIndicator color="#fff" size="small" />
+                        ) : (
+                          <>
+                            <Feather name="upload" size={14} color="#fff" />
+                            <Text
+                              style={{
+                                color: "#fff",
+                                fontWeight: "700",
+                                fontSize: 12,
+                              }}
+                            >
+                              Canhoto
+                            </Text>
+                          </>
+                        )}
+                      </TouchableOpacity>
                     ) : (
-                      <View style={[styles.checkbox, on && styles.checkboxOn]}>
-                        {on && <Feather name="check" size={14} color="#fff" />}
-                      </View>
+                      <Text
+                        style={{
+                          color: theme.textSecondary,
+                          fontSize: 11,
+                          fontStyle: "italic",
+                        }}
+                      >
+                        aguardando etapas
+                      </Text>
                     )}
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.itemTitle}>{label}</Text>
-                      {!!sub && <Text style={styles.itemSub}>{sub}</Text>}
-                    </View>
-                    {done && <Text style={styles.doneTag}>Concluída</Text>}
-                  </TouchableOpacity>
+                  </View>
                 );
               })
             )}
