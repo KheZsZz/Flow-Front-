@@ -151,7 +151,10 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       marginBottom: 8,
     },
     infoText: { color: theme.isDark ? "#ccc" : "#444", fontSize: 13, flex: 1 },
+
     cardFooter: {
+      flex: 1,
+      flexGrow: 1,
       flexDirection: "row",
       borderTopWidth: 1,
       borderTopColor: theme.borderColor,
@@ -161,25 +164,23 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
 
     footBtn: {
       flex: 1,
+      flexGrow: 1,
       padding: 8,
       borderRadius: 8,
       alignItems: "center",
       flexDirection: "row",
       justifyContent: "center",
       gap: 6,
-      maxHeight: 50,
+      height: 40,
     },
 
     baixarBtn: {
-      height: 40,
       backgroundColor: theme.isDark ? "#14532d" : "#dcfce7",
     },
     editBtn: {
-      height: 40,
       backgroundColor: theme.isDark ? "#1e2640" : "#e8f0fe",
     },
     deleteBtn: {
-      height: 40,
       backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2",
     },
 
