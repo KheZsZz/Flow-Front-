@@ -289,7 +289,7 @@ export default function OrdersListScreen() {
                     style={[styles.footBtn, styles.editBtn]}
                     onPress={() =>
                       router.push({
-                        pathname: "/orders/track/[id]",
+                        pathname: "/track/[id]",
                         params: { id: o.id },
                       })
                     }
