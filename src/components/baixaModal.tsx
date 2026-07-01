@@ -131,6 +131,7 @@ export function BaixarViagemModal({
                       alignItems: "center",
                       gap: 10,
                       marginBottom: 12,
+                      padding: 20,
                     }}
                   >
                     <TouchableOpacity
