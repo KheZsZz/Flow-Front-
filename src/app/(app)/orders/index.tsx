@@ -287,7 +287,12 @@ export default function OrdersListScreen() {
 
                   <TouchableOpacity
                     style={[styles.footBtn, styles.editBtn]}
-                    onPress={() => router.push(`/orders/track/${o.id}`)}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/orders/track/[id]",
+                        params: { id: o.id },
+                      })
+                    }
                   >
                     <Feather
                       name="map-pin"
