@@ -5,14 +5,16 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
+  ActivityIndicator,
   useWindowDimensions,
   Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
 import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useTheme } from "@/contexts/themeContext";
 import { api } from "@/services/api";
-import { orderService } from "@/services/orders";
+import { orderService, STATUS_CODE } from "@/services/orders";
 import { ItemStageCard } from "@/components/orders/itemStageCard";
 import { Loadding } from "@/components/loadding";
 import { createOrdersListStyles } from "@/styles/orders.styles";
@@ -29,6 +31,7 @@ export default function TrackOrderScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [busyItemId, setBusyItemId] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -64,6 +67,24 @@ export default function TrackOrderScreen() {
     [order],
   );
 
+  const orderCode = order?.status?.code;
+  const canStart = orderCode === STATUS_CODE.EM_ABERTO && !order?.finaled_at;
+
+  const startTrip = async () => {
+    setStarting(true);
+    try {
+      await orderService.startOrder(id);
+      await load();
+    } catch (e: any) {
+      Alert.alert(
+        "Não foi possível iniciar a viagem",
+        e?.response?.data?.error || "Erro ao iniciar.",
+      );
+    } finally {
+      setStarting(false);
+    }
+  };
+
   const advance = async (item: any, nextCode: number, location?: string) => {
     const target = statuses.find((s: any) => s.code === nextCode);
     if (!target) {
@@ -89,6 +110,31 @@ export default function TrackOrderScreen() {
     }
   };
 
+  const sendCanhoto = async (item: any) => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ["image/*", "application/pdf"],
+      copyToCacheDirectory: true,
+    });
+    if (result.canceled || !result.assets?.[0]) return;
+    const asset = result.assets[0];
+    setBusyItemId(item.id);
+    try {
+      await orderService.uploadItemComprovante(item.id, {
+        uri: asset.uri,
+        name: asset.name ?? `canhoto-${item.id}`,
+        mimeType: asset.mimeType,
+      });
+      await load();
+    } catch (e: any) {
+      Alert.alert(
+        "Erro ao enviar canhoto",
+        e?.response?.data?.error || "Falha no upload.",
+      );
+    } finally {
+      setBusyItemId(null);
+    }
+  };
+
   if (loading) return <Loadding />;
 
   return (
@@ -106,7 +152,6 @@ export default function TrackOrderScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* número único de rastreio = VG da viagem */}
         <View
           style={{
             flexDirection: "row",
@@ -124,6 +169,35 @@ export default function TrackOrderScreen() {
           </Text>
         </View>
 
+        {canStart && (
+          <TouchableOpacity
+            disabled={starting}
+            onPress={startTrip}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              backgroundColor: "#1d4ed8",
+              paddingVertical: 13,
+              borderRadius: 10,
+              marginBottom: 16,
+              opacity: starting ? 0.6 : 1,
+            }}
+          >
+            {starting ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <>
+                <Feather name="play" size={16} color="#fff" />
+                <Text style={{ color: "#fff", fontWeight: "700" }}>
+                  Iniciar viagem
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        )}
+
         {items.length === 0 ? (
           <Text style={{ color: theme.textSecondary }}>
             Esta viagem não possui itens.
@@ -135,6 +209,7 @@ export default function TrackOrderScreen() {
               item={it}
               busy={busyItemId === it.id}
               onAdvance={advance}
+              onSendCanhoto={sendCanhoto}
             />
           ))
         )}

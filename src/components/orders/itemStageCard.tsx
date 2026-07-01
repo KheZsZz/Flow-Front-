@@ -11,7 +11,6 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
 import { STATUS_CODE, nextDriverStage } from "@/services/orders";
 
-/* cor do badge por código de status */
 const STAGE_COLOR: Record<number, { bg: string; fg: string }> = {
   [STATUS_CODE.EM_ABERTO]: { bg: "#e5e7eb", fg: "#374151" },
   [STATUS_CODE.EM_ROTA]: { bg: "#dbeafe", fg: "#1d4ed8" },
@@ -37,11 +36,12 @@ const fmtDateTime = (iso?: string) => {
 interface Props {
   item: any;
   busy?: boolean;
-  /** chamado para avançar a etapa; location só vem na Chegada (111) */
   onAdvance: (item: any, nextCode: number, location?: string) => void;
+  /** dispara o seletor de arquivo + upload do canhoto (item em 200) */
+  onSendCanhoto?: (item: any) => void;
 }
 
-export function ItemStageCard({ item, busy, onAdvance }: Props) {
+export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
   const { theme } = useTheme();
   const [showLocation, setShowLocation] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
@@ -63,6 +63,7 @@ export function ItemStageCard({ item, busy, onAdvance }: Props) {
   };
 
   const next = nextDriverStage(item);
+  const awaitingCanhoto = code === STATUS_CODE.AGUARDANDO_CANHOTO;
 
   const events = useMemo(
     () =>
@@ -103,7 +104,6 @@ export function ItemStageCard({ item, busy, onAdvance }: Props) {
         gap: 10,
       }}
     >
-      {/* cabeçalho */}
       <View
         style={{
           flexDirection: "row",
@@ -138,7 +138,7 @@ export function ItemStageCard({ item, busy, onAdvance }: Props) {
         </View>
       </View>
 
-      {/* ação de avançar etapa */}
+      {/* ação: avançar etapa OU enviar canhoto OU estado final */}
       {next ? (
         <TouchableOpacity
           disabled={busy}
@@ -173,17 +173,45 @@ export function ItemStageCard({ item, busy, onAdvance }: Props) {
             </>
           )}
         </TouchableOpacity>
+      ) : awaitingCanhoto && onSendCanhoto ? (
+        <TouchableOpacity
+          disabled={busy}
+          onPress={() => onSendCanhoto(item)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            backgroundColor: "#c2410c",
+            paddingVertical: 11,
+            borderRadius: 10,
+            opacity: busy ? 0.6 : 1,
+          }}
+        >
+          {busy ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <>
+              <Feather name="upload" size={16} color="#fff" />
+              <Text style={{ color: "#fff", fontWeight: "700" }}>
+                Enviar canhoto
+              </Text>
+            </>
+          )}
+        </TouchableOpacity>
       ) : (
         <Text
           style={{ color: theme.textSecondary, fontSize: 12, fontStyle: "italic" }}
         >
           {code === STATUS_CODE.EM_ABERTO
-            ? "Aguardando início automático (Em Rota)."
-            : "Etapas do motorista concluídas."}
+            ? "Aguardando início da viagem."
+            : code === STATUS_CODE.CONCLUIDO
+              ? "Item concluído."
+              : "Etapas do motorista concluídas."}
         </Text>
       )}
 
-      {/* timeline (usa trackingevents já embutido no item) */}
+      {/* timeline */}
       <TouchableOpacity
         onPress={() => setShowTimeline((v) => !v)}
         style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
@@ -216,8 +244,7 @@ export function ItemStageCard({ item, busy, onAdvance }: Props) {
                     height: 8,
                     borderRadius: 4,
                     marginTop: 5,
-                    backgroundColor:
-                      (STAGE_COLOR[ev.status?.code]?.fg ?? "#9ca3af"),
+                    backgroundColor: STAGE_COLOR[ev.status?.code]?.fg ?? "#9ca3af",
                   }}
                 />
                 <View style={{ flex: 1 }}>
@@ -275,7 +302,9 @@ export function ItemStageCard({ item, busy, onAdvance }: Props) {
                 color: theme.text,
               }}
             />
-            <View style={{ flexDirection: "row", gap: 10, justifyContent: "flex-end" }}>
+            <View
+              style={{ flexDirection: "row", gap: 10, justifyContent: "flex-end" }}
+            >
               <TouchableOpacity
                 onPress={() => {
                   setShowLocation(false);

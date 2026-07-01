@@ -38,12 +38,12 @@ export const STATUS_CODE = {
   EM_ABERTO: 100,
   FINALIZADO: 101,
   CONCLUIDO: 102,
+  CANCELADO: 103,
   EM_ROTA: 110,
   CHEGADA_CLIENTE: 111,
   ENTREGA_REALIZADA: 112,
   COLETA_REALIZADA: 113,
   AGUARDANDO_CANHOTO: 200,
-  CANCELADO: 103,
 } as const;
 export const isFinalized = (order: any) =>
   !!order?.finaled_at || order?.status?.code === STATUS_CODE.CONCLUIDO;
