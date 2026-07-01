@@ -284,6 +284,18 @@ export default function OrdersListScreen() {
                       <Text style={styles.deleteText}>Excluir</Text>
                     </TouchableOpacity>
                   )}
+
+                  <TouchableOpacity
+                    style={[styles.footBtn, styles.editBtn]}
+                    onPress={() => router.push(`/orders/track/${o.id}`)}
+                  >
+                    <Feather
+                      name="map-pin"
+                      size={14}
+                      color={theme.isDark ? "#60a5fa" : "#1a73e8"}
+                    />
+                    <Text style={styles.editText}>Rastrear</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             );

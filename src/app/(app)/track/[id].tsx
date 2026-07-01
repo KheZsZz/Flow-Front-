@@ -32,6 +32,7 @@ export default function TrackOrderScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [busyItemId, setBusyItemId] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
+  const [concluding, setConcluding] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -69,6 +70,7 @@ export default function TrackOrderScreen() {
 
   const orderCode = order?.status?.code;
   const canStart = orderCode === STATUS_CODE.EM_ABERTO && !order?.finaled_at;
+  const canConcluir = !order?.finaled_at && orderCode !== STATUS_CODE.EM_ABERTO;
 
   const startTrip = async () => {
     setStarting(true);
@@ -83,6 +85,34 @@ export default function TrackOrderScreen() {
     } finally {
       setStarting(false);
     }
+  };
+
+  const concluir = () => {
+    Alert.alert(
+      "Concluir viagem",
+      "Isso conclui todos os itens pendentes, avançando pelas etapas automaticamente. Continuar?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Concluir",
+          style: "destructive",
+          onPress: async () => {
+            setConcluding(true);
+            try {
+              await orderService.concluirOrder(id);
+              await load();
+            } catch (e: any) {
+              Alert.alert(
+                "Erro",
+                e?.response?.data?.error || "Falha ao concluir.",
+              );
+            } finally {
+              setConcluding(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const advance = async (item: any, nextCode: number, location?: string) => {
@@ -140,7 +170,10 @@ export default function TrackOrderScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <Feather name="chevron-left" size={22} color={theme.textSecondary} />
         </TouchableOpacity>
         <Text style={styles.title}>Rastreio da viagem</Text>
@@ -192,6 +225,35 @@ export default function TrackOrderScreen() {
                 <Feather name="play" size={16} color="#fff" />
                 <Text style={{ color: "#fff", fontWeight: "700" }}>
                   Iniciar viagem
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        )}
+
+        {canConcluir && (
+          <TouchableOpacity
+            disabled={concluding}
+            onPress={concluir}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              backgroundColor: "#15803d",
+              paddingVertical: 13,
+              borderRadius: 10,
+              marginBottom: 16,
+              opacity: concluding ? 0.6 : 1,
+            }}
+          >
+            {concluding ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <>
+                <Feather name="flag" size={16} color="#fff" />
+                <Text style={{ color: "#fff", fontWeight: "700" }}>
+                  Concluir viagem
                 </Text>
               </>
             )}

@@ -118,4 +118,12 @@ export const orderService = {
     const res = await api.get(`/invoices/barcode/${barcode}`);
     return res.data;
   },
+
+  async concluirOrder(id: string, item_ids?: string[]) {
+    const res = await api.post(
+      `/orders/${id}/concluir`,
+      item_ids?.length ? { item_ids } : {},
+    );
+    return res.data;
+  },
 };
