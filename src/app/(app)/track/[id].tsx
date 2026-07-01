@@ -15,7 +15,7 @@ import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useTheme } from "@/contexts/themeContext";
 import { api } from "@/services/api";
 import { orderService, STATUS_CODE } from "@/services/orders";
-import { ItemStageCard } from "@/components/orders/itemStageCard";
+import { ItemStageCard } from "@/components/orders/ItemStageCard";
 import { Loadding } from "@/components/loadding";
 import { createOrdersListStyles } from "@/styles/orders.styles";
 
