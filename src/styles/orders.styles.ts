@@ -158,6 +158,7 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       padding: 10,
       gap: 8,
     },
+
     footBtn: {
       flex: 1,
       padding: 8,
@@ -166,23 +167,40 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       flexDirection: "row",
       justifyContent: "center",
       gap: 6,
+      maxHeight: 50,
     },
-    baixarBtn: { backgroundColor: theme.isDark ? "#14532d" : "#dcfce7" },
+
+    baixarBtn: {
+      height: 40,
+      backgroundColor: theme.isDark ? "#14532d" : "#dcfce7",
+    },
+    editBtn: {
+      height: 40,
+      backgroundColor: theme.isDark ? "#1e2640" : "#e8f0fe",
+    },
+    deleteBtn: {
+      height: 40,
+      backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2",
+    },
+
     baixarText: {
       color: theme.isDark ? "#4ade80" : "#15803d",
       fontWeight: "600",
       fontSize: 13,
     },
-    editBtn: { backgroundColor: theme.isDark ? "#1e2640" : "#e8f0fe" },
+
     editText: {
       color: theme.isDark ? "#60a5fa" : "#1a73e8",
       fontWeight: "600",
       fontSize: 13,
     },
-    deleteBtn: { backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2" },
-    deleteText: { color: "#ef4444", fontWeight: "600", fontSize: 13 },
 
-    /* modal de baixar */
+    deleteText: {
+      color: "#ef4444",
+      fontWeight: "600",
+      fontSize: 13,
+    },
+
     overlay: {
       flex: 1,
       backgroundColor: "rgba(0,0,0,0.5)",
@@ -190,6 +208,7 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       alignItems: "center",
       padding: 20,
     },
+
     modalCard: {
       backgroundColor: theme.card,
       borderRadius: 14,
@@ -268,16 +287,14 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       borderWidth: 1,
       borderColor: theme.isDark ? "#1a73e8" : "#bfdbfe",
     },
-    infoText: {
-      color: theme.isDark ? "#93c5fd" : "#1a73e8",
-      fontSize: 13,
-    },
+
     label: {
       color: theme.isDark ? theme.textSecondary : theme.text,
       fontSize: 14,
       fontWeight: "600",
       marginBottom: 6,
     },
+
     readonlyField: {
       flexDirection: "row",
       alignItems: "center",
@@ -285,7 +302,9 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       borderRadius: 12,
       borderWidth: 1,
       borderColor: theme.isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)",
-      backgroundColor: theme.isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+      backgroundColor: theme.isDark
+        ? "rgba(255,255,255,0.04)"
+        : "rgba(0,0,0,0.04)",
       paddingHorizontal: 14,
       marginBottom: 16,
     },
@@ -306,6 +325,7 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       fontWeight: "bold",
       fontSize: 15,
     },
+
     deleteBtn: {
       backgroundColor: theme.isDark ? "#4c1d1d" : "#fee2e2",
       paddingVertical: 14,
@@ -316,6 +336,7 @@ export const createOrdersListStyles = (theme: AppTheme, isMobile: boolean) =>
       gap: 8,
       marginBottom: 24,
     },
+
     deleteBtnText: {
       color: "#ef4444",
       fontWeight: "600",
