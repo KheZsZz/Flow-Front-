@@ -163,4 +163,11 @@ export const orderService = {
     const res = await api.get(`/invoices/barcode/${barcode}`);
     return res.data;
   },
+  async updateTrackingEvent(
+    eventId: string,
+    payload: { created_at?: string; location_item?: string },
+  ) {
+    const res = await api.patch(`/orders/tracking-events/${eventId}`, payload);
+    return res.data;
+  },
 };

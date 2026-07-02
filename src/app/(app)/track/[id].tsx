@@ -18,6 +18,7 @@ import { orderService, STATUS_CODE } from "@/services/orders";
 import { ItemStageCard } from "@/components/orders/itemStageCard";
 import { Loadding } from "@/components/loadding";
 import { createOrdersListStyles } from "@/styles/orders.styles";
+import { usePermissions } from "@/hooks/usePermission";
 
 export default function TrackOrderScreen() {
   const { theme } = useTheme();
@@ -25,6 +26,9 @@ export default function TrackOrderScreen() {
   const styles = createOrdersListStyles(theme, isMobile);
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+
+  const { profile } = usePermissions();
+  const canEditEvents = ["Manager", "Admin", "Requestor"].includes(profile);
 
   const [order, setOrder] = useState<any | null>(null);
   const [statuses, setStatuses] = useState<any[]>([]);
@@ -151,6 +155,18 @@ export default function TrackOrderScreen() {
     );
   };
 
+  const editEvent = async (
+    eventId: string,
+    payload: { created_at?: string; location_item?: string },
+  ) => {
+    try {
+      await orderService.updateTrackingEvent(eventId, payload);
+      await load();
+    } catch {
+      /* toast via interceptor */
+    }
+  };
+
   if (loading) return <Loadding />;
 
   return (
@@ -258,6 +274,8 @@ export default function TrackOrderScreen() {
               busy={busyItemId === it.id}
               onAdvance={advance}
               onSendCanhoto={sendCanhoto}
+              canEditEvents={canEditEvents}
+              onEditEvent={editEvent}
             />
           ))
         )}
