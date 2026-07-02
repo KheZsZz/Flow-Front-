@@ -16,6 +16,8 @@ export const ROLE_ALLOWED_ROUTES: Record<UserTypeEnum, string[]> = {
   Financer: [
     "/dashboard",
     "/finance",
+    "/maintenance",
+    "/fuel",
     "/invoices",
     "/collections",
     "/settings",
@@ -27,24 +29,28 @@ export const ROLE_ALLOWED_ROUTES: Record<UserTypeEnum, string[]> = {
     "/collections",
     "/vehicles",
     "/clients",
-
+    "/finance",
+    "/maintenance",
+    "/fuel",
     "/orders/create",
     "/invoices/create",
     "/collections/create",
     "/settings",
   ],
-  Driver: ["/dashboard", "/driver", "/settings"],
+
   Commum: [
     "/dashboard",
     "/orders",
     "/invoices",
     "/collections",
-
+    "/finance",
     "/orders/create",
     "/invoices/create",
     "/collections/create",
     "/settings",
   ],
+
+  Driver: ["/dashboard", "/driver", "/settings"], // sem alteração — sem acesso às telas
 };
 
 // Rota home por perfil (para onde redirecionar após login)

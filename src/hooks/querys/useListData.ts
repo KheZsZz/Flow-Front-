@@ -2,11 +2,24 @@ import { useQuery } from "@tanstack/react-query";
 import { orderService } from "@/services/orders";
 import { invoiceService } from "@/services/invoices";
 import { usersService } from "@/services/users";
+import {
+  operationalExpenseService,
+  administrativeExpenseService,
+  expenseTypesService,
+} from "@/services/expenses";
+import { maintenanceService } from "@/services/maintenance";
+import { fuelService } from "@/services/fuel";
 
 export const listKeys = {
   orders: ["orders"] as const,
+  users: ["users"] as const,
   invoices: ["invoices"] as const,
-  users: ["users"] as const, // NOVO
+  operationalExpenses: ["expenses", "operational"] as const,
+  administrativeExpenses: ["expenses", "administrative"] as const,
+  expenseTypes: (category?: string) =>
+    ["expenses", "types", category ?? "all"] as const,
+  maintenances: ["maintenance"] as const,
+  fuel: ["fuel"] as const,
 };
 
 export function useOrders() {
@@ -16,7 +29,7 @@ export function useOrders() {
       const data = await orderService.getOrders();
       return Array.isArray(data) ? data : [];
     },
-    staleTime: 15 * 1000, // transacional: revalida em background ao focar
+    staleTime: 15 * 1000,
   });
 }
 
@@ -39,5 +52,60 @@ export function useUsers() {
       return Array.isArray(data) ? data : [];
     },
     staleTime: 15 * 1000, // mesma janela usada em orders/invoices
+  });
+}
+
+export function useOperationalExpenses() {
+  return useQuery({
+    queryKey: listKeys.operationalExpenses,
+    queryFn: async () => {
+      const data = await operationalExpenseService.list();
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 15 * 1000,
+  });
+}
+
+export function useAdministrativeExpenses() {
+  return useQuery({
+    queryKey: listKeys.administrativeExpenses,
+    queryFn: async () => {
+      const data = await administrativeExpenseService.list();
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 15 * 1000,
+  });
+}
+
+export function useExpenseTypes(category?: "Operacional" | "Administrativo") {
+  return useQuery({
+    queryKey: listKeys.expenseTypes(category),
+    queryFn: async () => {
+      const data = await expenseTypesService.list(category);
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 60 * 1000, // tipos mudam pouco, cache mais longo
+  });
+}
+
+export function useMaintenances() {
+  return useQuery({
+    queryKey: listKeys.maintenances,
+    queryFn: async () => {
+      const data = await maintenanceService.list();
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 15 * 1000,
+  });
+}
+
+export function useFuelEntries() {
+  return useQuery({
+    queryKey: listKeys.fuel,
+    queryFn: async () => {
+      const data = await fuelService.list();
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 15 * 1000,
   });
 }

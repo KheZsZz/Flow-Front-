@@ -1,15 +1,11 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  useWindowDimensions,
-} from "react-native";
+import { View, Text, ScrollView, useWindowDimensions } from "react-native";
 import { useTheme } from "@/contexts/themeContext";
 import { useAuth } from "@/contexts/authContext";
 import { createDashboardStyles } from "@/styles/dashboard.styles";
 import { ROLE_COLOR, ROLE_LABEL } from "@/constants/colors";
 import { DriverPanel } from "@/components/dashboard/DriverPanel";
+import { FuelQuickEntry } from "@/components/driver/fuelQuickEntry";
 
 export default function DriverScreen() {
   const { theme } = useTheme();
@@ -27,13 +23,17 @@ export default function DriverScreen() {
           <View style={styles.headerTexts}>
             <Text style={styles.title}>Meu painel</Text>
             <Text style={styles.subtitle}>
-              Olá, {user?.user?.name_user ?? "motorista"} — suas viagens e entregas
+              Olá, {user?.user?.name_user ?? "motorista"} — suas viagens e
+              entregas
             </Text>
           </View>
           <View
             style={[
               styles.roleTag,
-              { backgroundColor: roleColor + "22", borderColor: roleColor + "55" },
+              {
+                backgroundColor: roleColor + "22",
+                borderColor: roleColor + "55",
+              },
             ]}
           >
             <Text style={[styles.roleTagText, { color: roleColor }]}>
@@ -43,6 +43,7 @@ export default function DriverScreen() {
         </View>
 
         <DriverPanel isMobile={isMobile} />
+        <FuelQuickEntry />
       </ScrollView>
     </View>
   );

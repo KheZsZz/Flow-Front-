@@ -47,7 +47,22 @@ const MENU_ITEMS: MenuItem[] = [
     minRole: "Commum",
   },
   { name: "Frota", path: "/vehicles/list", icon: "truck", minRole: "Admin" },
-  { name: "Custos", path: "/costs", icon: "tool", minRole: "Commum" },
+
+  { name: "Custos", path: "/finance", icon: "dollar-sign", minRole: "Commum" },
+
+  {
+    name: "Manutenções",
+    path: "/maintenance",
+    icon: "tool",
+    minRole: "Requestor",
+  },
+  {
+    name: "Abastecimento",
+    path: "/fuel",
+    icon: "droplet",
+    minRole: "Requestor",
+  },
+
   { name: "Clientes", path: "/clients", icon: "briefcase", minRole: "Admin" },
   { name: "Usuarios", path: "/users", icon: "users", minRole: "Financer" },
   { name: "Status", path: "/status", icon: "check-circle", minRole: "Admin" },

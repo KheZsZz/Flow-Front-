@@ -38,6 +38,7 @@ interface ControlledInputProps<
   mask?: string;
   disabled?: boolean;
   placeholder?: string;
+  secureTextEntry?: boolean;
 }
 
 export function ControlledInput<TFieldValues extends FieldValues>({
@@ -50,6 +51,7 @@ export function ControlledInput<TFieldValues extends FieldValues>({
   options = [],
   mask,
   style,
+  rules,
   secureTextEntry,
 
   ...textInputProps
@@ -99,7 +101,9 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                       paddingVertical: 10,
                       backgroundColor:
                         value === opt.value
-                          ? theme.isDark ? theme.link : theme.primary
+                          ? theme.isDark
+                            ? theme.link
+                            : theme.primary
                           : theme.isDark
                             ? "#333"
                             : "#EEE",
@@ -270,7 +274,9 @@ export function ControlledInput<TFieldValues extends FieldValues>({
                         paddingHorizontal: 16,
                         paddingVertical: 10,
                         backgroundColor: active
-                          ? theme.isDark ? theme.link : theme.primary
+                          ? theme.isDark
+                            ? theme.link
+                            : theme.primary
                           : theme.isDark
                             ? "#333"
                             : "#EEE",

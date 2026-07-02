@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useColorScheme as RNUseColorScheme } from "react-native";
 import { lightTheme, darkTheme } from "@/constants/colors";
 
-type ThemeType = typeof lightTheme;
+export type ThemeType = typeof lightTheme | typeof darkTheme;
+
 export type ThemeMode = "light" | "dark" | "system";
 
 interface ThemeContextData {
