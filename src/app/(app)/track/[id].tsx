@@ -182,7 +182,11 @@ export default function TrackOrderScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{
+          padding: 16,
+          paddingBottom: 40,
+          width: isMobile ? undefined : "50%",
+        }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
