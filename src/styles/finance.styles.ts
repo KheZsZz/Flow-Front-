@@ -8,7 +8,24 @@ export const createFinanceStyles = (
   isMobile: boolean,
 ) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.background },
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      position: "relative",
+    },
+    fab: {
+      position: "absolute",
+      right: isMobile ? 16 : 32,
+      bottom: isMobile ? 16 : 32,
+      backgroundColor: theme.primary,
+      width: 52,
+      height: 52,
+      borderRadius: 26,
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 10,
+      elevation: 6, // sombra/ordem de empilhamento no Android
+    },
 
     topbar: {
       paddingHorizontal: isMobile ? 16 : 32,

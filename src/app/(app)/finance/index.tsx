@@ -18,6 +18,8 @@ import {
 } from "@/hooks/querys/useListData";
 import { formatCurrency } from "@/services/formatMoney";
 import { Loadding } from "@/components/loadding";
+import { useForm } from "react-hook-form";
+import { ControlledInput } from "@/components/controllerInput";
 
 type TabKey = "operational" | "administrative";
 
@@ -53,6 +55,16 @@ export default function FinanceScreen() {
   const current = active === "operational" ? operational : administrative;
   const list = current.data ?? [];
 
+  const { control, watch, reset } = useForm({
+    defaultValues: { start_date: "", end_date: "" },
+  });
+  const filters = watch();
+  const filtered = list.filter((item: any) => {
+    const d = new Date(item.expense_date);
+    if (filters.start_date && d < new Date(filters.start_date)) return false;
+    if (filters.end_date && d > new Date(filters.end_date)) return false;
+    return true;
+  });
   return (
     <View style={styles.container}>
       <View style={styles.topbar}>
@@ -61,6 +73,20 @@ export default function FinanceScreen() {
           <Text style={styles.subtitle}>
             Despesas operacionais e administrativas da operação
           </Text>
+        </View>
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
+          <ControlledInput
+            control={control}
+            name="start_date"
+            label="De"
+            variant="date"
+          />
+          <ControlledInput
+            control={control}
+            name="end_date"
+            label="Até"
+            variant="date"
+          />
         </View>
 
         <ScrollView
