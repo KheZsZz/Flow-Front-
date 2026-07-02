@@ -6,24 +6,21 @@ export interface OrderVehicleInput {
   role: "Cavalo" | "carreta";
   position: number;
 }
-
 export interface OrderItemInput {
   invoice_id?: string;
   collection_id?: string;
   type_orders: string;
   status_id: string;
 }
-
 export interface CreateOrderPayload {
   status_id: string;
   driver_id: string;
-  delivery_date: string; // ISO
-  scheduled_start?: string | null; // ISO
+  delivery_date: string;
+  scheduled_start?: string | null;
   notes?: string | null;
   vehicles: OrderVehicleInput[];
   items: OrderItemInput[];
 }
-
 export interface UpdateOrderPayload {
   driver_id?: string;
   notes?: string;
@@ -33,7 +30,6 @@ export interface UpdateOrderPayload {
   add_items?: OrderItemInput[];
   remove_item_ids?: string[];
 }
-
 export interface PickedFile {
   uri: string;
   name: string;

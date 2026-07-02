@@ -21,16 +21,37 @@ const STAGE_COLOR: Record<number, { bg: string; fg: string }> = {
   [STATUS_CODE.CONCLUIDO]: { bg: "#bbf7d0", fg: "#166534" },
 };
 
+const pad = (n: number) => String(n).padStart(2, "0");
+
 const fmtDateTime = (iso?: string) => {
   if (!iso) return "—";
   const d = new Date(iso);
-  return d.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${String(
+    d.getFullYear(),
+  ).slice(2)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+const toEditableDateTime = (iso?: string) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(
+    d.getHours(),
+  )}:${pad(d.getMinutes())}`;
+};
+
+// "DD/MM/AAAA HH:mm" -> Date | null
+const parseEditableDateTime = (s: string): Date | null => {
+  const m = s.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  const [, dd, mm, yyyy, hh, min] = m;
+  const d = new Date(
+    Number(yyyy),
+    Number(mm) - 1,
+    Number(dd),
+    Number(hh),
+    Number(min),
+  );
+  return isNaN(d.getTime()) ? null : d;
 };
 
 interface Props {
@@ -39,13 +60,32 @@ interface Props {
   onAdvance: (item: any, nextCode: number, location?: string) => void;
   /** dispara o seletor de arquivo + upload do canhoto (item em 200) */
   onSendCanhoto?: (item: any) => void;
+  /** habilita edição de data/hora/local dos eventos (Manager/Admin/Requestor) */
+  canEditEvents?: boolean;
+  onEditEvent?: (
+    eventId: string,
+    payload: { created_at?: string; location_item?: string },
+  ) => void;
 }
 
-export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
+export function ItemStageCard({
+  item,
+  busy,
+  onAdvance,
+  onSendCanhoto,
+  canEditEvents,
+  onEditEvent,
+}: Props) {
   const { theme } = useTheme();
   const [showLocation, setShowLocation] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
   const [location, setLocation] = useState("");
+
+  // edição de evento
+  const [editingEvent, setEditingEvent] = useState<any | null>(null);
+  const [editDate, setEditDate] = useState("");
+  const [editLoc, setEditLoc] = useState("");
+  const [editErr, setEditErr] = useState<string | null>(null);
 
   const isColeta = !!item?.collections || !!item?.collection_id;
   const label = isColeta
@@ -89,13 +129,33 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
     setLocation("");
   };
 
+  const openEdit = (ev: any) => {
+    setEditingEvent(ev);
+    setEditDate(toEditableDateTime(ev.created_at));
+    setEditLoc(ev.location_item ?? "");
+    setEditErr(null);
+  };
+
+  const saveEdit = () => {
+    if (!editingEvent || !onEditEvent) return;
+    const parsed = parseEditableDateTime(editDate);
+    if (!parsed) {
+      setEditErr("Use o formato DD/MM/AAAA HH:mm");
+      return;
+    }
+    onEditEvent(editingEvent.id, {
+      created_at: parsed.toISOString(),
+      location_item: editLoc.trim(),
+    });
+    setEditingEvent(null);
+  };
+
   const cardBg = theme.isDark ? "#1f2937" : "#fff";
   const border = theme.isDark ? "#374151" : "#e5e7eb";
 
   return (
     <View
       style={{
-        flexGrow: 1,
         backgroundColor: cardBg,
         borderRadius: 12,
         borderWidth: 1,
@@ -119,7 +179,7 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
           {!!sub && (
             <Text
               numberOfLines={1}
-              style={{ color: theme.text, fontSize: 12, marginTop: 2 }}
+              style={{ color: theme.textSecondary, fontSize: 12, marginTop: 2 }}
             >
               {sub}
             </Text>
@@ -168,7 +228,7 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
                 size={16}
                 color="#fff"
               />
-              <Text style={{ color: theme.textSecondary, fontWeight: "700" }}>
+              <Text style={{ color: "#fff", fontWeight: "700" }}>
                 {next.label}
               </Text>
             </>
@@ -202,11 +262,7 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
         </TouchableOpacity>
       ) : (
         <Text
-          style={{
-            color: theme.textSecondary,
-            fontSize: 12,
-            fontStyle: "italic",
-          }}
+          style={{ color: theme.textSecondary, fontSize: 12, fontStyle: "italic" }}
         >
           {code === STATUS_CODE.EM_ABERTO
             ? "Aguardando início da viagem."
@@ -241,11 +297,7 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
             events.map((ev: any) => (
               <View
                 key={ev.id}
-                style={{
-                  flexDirection: "row",
-                  gap: 8,
-                  alignItems: "flex-start",
-                }}
+                style={{ flexDirection: "row", gap: 8, alignItems: "flex-start" }}
               >
                 <View
                   style={{
@@ -253,17 +305,12 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
                     height: 8,
                     borderRadius: 4,
                     marginTop: 5,
-                    backgroundColor:
-                      STAGE_COLOR[ev.status?.code]?.fg ?? "#9ca3af",
+                    backgroundColor: STAGE_COLOR[ev.status?.code]?.fg ?? "#9ca3af",
                   }}
                 />
                 <View style={{ flex: 1 }}>
                   <Text
-                    style={{
-                      color: theme.text,
-                      fontSize: 13,
-                      fontWeight: "600",
-                    }}
+                    style={{ color: theme.text, fontSize: 13, fontWeight: "600" }}
                   >
                     {ev.status?.name ?? ev.description_item ?? "Evento"}
                   </Text>
@@ -272,6 +319,15 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
                     {ev.location_item ? ` · ${ev.location_item}` : ""}
                   </Text>
                 </View>
+                {canEditEvents && onEditEvent && (
+                  <TouchableOpacity
+                    onPress={() => openEdit(ev)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    style={{ padding: 2 }}
+                  >
+                    <Feather name="edit-2" size={13} color={theme.textSecondary} />
+                  </TouchableOpacity>
+                )}
               </View>
             ))
           )}
@@ -294,16 +350,9 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
           }}
         >
           <View
-            style={{
-              backgroundColor: cardBg,
-              borderRadius: 14,
-              padding: 18,
-              gap: 12,
-            }}
+            style={{ backgroundColor: cardBg, borderRadius: 14, padding: 18, gap: 12 }}
           >
-            <Text
-              style={{ fontWeight: "700", fontSize: 16, color: theme.text }}
-            >
+            <Text style={{ fontWeight: "700", fontSize: 16, color: theme.text }}>
               Registrar chegada
             </Text>
             <Text style={{ color: theme.textSecondary, fontSize: 13 }}>
@@ -324,11 +373,7 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
               }}
             />
             <View
-              style={{
-                flexDirection: "row",
-                gap: 10,
-                justifyContent: "flex-end",
-              }}
+              style={{ flexDirection: "row", gap: 10, justifyContent: "flex-end" }}
             >
               <TouchableOpacity
                 onPress={() => {
@@ -350,9 +395,101 @@ export function ItemStageCard({ item, busy, onAdvance, onSendCanhoto }: Props) {
                   borderRadius: 10,
                 }}
               >
-                <Text style={{ color: "#fff", fontWeight: "700" }}>
-                  Confirmar
+                <Text style={{ color: "#fff", fontWeight: "700" }}>Confirmar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* modal de edição de evento (data/hora/local) */}
+      <Modal
+        visible={!!editingEvent}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setEditingEvent(null)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.45)",
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <View
+            style={{ backgroundColor: cardBg, borderRadius: 14, padding: 18, gap: 12 }}
+          >
+            <Text style={{ fontWeight: "700", fontSize: 16, color: theme.text }}>
+              Editar evento
+            </Text>
+            <Text style={{ color: theme.textSecondary, fontSize: 13 }}>
+              {editingEvent?.status?.name ?? "Evento"} — ajuste a data/hora real
+              e o local.
+            </Text>
+
+            <Text style={{ color: theme.textSecondary, fontSize: 12 }}>
+              Data e hora
+            </Text>
+            <TextInput
+              value={editDate}
+              onChangeText={(t) => {
+                setEditDate(t);
+                setEditErr(null);
+              }}
+              placeholder="DD/MM/AAAA HH:mm"
+              placeholderTextColor={theme.textSecondary}
+              style={{
+                borderWidth: 1,
+                borderColor: editErr ? "#ef4444" : border,
+                borderRadius: 10,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                color: theme.text,
+              }}
+            />
+
+            <Text style={{ color: theme.textSecondary, fontSize: 12 }}>Local</Text>
+            <TextInput
+              value={editLoc}
+              onChangeText={setEditLoc}
+              placeholder="Local do evento (opcional)"
+              placeholderTextColor={theme.textSecondary}
+              style={{
+                borderWidth: 1,
+                borderColor: border,
+                borderRadius: 10,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                color: theme.text,
+              }}
+            />
+
+            {editErr && (
+              <Text style={{ color: "#ef4444", fontSize: 12 }}>{editErr}</Text>
+            )}
+
+            <View
+              style={{ flexDirection: "row", gap: 10, justifyContent: "flex-end" }}
+            >
+              <TouchableOpacity
+                onPress={() => setEditingEvent(null)}
+                style={{ paddingVertical: 10, paddingHorizontal: 14 }}
+              >
+                <Text style={{ color: theme.textSecondary, fontWeight: "600" }}>
+                  Cancelar
                 </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={saveEdit}
+                style={{
+                  backgroundColor: "#2563eb",
+                  paddingVertical: 10,
+                  paddingHorizontal: 18,
+                  borderRadius: 10,
+                }}
+              >
+                <Text style={{ color: "#fff", fontWeight: "700" }}>Salvar</Text>
               </TouchableOpacity>
             </View>
           </View>
