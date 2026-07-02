@@ -18,6 +18,8 @@ import {
   Alert,
   useWindowDimensions,
 } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
+import { referenceKeys } from "@/hooks/querys/useReferenceData";
 
 export default function CreateClientScreen() {
   const { theme } = useTheme();
@@ -26,7 +28,7 @@ export default function CreateClientScreen() {
 
   const isMobile = width < 768;
   const styles = listClientStyles(theme, isMobile);
-
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -44,6 +46,7 @@ export default function CreateClientScreen() {
     setLoading(true);
     try {
       await api.post("/clients", { ...data, created_by: user?.user.id });
+      queryClient.invalidateQueries({ queryKey: referenceKeys.clients });
       Alert.alert("Sucesso", "Cliente cadastrado com sucesso!");
       rollback();
     } catch (e: any) {

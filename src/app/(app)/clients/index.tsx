@@ -1,46 +1,36 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   useWindowDimensions,
-  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@/contexts/themeContext";
 import { api } from "@/services/api";
 import { ClientType } from "@/schemas/clientsSchema";
 import { Loadding } from "@/components/loadding";
 import { createClientsStyles } from "@/styles/clients.styles";
 import { SearchField } from "@/components/searchField";
+import { useClients, referenceKeys } from "@/hooks/querys/useReferenceData";
 
 export default function ClientsListScreen() {
   const { theme } = useTheme();
   const isMobile = useWindowDimensions().width <= 820;
   const styles = createClientsStyles(theme, isMobile);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const [clients, setClients] = useState<ClientType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: clients = [], isLoading } = useClients();
   const [search, setSearch] = useState("");
-
-  const fetchClients = async () => {
-    try {
-      setLoading(true);
-      const { data } = await api.get("/clients");
-      setClients(data);
-    } catch {
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filtered = useMemo(() => {
     const lower = search.toLowerCase();
     return clients.filter(
-      (c) =>
+      (c: ClientType) =>
         c.name_client.toLowerCase().includes(lower) ||
         c.document.includes(lower) ||
         c.email?.toLowerCase().includes(lower),
@@ -52,15 +42,11 @@ export default function ClientsListScreen() {
       await api.patch(`/clients/${client.id}`, {
         is_active: !client.is_active,
       });
-      fetchClients();
+      queryClient.invalidateQueries({ queryKey: referenceKeys.clients });
     } catch {}
   };
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  if (loading)
+  if (isLoading)
     return (
       <Loadding color={theme.isDark ? theme.link : theme.text} size={50} />
     );
@@ -87,7 +73,10 @@ export default function ClientsListScreen() {
         </TouchableOpacity>
       </View>
 
-      <SearchField placeholder="Buscar por nome, CPF/CNPJ ou e-mail..." onChange={setSearch} />
+      <SearchField
+        placeholder="Buscar por nome, CPF/CNPJ ou e-mail..."
+        onChange={setSearch}
+      />
 
       {filtered.length === 0 ? (
         <Text style={styles.emptyText}>Nenhum cliente encontrado.</Text>

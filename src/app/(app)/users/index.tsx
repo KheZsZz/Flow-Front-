@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -8,17 +8,19 @@ import {
   Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter, useFocusEffect } from "expo-router";
+import { useRouter } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@/contexts/themeContext";
 import { usePermissions } from "@/hooks/usePermission";
-import { api } from "@/services/api";
 import { UserType } from "@/schemas/usersSchema";
-import { UserTypeEnum } from "@/schemas/enumSchema";
 import { Loadding } from "@/components/loadding";
 import { createUsersStyles } from "@/styles/users.styles";
 import { ROLE_LABEL, ROLE_COLOR } from "@/constants/colors";
 import { usersService } from "@/services/users";
 import { SearchField } from "@/components/searchField";
+import { useUsers, listKeys } from "@/hooks/querys/useListData";
+import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
+import { UserTypeEnum } from "@/schemas/enumSchema";
 
 export default function UsersListScreen() {
   const { theme } = useTheme();
@@ -26,39 +28,24 @@ export default function UsersListScreen() {
   const styles = createUsersStyles(theme, isMobile);
   const router = useRouter();
   const { isAdmin } = usePermissions();
+  const queryClient = useQueryClient();
 
-  const [users, setUsers] = useState<UserType[]>([]);
-  const [filtered, setFiltered] = useState<UserType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: users = [], isLoading, refetch } = useUsers();
+  useRefreshOnFocus(refetch);
+
   const [search, setSearch] = useState("");
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const data = await usersService.list();
-      setUsers(data);
-      setFiltered(data);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchUsers();
-    }, []),
-  );
-
-  useEffect(() => {
+  const filtered = useMemo(() => {
     const lower = search.toLowerCase();
-    setFiltered(
-      users.filter(
-        (u) =>
-          u.name_user?.toLowerCase().includes(lower) ||
-          u.email_user?.toLowerCase().includes(lower),
-      ),
+    return users.filter(
+      (u: UserType) =>
+        u.name_user?.toLowerCase().includes(lower) ||
+        u.email_user?.toLowerCase().includes(lower),
     );
   }, [search, users]);
+
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: listKeys.users });
 
   const toggleStatus = (user: UserType) => {
     const turningOff = user.is_active;
@@ -77,15 +64,14 @@ export default function UsersListScreen() {
                 user.id as string,
                 !user.is_active,
               );
-              fetchUsers();
+              invalidate(); // substitui o fetchUsers() manual
             } catch {}
           },
         },
       ],
     );
   };
-
-  if (loading)
+  if (isLoading)
     return (
       <Loadding color={theme.isDark ? theme.link : theme.text} size={50} />
     );

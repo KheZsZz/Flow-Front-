@@ -18,10 +18,11 @@ import { useAuth } from "@/contexts/authContext";
 import { ControlledInput } from "@/components/controllerInput";
 import { usersFormStyles } from "@/styles/users.styles";
 import rollback from "@/services/rollback";
-import { api } from "@/services/api";
 import { CNH_CATEGORIES, ALLOWED_NON_MANAGER } from "@/constants/colors";
 import { usersService } from "@/services/users";
 import { DocumentUpload } from "@/components/documentUpload";
+import { useQueryClient } from "@tanstack/react-query";
+import { listKeys } from "@/hooks/querys/useListData";
 
 /** Gerente pode atribuir qualquer perfil. */
 const MANAGER_ROLES = [
@@ -44,6 +45,7 @@ export default function CreateUserScreen() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const styles = usersFormStyles(theme, isMobile);
+  const queryClient = useQueryClient();
 
   const { user } = useAuth();
   const { profile } = usePermissions();
@@ -98,6 +100,7 @@ export default function CreateUserScreen() {
       }
 
       await usersService.create(payload);
+      queryClient.invalidateQueries({ queryKey: listKeys.users });
       Alert.alert("Sucesso", "Usuário cadastrado com sucesso!");
       rollback();
     } catch {
