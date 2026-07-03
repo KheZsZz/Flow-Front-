@@ -64,7 +64,7 @@ export default function MaintenanceScreen() {
         style={styles.fab}
         onPress={() => router.push("/(app)/maintenance/create")}
       >
-        <Feather name="plus" size={22} color={theme.primary} />
+        <Feather name="plus" size={22} color={theme.text} />
       </TouchableOpacity>
     </View>
   );

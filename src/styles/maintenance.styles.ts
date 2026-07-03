@@ -20,7 +20,7 @@ export const createMaintenanceStyles = (
 
   subtitle: {
     fontSize: 13,
-    color: theme.textSecondary,
+    color: theme.text,
     marginTop: 2,
   },
 
@@ -49,20 +49,20 @@ export const createMaintenanceStyles = (
   cardAmount: {
     fontSize: 15,
     fontWeight: "700" as const,
-    color: theme.primary,
+    color: theme.error,
   },
-  cardMeta: { fontSize: 12, color: theme.textSecondary },
+  cardMeta: { fontSize: 12, color: theme.text },
   fab: {
     position: "absolute" as const,
     right: isMobile ? 16 : 32,
-    bottom: isMobile ? 16 : 32,
-    backgroundColor: theme.primary,
+    top: isMobile ? 16 : 32,
+    backgroundColor: theme.isDark ? theme.link : theme.primary,
     width: 52,
     height: 52,
-    borderRadius: 26,
+    borderRadius: 8,
     alignItems: "center" as const,
     justifyContent: "center" as const,
   },
   emptyState: { padding: 32, alignItems: "center" as const },
-  emptyText: { color: theme.textSecondary, fontSize: 13 },
+  emptyText: { color: theme.error, fontSize: 13 },
 });

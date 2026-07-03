@@ -65,6 +65,7 @@ export default function FinanceScreen() {
     if (filters.end_date && d > new Date(filters.end_date)) return false;
     return true;
   });
+
   return (
     <View style={styles.container}>
       <View style={styles.topbar}>
@@ -74,19 +75,23 @@ export default function FinanceScreen() {
             Despesas operacionais e administrativas da operação
           </Text>
         </View>
-        <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
-          <ControlledInput
-            control={control}
-            name="start_date"
-            label="De"
-            variant="date"
-          />
-          <ControlledInput
-            control={control}
-            name="end_date"
-            label="Até"
-            variant="date"
-          />
+        <View style={{ flexDirection: "row", gap: 8, marginTop: 8, flexWrap:"wrap", maxWidth:"100%" }}>
+          <View>
+            <ControlledInput
+              control={control}
+              name="start_date"
+              label="De"
+              variant="date"
+            />
+          </View>
+          <View>
+            <ControlledInput
+              control={control}
+              name="end_date"
+              label="Até"
+              variant="date"
+            />
+          </View>
         </View>
 
         <ScrollView
@@ -159,7 +164,7 @@ export default function FinanceScreen() {
         style={styles.fab}
         onPress={() => router.push(`/(app)/finance/create?category=${active}`)}
       >
-        <Feather name="plus" size={22} color={theme.primary} />
+        <Feather name="plus" size={22} color={theme.text} />
       </TouchableOpacity>
     </View>
   );

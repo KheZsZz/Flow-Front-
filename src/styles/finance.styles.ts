@@ -13,14 +13,15 @@ export const createFinanceStyles = (
       backgroundColor: theme.background,
       position: "relative",
     },
+
     fab: {
       position: "absolute",
       right: isMobile ? 16 : 32,
-      bottom: isMobile ? 16 : 32,
+      top: isMobile ? 16 : 32,
       backgroundColor: theme.primary,
       width: 52,
       height: 52,
-      borderRadius: 26,
+      borderRadius: 8,
       alignItems: "center",
       justifyContent: "center",
       zIndex: 10,
@@ -40,7 +41,7 @@ export const createFinanceStyles = (
       fontWeight: "700",
       color: theme.text,
     },
-    subtitle: { fontSize: 13, color: theme.textSecondary, marginTop: 2 },
+    subtitle: { fontSize: 13, color: theme.text, marginTop: 2 },
 
     tabBarScroll: { flexGrow: 0 },
     tabBar: { gap: 8, paddingBottom: 12 },
@@ -50,12 +51,14 @@ export const createFinanceStyles = (
       gap: 6,
       paddingVertical: 8,
       paddingHorizontal: 14,
-      borderRadius: 20,
+      borderRadius: 8,
       backgroundColor: theme.card,
     },
-    tabActive: { backgroundColor: theme.primary },
-    tabLabel: { fontSize: 13, fontWeight: "600", color: theme.textSecondary },
-    tabLabelActive: { color: "#fff" },
+    tabActive: { 
+      backgroundColor: theme.isDark ? theme.link : theme.primary 
+    },
+    tabLabel: { fontSize: 13, fontWeight: "600", color: theme.text },
+    tabLabelActive: { color: theme.textSecondary },
 
     listContent: { padding: isMobile ? 16 : 32, gap: 10 },
     card: {
@@ -70,21 +73,10 @@ export const createFinanceStyles = (
       alignItems: "center",
     },
     cardType: { fontSize: 14, fontWeight: "600", color: theme.text },
-    cardAmount: { fontSize: 15, fontWeight: "700", color: theme.primary },
-    cardMeta: { fontSize: 12, color: theme.textSecondary },
+    cardAmount: { fontSize: 15, fontWeight: "700", color: theme.error },
+    cardMeta: { fontSize: 12, color: theme.text },
 
-    fab: {
-      position: "absolute",
-      right: isMobile ? 16 : 32,
-      bottom: isMobile ? 16 : 32,
-      backgroundColor: theme.primary,
-      width: 52,
-      height: 52,
-      borderRadius: 26,
-      alignItems: "center",
-      justifyContent: "center",
-    },
 
     emptyState: { padding: 32, alignItems: "center" },
-    emptyText: { color: theme.textSecondary, fontSize: 13 },
+    emptyText: { color: theme.error, fontSize: 13 },
   });
