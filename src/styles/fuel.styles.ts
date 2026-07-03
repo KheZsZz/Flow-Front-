@@ -42,7 +42,7 @@ export const createFuelStyles = (theme: ThemeType, isMobile: boolean) => ({
   cardAmount: {
     fontSize: 15,
     fontWeight: "700" as const,
-    color: theme.success,
+    color: theme.error,
   },
   cardMeta: { fontSize: 12, color: theme.text },
 
@@ -51,7 +51,7 @@ export const createFuelStyles = (theme: ThemeType, isMobile: boolean) => ({
     position: "absolute" as const,
     right: isMobile ? 16 : 32,
     top: isMobile ? 16 : 32,
-    backgroundColor: theme.primary,
+    backgroundColor: theme.isDark ? theme.link : theme.primary,
     width: 52,
     height: 52,
     borderRadius: 8,
