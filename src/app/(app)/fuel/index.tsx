@@ -66,7 +66,7 @@ export default function FuelScreen() {
         style={styles.fab}
         onPress={() => router.push("/(app)/fuel/create")}
       >
-        <Feather name="plus" size={22} color={theme.primary} />
+        <Feather name="plus" size={22} color={theme.textSecondary} />
       </TouchableOpacity>
     </View>
   );
