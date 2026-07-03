@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
 import { findStatus, updateStatus } from "@/services/status";
-import { StatusUpdateSchema, StatusTypes } from "@/schemas/statusSchema";
+import {
+  StatusUpdateSchema,
+  StatusTypes,
+} from "@/services/schemas/statusSchematusSchema";
 import { useTheme } from "@/contexts/themeContext";
 import {
   TouchableOpacity,

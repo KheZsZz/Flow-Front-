@@ -11,7 +11,10 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterUserSchema, RegisterUserType } from "@/schemas/usersSchema";
+import {
+  RegisterUserSchema,
+  RegisterUserType,
+} from "@/services/schemas/usersSchemaersSchema";
 import { useTheme } from "@/contexts/themeContext";
 import { usePermissions } from "@/hooks/usePermission";
 import { useAuth } from "@/contexts/authContext";

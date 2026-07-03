@@ -11,6 +11,7 @@ export type FuelSummary = {
 
 export type VehicleEfficiency = {
   vehicle_id: string;
+  license_plate: string; // ← novo (vem da RPC agora)
   total_price: number;
   liters: number;
   kms_driven: number;
@@ -140,9 +141,7 @@ export const orderItems = (o: any): any[] =>
 
 /* ── Notas fiscais ─────────────────────────────────────────────────────── */
 export type InvoiceSituation =
-  | "Finalizada"
-  | "Aguardando comprovante"
-  | "Pendente";
+  "Finalizada" | "Aguardando comprovante" | "Pendente";
 
 export const invoiceSituation = (inv: any): InvoiceSituation => {
   if (inv?.delivery_status === "finalizada") return "Finalizada";

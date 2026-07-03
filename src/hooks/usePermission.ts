@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/authContext";
-import { UserTypeEnum } from "@/schemas/enumSchema";
+import { UserTypeEnum } from "@/services/schemas/enumSchemanumSchema";
 
 const ROLE_LEVEL: Record<UserTypeEnum, number> = {
   Manager: 5,

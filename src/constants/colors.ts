@@ -1,5 +1,5 @@
 import { ThemeMode } from "@/contexts/themeContext";
-import { UserTypeEnum } from "@/schemas/enumSchema";
+import { UserTypeEnum } from "@/services/schemas/enumSchemanumSchema";
 
 export type AppTheme = {
   isDark: boolean;

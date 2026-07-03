@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useForm } from "react-hook-form";
 import { useTheme } from "@/contexts/themeContext";
@@ -52,17 +46,28 @@ import {
 } from "@/services/dashboard";
 import { Loadding } from "../loadding";
 
+// Filtros persistentes por react-hook-form (padrão do app — nada de TextInput cru)
 type FilterForm = {
   start_date?: string;
   end_date?: string;
   status?: string;
 };
 
+/**
+ * Rótulo do veículo priorizando a placa (fonte única da verdade: RPC).
+ * Fallback defensivo: se a Migration 1 ainda não estiver aplicada e a
+ * RPC devolver `license_plate` vazio, mostra shortId do UUID em vez de crashar.
+ */
+function vehicleLabel(e: VehicleEfficiency): string {
+  return e.license_plate?.trim() || String(e.vehicle_id).slice(0, 6);
+}
+
 export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
   const { theme } = useTheme();
   const styles = createDashboardStyles(theme, isMobile);
   const accent = theme.isDark ? theme.link : theme.primary;
 
+  // ── Estado bruto vindo dos endpoints ────────────────────────────────
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -74,16 +79,24 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
   });
   const [efficiency, setEfficiency] = useState<VehicleEfficiency[]>([]);
   const [ranking, setRanking] = useState<any[]>([]);
+
+  // Filtro por placa dos chips de eficiência ("TODOS" = frota inteira)
   const [vehicleFilter, setVehicleFilter] = useState<string>("TODOS");
 
+  // Filtros globais (data + status)
   const { control, watch, reset } = useForm<FilterForm>({
     defaultValues: { start_date: undefined, end_date: undefined, status: "" },
   });
   const filters = watch();
 
+  /**
+   * Carrega tudo em paralelo. Usamos Promise.allSettled em vez de Promise.all
+   * pra evitar que uma única falha (ex.: /dashboard/ranking) derrube o painel
+   * inteiro e mascare erros — problema que existia no fluxo anterior.
+   */
   const loadAll = async () => {
     setLoading(true);
-    const r = await Promise.allSettled([
+    const results = await Promise.allSettled([
       dashboardService.getOrders(),
       dashboardService.getInvoices(),
       dashboardService.getCollections(),
@@ -91,7 +104,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
       dashboardService.getVehicleEfficiency(),
       dashboardService.getDriverRanking(8),
     ]);
-    const [ord, inv, col, sum, eff, rank] = r;
+    const [ord, inv, col, sum, eff, rank] = results;
     if (ord.status === "fulfilled") setOrders(ord.value);
     if (inv.status === "fulfilled") setInvoices(inv.value);
     if (col.status === "fulfilled") setCollections(col.value);
@@ -99,6 +112,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     if (eff.status === "fulfilled") setEfficiency(eff.value);
     if (rank.status === "fulfilled") setRanking(rank.value);
 
+    // Log das rejeições — não abre alerta pra não poluir a UI
     const nomes = [
       "orders",
       "invoices",
@@ -107,7 +121,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
       "efficiency",
       "ranking",
     ];
-    r.forEach(
+    results.forEach(
       (x, i) =>
         x.status === "rejected" &&
         console.warn("[dashboard] falhou:", nomes[i], x.reason),
@@ -120,6 +134,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Refetch do fuel_summary sempre que a janela de data mudar
   useEffect(() => {
     dashboardService
       .getFuelSummary({
@@ -131,7 +146,19 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.start_date, filters.end_date]);
 
-  /* ── Filtragem client-side ──────────────────────────────────────────── */
+  /**
+   * Se recarregar os dados e a placa filtrada não existir mais no dataset,
+   * volta pra frota inteira — evita chip “fantasma” selecionado sem barra.
+   */
+  useEffect(() => {
+    if (vehicleFilter === "TODOS") return;
+    const stillExists = efficiency.some(
+      (e) => e.license_plate === vehicleFilter,
+    );
+    if (!stillExists) setVehicleFilter("TODOS");
+  }, [efficiency, vehicleFilter]);
+
+  /* ── Filtragem client-side (aplica start_date/end_date/status) ────── */
   const fOrders = useMemo(
     () =>
       orders
@@ -160,7 +187,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     [collections, filters.start_date, filters.end_date],
   );
 
-  /* ── Frete ──────────────────────────────────────────────────────────── */
+  /* ── Frete: mapa invoice→valor + total agregado no período ────────── */
   const freightMap = useMemo(
     () => buildInvoiceFreightMap(invoices),
     [invoices],
@@ -170,7 +197,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     [fInvoices],
   );
 
-  /* ── KPIs ───────────────────────────────────────────────────────────── */
+  /* ── KPIs agregados (operação + doc + coletas) ────────────────────── */
   const k = useMemo(() => {
     const ordersFinalized = fOrders.filter(orderIsFinalized).length;
     const invWaiting = fInvoices.filter(
@@ -191,7 +218,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     };
   }, [fOrders, fInvoices, fCollections]);
 
-  /* ── Donuts ─────────────────────────────────────────────────────────── */
+  /* ── Donuts + barras de situação ──────────────────────────────────── */
   const ordersStatusSlices = useMemo(
     () => toSlices(countBy(fOrders, orderStatusName)),
     [fOrders],
@@ -205,7 +232,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     [fInvoices],
   );
 
-  /* ── Séries de 7 dias (janela própria, independente do filtro) ──────── */
+  /* ── Séries de 7 dias (janela própria, independente do filtro) ────── */
   const days = useMemo(() => lastNDays(7), []);
   const dayLabels = days.map((d) => d.label);
 
@@ -226,7 +253,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     [collections, days],
   );
 
-  /* ── Opções de status ───────────────────────────────────────────────── */
+  /* ── Opções do dropdown de status (extraídas do dataset) ──────────── */
   const statusOptions = useMemo(() => {
     const names = Array.from(new Set(orders.map(orderStatusName)));
     return [
@@ -235,7 +262,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     ];
   }, [orders]);
 
-  /* ── Funil de viagens ───────────────────────────────────────────────── */
+  /* ── Funil de viagens ─────────────────────────────────────────────── */
   const funnelStages = useMemo(() => {
     const created = fOrders.length;
     const started = fOrders.filter((o) => {
@@ -250,7 +277,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     ];
   }, [fOrders]);
 
-  /* ── Tendência de frete (30 dias) ───────────────────────────────────── */
+  /* ── Tendência de frete (30 dias) ─────────────────────────────────── */
   const freightTrend = useMemo(() => {
     const d30 = lastNDays(30);
     const byDay: number[] = d30.map((day) => {
@@ -263,7 +290,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     return { labels: d30.map((d) => d.label), values: byDay };
   }, [invoices]);
 
-  /* ── Taxa de documentação ───────────────────────────────────────────── */
+  /* ── Taxa de documentação completa ────────────────────────────────── */
   const docCompletionRate = useMemo(() => {
     if (!fInvoices.length) return 0;
     const complete = fInvoices.filter(
@@ -272,7 +299,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     return Math.round((complete / fInvoices.length) * 100);
   }, [fInvoices]);
 
-  /* ── Radar de eficiência da frota ───────────────────────────────────── */
+  /* ── Radar de eficiência da frota (top 5 por km/L) ────────────────── */
   const fleetRadarData = useMemo(() => {
     const top5 = efficiency.slice(0, 5);
     if (!top5.length) return null;
@@ -285,8 +312,9 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         { name: "Km rodados", max: Math.ceil(maxKm * 1.2) },
         { name: "Litros", max: Math.ceil(maxL * 1.2) },
       ],
+      // Nome do radar agora é a placa (fonte única da verdade — RPC)
       series: top5.map((e) => ({
-        name: `Veíc. ${String(e.vehicle_id).slice(0, 6)}`,
+        name: vehicleLabel(e),
         values: [
           Number(e.km_per_liter),
           Number(e.kms_driven),
@@ -296,16 +324,17 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
     };
   }, [efficiency]);
 
-  /* ── Eficiência por veículo ─────────────────────────────────────────── */
+  /* ── Eficiência por veículo (chips + barras) ──────────────────────── */
+  // Filtro exato por placa — não é mais prefixo do UUID
   const effFiltered = useMemo(() => {
     if (vehicleFilter === "TODOS") return efficiency;
-    return efficiency.filter((e) => e.vehicle_id?.startsWith(vehicleFilter));
+    return efficiency.filter((e) => e.license_plate === vehicleFilter);
   }, [efficiency, vehicleFilter]);
 
   const effBars = useMemo(
     () =>
       effFiltered.map((e) => ({
-        label: `Veículo ${String(e.vehicle_id).substring(0, 4)}`,
+        label: vehicleLabel(e),
         value: Number(e.km_per_liter) || 0,
       })),
     [effFiltered],
@@ -318,7 +347,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
 
   return (
     <View style={{ gap: 18 }}>
-      {/* ── Filtros ─────────────────────────────────────────────────── */}
+      {/* ── Filtros ───────────────────────────────────────────────── */}
       <View style={styles.filterBar}>
         <Text style={styles.filterTitle}>Filtros</Text>
         <View style={styles.filterRow}>
@@ -366,7 +395,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         )}
       </View>
 
-      {/* ── KPIs operacionais ───────────────────────────────────────── */}
+      {/* ── KPIs operacionais ─────────────────────────────────────── */}
       <View style={styles.kpiGrid}>
         <KpiCard
           icon="package"
@@ -409,7 +438,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </View>
 
-      {/* ── KPIs de combustível ─────────────────────────────────────── */}
+      {/* ── KPIs de combustível ───────────────────────────────────── */}
       <View style={styles.kpiGrid}>
         <KpiCard
           icon="trending-down"
@@ -431,19 +460,13 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </View>
 
-      {/* ── Status de documentação (CT-e / frete / canhoto) ─────────── */}
+      {/* ── Status de documentação (CT-e / frete / canhoto) ───────── */}
       <SectionCard
         title="Status de Documentação"
         icon="file-text"
         hint="Notas pendentes de CT-e, valor de frete e canhoto"
         right={
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <View
               style={{
                 width: 8,
@@ -453,7 +476,10 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
               }}
             />
             <Text
-              style={{ color: theme.isDark ? "#aaa" : "#666", fontSize: 12 }}
+              style={{
+                color: theme.isDark ? "#aaa" : "#666",
+                fontSize: 12,
+              }}
             >
               Ao vivo
             </Text>
@@ -463,7 +489,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         <DocumentationStatus invoices={fInvoices} />
       </SectionCard>
 
-      {/* ── Funil de viagens ────────────────────────────────────────── */}
+      {/* ── Funil de viagens ──────────────────────────────────────── */}
       <SectionCard
         title="Funil de viagens"
         icon="filter"
@@ -472,7 +498,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         <FunnelOrderChart stages={funnelStages} title="Funil de viagens" />
       </SectionCard>
 
-      {/* ── Distribuição por status (donut) ─────────────────────────── */}
+      {/* ── Distribuição por status (donut) ───────────────────────── */}
       <SectionCard
         title="Distribuição por status"
         icon="pie-chart"
@@ -486,7 +512,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
-      {/* ── Volume últimos 7 dias ───────────────────────────────────── */}
+      {/* ── Volume 7 dias (viagens) ───────────────────────────────── */}
       <SectionCard
         title="Volume — Últimos 7 dias"
         icon="bar-chart-2"
@@ -502,7 +528,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
-      {/* ── Tendência de receita de frete (30 dias) ─────────────────── */}
+      {/* ── Tendência de receita de frete (30 dias) ───────────────── */}
       <SectionCard
         title="Receita de frete — 30 dias"
         icon="trending-up"
@@ -516,7 +542,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
-      {/* ── Taxa de documentação (gauge) ────────────────────────────── */}
+      {/* ── Taxa de documentação (gauge) ──────────────────────────── */}
       <SectionCard
         title="Taxa de documentação completa"
         icon="check-square"
@@ -529,7 +555,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
-      {/* ── Notas por situação ──────────────────────────────────────── */}
+      {/* ── Notas por situação ────────────────────────────────────── */}
       <SectionCard title="Notas por situação de entrega" icon="file-text">
         <MiniBars
           data={invoicesSituationBars}
@@ -537,7 +563,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
-      {/* ── Coletas: donut + volume 7 dias ──────────────────────────── */}
+      {/* ── Coletas por status (donut) ────────────────────────────── */}
       <SectionCard
         title="Coletas por status"
         icon="pie-chart"
@@ -551,6 +577,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
+      {/* ── Coletas 7 dias ────────────────────────────────────────── */}
       <SectionCard
         title="Coletas — Últimos 7 dias"
         icon="bar-chart-2"
@@ -568,7 +595,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
-      {/* ── Radar de eficiência da frota ────────────────────────────── */}
+      {/* ── Radar de eficiência da frota ──────────────────────────── */}
       {fleetRadarData && (
         <SectionCard
           title="Radar de eficiência da frota"
@@ -583,30 +610,33 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         </SectionCard>
       )}
 
-      {/* ── Eficiência por veículo ──────────────────────────────────── */}
+      {/* ── Eficiência por veículo (chips POR PLACA) ──────────────── */}
       <SectionCard
         title="Eficiência por veículo (km/L)"
         icon="truck"
-        hint="Toque em um veículo para isolar a métrica"
+        hint="Toque em uma placa para isolar a métrica"
       >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.chipScroll}
         >
+          {/* Chip fixo pra ver a frota inteira */}
           <FilterChip
             label="Frota completa"
             active={vehicleFilter === "TODOS"}
             onPress={() => setVehicleFilter("TODOS")}
           />
+          {/* Um chip por placa — dado vem da RPC get_vehicle_efficiency */}
           {efficiency.map((e) => {
-            const shortId = String(e.vehicle_id).substring(0, 4);
+            const label = vehicleLabel(e);
+            const key = e.license_plate ?? "";
             return (
               <FilterChip
                 key={e.vehicle_id}
-                label={`Veículo ${shortId}`}
-                active={vehicleFilter === shortId}
-                onPress={() => setVehicleFilter(shortId)}
+                label={label}
+                active={vehicleFilter === key}
+                onPress={() => setVehicleFilter(key || "TODOS")}
               />
             );
           })}
@@ -619,7 +649,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         />
       </SectionCard>
 
-      {/* ── Ranking de motoristas ───────────────────────────────────── */}
+      {/* ── Ranking de motoristas ─────────────────────────────────── */}
       {ranking.length > 0 && (
         <SectionCard title="Ranking de motoristas" icon="award">
           <View style={{ gap: 0 }}>
@@ -652,7 +682,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
         </SectionCard>
       )}
 
-      {/* ── Viagens recentes (com valor de frete por viagem) ────────── */}
+      {/* ── Viagens recentes (com valor de frete por viagem) ──────── */}
       <SectionCard title="Viagens recentes" icon="clock">
         {fOrders.slice(0, 8).map((o) => {
           const plates = orderPlates(o);

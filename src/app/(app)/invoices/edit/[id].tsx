@@ -13,7 +13,10 @@ import { useLocalSearchParams } from "expo-router";
 import rollback from "@/services/rollback";
 import { invoiceService } from "@/services/invoices";
 import { useTheme } from "@/contexts/themeContext";
-import { invoiceSchema, InvoiceTypes } from "@/schemas/invoicesSchema";
+import {
+  invoiceSchema,
+  InvoiceTypes,
+} from "@/services/schemas/invoicesSchemacesSchema";
 
 import { Loadding } from "@/components/loadding";
 import { Button } from "@/components/button";

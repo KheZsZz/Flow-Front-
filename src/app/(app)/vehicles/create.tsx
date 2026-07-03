@@ -12,12 +12,12 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { vehicleSchema } from "@/schemas/vehicleSchema";
+import { vehicleSchema } from "@/services/schemas/vehicleSchemacleSchema";
 import { useTheme } from "@/contexts/themeContext";
 import { createVehicleStyles } from "@/styles/vehicles.styles";
 import { api } from "@/services/api";
 import { ControlledInput } from "@/components/controllerInput";
-import { VehicleTypeSchema } from "@/schemas/enumSchema";
+import { VehicleTypeSchema } from "@/services/schemas/enumSchemanumSchema";
 import rollback from "@/services/rollback";
 import { useAuth } from "@/contexts/authContext";
 import { DocumentUpload } from "@/components/documentUpload";

@@ -5,7 +5,7 @@ import { View, Text, useWindowDimensions } from "react-native";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
-import { UserSchema } from "@/schemas/usersSchema";
+import { UserSchema } from "@/services/schemas/usersSchemaersSchema";
 import { ControlledInput } from "@/components/controllerInput";
 import { Button } from "@/components/button";
 import { createLoginStyles } from "@/styles/login.styles";

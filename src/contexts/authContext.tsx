@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { UserType } from "@/schemas/usersSchema";
+import { UserType } from "@/services/schemas/usersSchemaersSchema";
 import { api } from "@/services/api";
 import { queryClient } from "@/lib/queryClient";
 

@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/authContext";
 import { usePermissions } from "@/hooks/usePermission";
 import { createDashboardStyles } from "@/styles/dashboard.styles";
 import { ROLE_LABEL, ROLE_COLOR } from "@/constants/colors";
-import { UserTypeEnum } from "@/schemas/enumSchema";
+import { UserTypeEnum } from "@/services/schemas/enumSchemanumSchema";
 import { ErrorBoundary } from "@/components/errorBoundary";
 import {
   KpiCard,

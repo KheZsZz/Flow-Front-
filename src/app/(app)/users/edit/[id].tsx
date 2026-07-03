@@ -12,7 +12,10 @@ import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateUserSchema, UpdateUserType } from "@/schemas/usersSchema";
+import {
+  UpdateUserSchema,
+  UpdateUserType,
+} from "@/services/schemas/usersSchemaersSchema";
 import { useTheme } from "@/contexts/themeContext";
 import { usePermissions } from "@/hooks/usePermission";
 import { ControlledInput } from "@/components/controllerInput";

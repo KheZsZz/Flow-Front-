@@ -10,7 +10,7 @@ import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@/contexts/themeContext";
 import { InvoiceList } from "@/components/invoices/invoicesList";
-import { InvoiceTypes } from "@/schemas/invoicesSchema";
+import { InvoiceTypes } from "@/services/schemas/invoicesSchemacesSchema";
 import { createInvoiceListStyles } from "@/styles/invoices.styles";
 import { Loadding } from "@/components/loadding";
 import { SearchField } from "@/components/searchField";

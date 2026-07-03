@@ -15,9 +15,12 @@ import { useTheme } from "@/contexts/themeContext";
 import { createVehicleStyles } from "@/styles/vehicles.styles";
 import { api } from "@/services/api";
 import { ControlledInput } from "@/components/controllerInput";
-import { vehicleSchema, VehicleType } from "@/schemas/vehicleSchema";
+import {
+  vehicleSchema,
+  VehicleType,
+} from "@/services/schemas/vehicleSchemacleSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { VehicleTypeSchema } from "@/schemas/enumSchema";
+import { VehicleTypeSchema } from "@/services/schemas/enumSchemanumSchema";
 import rollback from "@/services/rollback";
 import { Loadding } from "@/components/loadding";
 import { DocumentUpload } from "@/components/documentUpload";

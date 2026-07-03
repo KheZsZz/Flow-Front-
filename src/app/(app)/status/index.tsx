@@ -14,7 +14,7 @@ import {
   Alert,
 } from "react-native";
 import { SearchField } from "@/components/searchField";
-import { StatusTypes } from "@/schemas/statusSchema";
+import { StatusTypes } from "@/services/schemas/statusSchematusSchema";
 import { useRouter } from "expo-router";
 import { createStatusStyles } from "@/styles/status.styles";
 

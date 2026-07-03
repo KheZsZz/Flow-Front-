@@ -9,7 +9,7 @@ import {
   AuditLogType,
   AUDIT_ENTITY_LABELS,
   AUDIT_ACTION_LABELS,
-} from "@/schemas/auditSchema";
+} from "@/services/schemas/auditSchemaditSchema";
 
 const ENTITY_FILTERS = [
   { label: "Todas", value: "" },
