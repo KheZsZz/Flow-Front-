@@ -18,7 +18,7 @@ import { ClientPickerModal, PickedClient } from "@/components/clientpicker";
 import {
   collectionFormSchema,
   CollectionFormInput,
-} from "@/services/schemas/collectionsSchemaonsSchema";
+} from "@/schemas/collectionsSchema";
 import { collectionService } from "@/services/collections";
 import { createCollectionStyles } from "@/styles/collections.styles";
 import { Loadding } from "@/components/loadding";
