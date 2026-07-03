@@ -10,7 +10,12 @@ export const createFuelStyles = (theme: ThemeType, isMobile: boolean) => ({
     fontWeight: "700" as const,
     color: theme.text,
   },
-  subtitle: { fontSize: 13, color: theme.textSecondary, marginTop: 2 },
+
+  subtitle: { 
+    fontSize: 13, 
+    color: theme.text, 
+    marginTop: 2 
+  },
 
   // Lista de abastecimentos
   listContent: {
@@ -37,23 +42,23 @@ export const createFuelStyles = (theme: ThemeType, isMobile: boolean) => ({
   cardAmount: {
     fontSize: 15,
     fontWeight: "700" as const,
-    color: theme.primary,
+    color: theme.success,
   },
-  cardMeta: { fontSize: 12, color: theme.textSecondary },
+  cardMeta: { fontSize: 12, color: theme.text },
 
   // Botão flutuante de novo lançamento
   fab: {
     position: "absolute" as const,
     right: isMobile ? 16 : 32,
-    bottom: isMobile ? 16 : 32,
+    top: isMobile ? 16 : 32,
     backgroundColor: theme.primary,
     width: 52,
     height: 52,
-    borderRadius: 26,
+    borderRadius: 8,
     alignItems: "center" as const,
     justifyContent: "center" as const,
   },
 
   emptyState: { padding: 32, alignItems: "center" as const },
-  emptyText: { color: theme.textSecondary, fontSize: 13 },
+  emptyText: { color: theme.error, fontSize: 13 },
 });
