@@ -115,18 +115,7 @@ export default function SatusScreen() {
                   <Text style={styles.listItemTitle}>{item.code}</Text>
                 </View>
 
-                {inactive && (
-                  <Text
-                    style={{
-                      color: "#ef4444",
-                      fontSize: 11,
-                      fontWeight: "700",
-                      marginTop: 2,
-                    }}
-                  >
-                    INATIVO
-                  </Text>
-                )}
+                {inactive && <Text style={styles.inactiveBadge}>INATIVO</Text>}
 
                 <Text style={styles.listItemDescription}>
                   Descrição: {item.description}
@@ -145,11 +134,10 @@ export default function SatusScreen() {
                   onPress={() => handleToggle(item)}
                   style={[
                     styles.icon,
-                    styles.deleteBtn,
-                    { backgroundColor: inactive ? "#22c55e" : "#f59e0b" },
+                    inactive ? styles.toggleActivate : styles.toggleDeactivate,
                   ]}
                 >
-                  <Text style={[styles.deleteText, { color: "#fff" }]}>
+                  <Text style={styles.toggleText}>
                     <Feather
                       name={inactive ? "check-circle" : "slash"}
                       size={20}

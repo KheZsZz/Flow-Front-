@@ -28,14 +28,14 @@ export const updateStatus = async (id: string, data: StatusTypes) => {
   }
 };
 
-export const deleteStatus = async (id: string) => {
-  try {
-    const response = await api.delete(`/status/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+// export const deleteStatus = async (id: string) => {
+//   try {
+//     const response = await api.delete(`/status/${id}`);
+//     return response.data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
 export const findStatus = async (id: string) => {
   try {
@@ -44,4 +44,9 @@ export const findStatus = async (id: string) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const toggleStatus = async (id: string, is_active: boolean) => {
+  const response = await api.patch(`/status/${id}`, { is_active });
+  return response.data;
 };

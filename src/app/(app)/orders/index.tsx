@@ -66,6 +66,15 @@ export default function OrdersListScreen() {
   const to = watch("to");
 
   const onDelete = (order: any) => {
+    if (order?.status?.code !== 100) {
+      Alert.alert(
+        "Não é possível excluir",
+        "Apenas viagens em 'Em Aberto' podem ser excluídas. " +
+          "Esta viagem já foi iniciada ou finalizada.",
+      );
+      return;
+    }
+
     Alert.alert("Excluir viagem", `Excluir a viagem ${order.tracking}?`, [
       { text: "Cancelar", style: "cancel" },
       {
@@ -75,7 +84,13 @@ export default function OrdersListScreen() {
           try {
             await orderService.deleteOrder(order.id);
             queryClient.invalidateQueries({ queryKey: listKeys.orders });
-          } catch (e: any) {}
+          } catch (e: any) {
+            const msg =
+              e?.response?.data?.error ??
+              e?.response?.data?.message ??
+              "Não foi possível excluir a viagem.";
+            Alert.alert("Falha ao excluir", msg);
+          }
         },
       },
     ]);

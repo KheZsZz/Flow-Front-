@@ -39,6 +39,7 @@ interface ControlledInputProps<
   disabled?: boolean;
   placeholder?: string;
   secureTextEntry?: boolean;
+  rules?: any;
 }
 
 export function ControlledInput<TFieldValues extends FieldValues>({

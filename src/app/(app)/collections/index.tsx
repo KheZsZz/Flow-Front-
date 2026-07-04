@@ -50,7 +50,9 @@ export default function CollectionsListScreen() {
   const [search, setSearch] = useState("");
   const [dateField, setDateField] = useState<DateField>("scheduled_date");
 
-  const { control, watch } = useForm({ defaultValues: { from: null, to: null } });
+  const { control, watch } = useForm({
+    defaultValues: { from: null, to: null },
+  });
   const fromDate: Date | null = watch("from");
   const toDate: Date | null = watch("to");
 
@@ -99,7 +101,14 @@ export default function CollectionsListScreen() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     const toEnd = toDate
-      ? new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate(), 23, 59, 59)
+      ? new Date(
+          toDate.getFullYear(),
+          toDate.getMonth(),
+          toDate.getDate(),
+          23,
+          59,
+          59,
+        )
       : null;
 
     return collections.filter((c) => {
@@ -141,7 +150,10 @@ export default function CollectionsListScreen() {
         </TouchableOpacity>
       </View>
 
-      <SearchField placeholder="Buscar por nº da coleta, cliente ou documento..." onChange={setSearch} />
+      <SearchField
+        placeholder="Buscar por nº da coleta, cliente ou documento..."
+        onChange={setSearch}
+      />
 
       {/* Seletor de qual data filtrar */}
       <Text style={styles.filterLabel}>Filtrar por data</Text>
@@ -278,22 +290,37 @@ export default function CollectionsListScreen() {
                   <Text style={styles.editBtnText}>Alterar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={[
-                    styles.toggleBtn,
-                    { backgroundColor: item.is_active ? "#ef4444" : "#22c55e" },
-                  ]}
-                  onPress={() => toggleStatus(item)}
-                >
-                  <Feather
-                    name={item.is_active ? "slash" : "check-circle"}
-                    size={14}
-                    color="#fff"
-                  />
-                  <Text style={styles.toggleBtnText}>
-                    {item.is_active ? "Inativar" : "Ativar"}
-                  </Text>
-                </TouchableOpacity>
+                {(!item.in_order || !item.is_active) && (
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleBtn,
+                      item.is_active
+                        ? styles.toggleBtnDanger
+                        : styles.toggleBtnSuccess,
+                    ]}
+                    onPress={() => toggleStatus(item)}
+                  >
+                    <Feather
+                      name={item.is_active ? "slash" : "check-circle"}
+                      size={14}
+                      color="#fff"
+                    />
+                    <Text style={styles.toggleBtnText}>
+                      {item.is_active ? "Inativar" : "Ativar"}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {item.in_order && item.is_active && (
+                  <View style={styles.lockedBadge}>
+                    <Feather
+                      name="link"
+                      size={12}
+                      color={theme.textSecondary}
+                    />
+                    <Text style={styles.lockedBadgeText}>Em uso</Text>
+                  </View>
+                )}
               </View>
             </View>
           ))}
