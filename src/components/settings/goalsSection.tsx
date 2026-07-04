@@ -20,7 +20,7 @@ import {
   GOAL_METRIC_LABELS,
   GOAL_METRIC_OPTIONS,
   GOAL_PERIOD_OPTIONS,
-} from "@/services/schemas/goalsSchemaalsSchema";
+} from "@/schemas/goalsSchema";
 
 type GoalRow = {
   id: string;

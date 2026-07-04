@@ -11,7 +11,7 @@ import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/themeContext";
 import { createVehicleListStyles } from "@/styles/vehicleList.styles";
 import { api } from "@/services/api";
-import { VehicleType } from "@/services/schemas/vehicleSchemacleSchema";
+import { VehicleType } from "@/schemas/vehicleSchema";
 import { Loadding } from "@/components/loadding";
 
 export default function VehiclesScreen() {

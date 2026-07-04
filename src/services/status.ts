@@ -1,4 +1,4 @@
-import { StatusTypes } from "@/services/schemas/statusSchematusSchema";
+import { StatusTypes } from "@/schemas/statusSchema";
 import { api } from "./api";
 
 export const getStatus = async () => {

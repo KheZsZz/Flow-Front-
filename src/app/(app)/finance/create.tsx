@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ScrollView, Text, Alert, useWindowDimensions } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useForm } from "react-hook-form";
 import { useTheme } from "@/contexts/themeContext";
 import { useQueryClient } from "@tanstack/react-query";

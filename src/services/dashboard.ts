@@ -1,8 +1,5 @@
 import { api } from "@/services/api";
 
-/* ─────────────────────────────────────────────────────────────────────────
- *  Tipos das RPCs de combustível (Admin-only — /dashboard/*)
- * ──────────────────────────────────────────────────────────────────────── */
 export type FuelSummary = {
   total_spent: number;
   total_liters: number;
@@ -20,11 +17,6 @@ export type VehicleEfficiency = {
 
 type DateRange = { start_date?: string; end_date?: string };
 
-/* ─────────────────────────────────────────────────────────────────────────
- *  Fetchers
- *  Obs.: as três primeiras só devem ser chamadas por Admin/Manager —
- *  a rota /dashboard é requireRole("Admin") no backend.
- * ──────────────────────────────────────────────────────────────────────── */
 export const dashboardService = {
   async getFuelSummary(range?: DateRange): Promise<FuelSummary> {
     const { data } = await api.get("/dashboard/summary", { params: range });
@@ -59,11 +51,6 @@ export const dashboardService = {
   },
 };
 
-/* ─────────────────────────────────────────────────────────────────────────
- *  Helpers puros de agregação (sem dependência de React)
- *  Cuidado: joins do PostgREST vêm como { relation: {...} } (to-one) ou
- *  array (to-many). pickOne() normaliza o caso to-one.
- * ──────────────────────────────────────────────────────────────────────── */
 export function pickOne<T = any>(rel: any): T | null {
   if (!rel) return null;
   return Array.isArray(rel) ? (rel[0] ?? null) : rel;
@@ -172,13 +159,6 @@ export const formatNumber = (n: number, digits = 0): string =>
     maximumFractionDigits: digits,
   });
 
-/* ─────────────────────────────────────────────────────────────────────────
- *  Frete (CT-e) e documentação das notas
- *  Pegadinhas do schema:
- *    - cte é NOT NULL; o import por XML grava "AGUARDANDO" quando não há CT-e.
- *    - cte_value / value_nfe têm DEFAULT 0.00 — "sem valor" = <= 0.
- *    - comprovante_url preenchido = canhoto recebido.
- * ──────────────────────────────────────────────────────────────────────── */
 export const invoiceCte = (inv: any): string => String(inv?.cte ?? "").trim();
 
 export const invoiceHasCte = (inv: any): boolean => {
@@ -307,9 +287,6 @@ export function bucketByDay(
   return out;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
- *  Paleta de gráficos + conversão para fatias de donut
- * ──────────────────────────────────────────────────────────────────────── */
 export const CHART_PALETTE = [
   "#1E73FF",
   "#34d399",

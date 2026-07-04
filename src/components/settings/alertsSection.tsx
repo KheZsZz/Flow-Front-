@@ -9,7 +9,7 @@ import {
   DocumentAlertType,
   alertSeverity,
   AlertSeverity,
-} from "@/services/schemas/alertsSchemartsSchema";
+} from "@/schemas/alertsSchema";
 
 const WINDOWS = [7, 15, 30, 60];
 

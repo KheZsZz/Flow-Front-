@@ -12,7 +12,7 @@ import { useRouter } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@/contexts/themeContext";
 import { usePermissions } from "@/hooks/usePermission";
-import { UserType } from "@/services/schemas/usersSchemaersSchema";
+import { UserType } from "@/schemas/usersSchema";
 import { Loadding } from "@/components/loadding";
 import { createUsersStyles } from "@/styles/users.styles";
 import { ROLE_LABEL, ROLE_COLOR } from "@/constants/colors";
@@ -20,7 +20,7 @@ import { usersService } from "@/services/users";
 import { SearchField } from "@/components/searchField";
 import { useUsers, listKeys } from "@/hooks/querys/useListData";
 import { useRefreshOnFocus } from "@/hooks/useRefreshOnFocus";
-import { UserTypeEnum } from "@/services/schemas/enumSchemanumSchema";
+import { UserTypeEnum } from "@/schemas/enumSchema";
 
 export default function UsersListScreen() {
   const { theme } = useTheme();

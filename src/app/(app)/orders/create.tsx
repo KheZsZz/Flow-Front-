@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useTheme } from "@/contexts/themeContext";
 import { api } from "@/services/api";
 import { orderService } from "@/services/orders";
-import { OrderTypeSchema } from "@/services/schemas/enumSchemanumSchema";
+import { OrderTypeSchema } from "@/schemas/enumSchema";
 import { ControlledInput } from "@/components/controllerInput";
 import {
   AddInvoiceItems,

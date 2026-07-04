@@ -8,7 +8,7 @@ import { Button } from "@/components/button";
 import { createFuelStyles } from "@/styles/fuel.styles";
 import { fuelService } from "@/services/fuel";
 import { vehiclesService } from "@/services/vehicles";
-import { FuelTypeShema } from "@/services/schemas/enumSchemanumSchema";
+import { FuelTypeShema } from "@/schemas/enumSchema";
 import { listKeys } from "@/hooks/querys/useListData";
 import rollback from "@/services/rollback";
 

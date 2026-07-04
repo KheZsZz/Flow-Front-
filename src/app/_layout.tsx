@@ -7,7 +7,7 @@ import Toast from "react-native-toast-message";
 import { AuthProvider, useAuth } from "@/contexts/authContext";
 import { ThemeProvider, useTheme } from "@/contexts/themeContext";
 import { usePermissions, HOME_BY_ROLE } from "@/hooks/usePermission";
-import { UserTypeEnum } from "@/services/schemas/enumSchemanumSchema";
+import { UserTypeEnum } from "@/schemas/enumSchema";
 import { Loadding } from "@/components/loadding";
 
 import { QueryClientProvider } from "@tanstack/react-query";

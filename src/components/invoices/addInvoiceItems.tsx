@@ -14,7 +14,7 @@ import { createOrdersItensStyles } from "@/styles/orders.styles";
 import { orderService } from "@/services/orders";
 import { collectionService } from "@/services/collections";
 import { api } from "@/services/api";
-import { InvoiceTypes } from "@/services/schemas/invoicesSchemacesSchema";
+import { InvoiceTypes } from "@/schemas/invoicesSchema";
 
 export interface OrderItemDraft {
   key: string;

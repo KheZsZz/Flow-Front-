@@ -15,7 +15,7 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme, ThemeMode } from "@/contexts/themeContext";
 import { usePermissions } from "@/hooks/usePermission";
 import { createNavbarStyles } from "@/styles/navbar.styles";
-import { UserTypeEnum } from "@/services/schemas/enumSchemanumSchema";
+import { UserTypeEnum } from "@/schemas/enumSchema";
 import { ROLE_LABEL, ROLE_COLOR, THEME_OPTIONS } from "@/constants/colors";
 
 interface SidebarProps {

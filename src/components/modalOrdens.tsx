@@ -11,7 +11,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/themeContext";
 import { useWindowDimensions } from "react-native";
-import { createOrdersStyles } from "@/styles/ordens.styles";
+import { createOrdersListStyles } from "@/styles/orders.styles";
 import { orderService, STATUS_CODE } from "@/services/orders";
 import { formatCurrency } from "@/services/formatMoney";
 
@@ -36,7 +36,7 @@ export function BaixaViagemModal({
 }) {
   const { theme } = useTheme();
   const isMobile = useWindowDimensions().width < 820;
-  const styles = createOrdersStyles(theme, isMobile);
+  const styles = createOrdersListStyles(theme, isMobile);
 
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
