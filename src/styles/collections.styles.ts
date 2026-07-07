@@ -6,6 +6,7 @@ export const createCollectionStyles = (theme: any, isMobile: boolean) =>
       flex: 1,
       backgroundColor: theme.background,
     },
+
     header: {
       padding: 16,
       flexDirection: "row",
@@ -15,11 +16,13 @@ export const createCollectionStyles = (theme: any, isMobile: boolean) =>
       borderBottomWidth: 1,
       borderBottomColor: theme.borderColor,
     },
+
     title: {
       color: theme.text,
       fontSize: 20,
       fontWeight: "bold",
     },
+
     backButton: {
       position: "absolute",
       left: 16,
@@ -27,9 +30,11 @@ export const createCollectionStyles = (theme: any, isMobile: boolean) =>
       padding: 10,
       borderRadius: 10,
     },
+
     scrollContent: {
       paddingBottom: 40,
     },
+
     form: {
       paddingHorizontal: isMobile ? 20 : 40,
       paddingTop: 24,
@@ -113,6 +118,7 @@ export const createCollectionStyles = (theme: any, isMobile: boolean) =>
     disabledField: {
       opacity: 0.5,
     },
+
     toggleBtn: {
       flexDirection: "row",
       alignItems: "center",
@@ -122,17 +128,21 @@ export const createCollectionStyles = (theme: any, isMobile: boolean) =>
       height: 48,
       marginTop: 14,
     },
+
     toggleBtnText: {
       color: "#fff",
       fontWeight: "700",
       fontSize: 15,
     },
+
     toggleBtnDanger: {
       backgroundColor: theme.isDark ? "#7f1d1d" : "#ef4444",
     },
+
     toggleBtnSuccess: {
       backgroundColor: theme.isDark ? "#166534" : "#22c55e",
     },
+
     lockedBadge: {
       flex: 1,
       flexDirection: "row",
@@ -145,6 +155,7 @@ export const createCollectionStyles = (theme: any, isMobile: boolean) =>
       borderWidth: 1,
       borderColor: theme.borderColor,
     },
+
     lockedBadgeText: {
       color: theme.textSecondary,
       fontSize: 12,
