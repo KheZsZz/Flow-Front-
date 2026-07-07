@@ -127,6 +127,29 @@ export const createCollectionStyles = (theme: any, isMobile: boolean) =>
       fontWeight: "700",
       fontSize: 15,
     },
+    toggleBtnDanger: {
+      backgroundColor: theme.isDark ? "#7f1d1d" : "#ef4444",
+    },
+    toggleBtnSuccess: {
+      backgroundColor: theme.isDark ? "#166534" : "#22c55e",
+    },
+    lockedBadge: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      padding: 8,
+      borderRadius: 8,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.borderColor,
+    },
+    lockedBadgeText: {
+      color: theme.textSecondary,
+      fontSize: 12,
+      fontWeight: "600",
+    },
   });
 
 export const createCollectionsListStyles = (theme: any, isMobile: boolean) =>

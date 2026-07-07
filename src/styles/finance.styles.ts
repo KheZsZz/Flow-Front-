@@ -6,25 +6,14 @@ export const createFinanceStyles = (
   isMobile: boolean,
 ) =>
   StyleSheet.create({
+    // ── Container raiz ──
     container: {
       flex: 1,
       backgroundColor: theme.background,
       position: "relative",
     },
-    fab: {
-      position: "absolute",
-      right: isMobile ? 16 : 32,
-      bottom: isMobile ? 16 : 32,
-      backgroundColor: theme.primary,
-      width: 52,
-      height: 52,
-      borderRadius: 26,
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 10,
-      elevation: 6, // sombra/ordem de empilhamento no Android
-    },
 
+    // ── Topbar (cabeçalho + filtros + abas) ──
     topbar: {
       paddingHorizontal: isMobile ? 16 : 32,
       paddingTop: isMobile ? 16 : 24,
@@ -38,8 +27,17 @@ export const createFinanceStyles = (
       fontWeight: "700",
       color: theme.text,
     },
-    subtitle: { fontSize: 13, color: theme.textSecondary, marginTop: 2 },
+    subtitle: { fontSize: 13, color: theme.text, marginTop: 2 },
 
+    // ── Linha de filtros (data De/Até lado a lado) ──
+    filterRow: {
+      flexDirection: "row",
+      gap: 8,
+      marginTop: 4,
+    },
+    filterCell: { flex: 1 }, // divide o espaço igualmente entre De e Até
+
+    // ── Abas Operacional/Administrativo ──
     tabBarScroll: { flexGrow: 0 },
     tabBar: { gap: 8, paddingBottom: 12 },
     tab: {
@@ -51,10 +49,11 @@ export const createFinanceStyles = (
       borderRadius: 20,
       backgroundColor: theme.card,
     },
-    tabActive: { backgroundColor: theme.primary },
-    tabLabel: { fontSize: 13, fontWeight: "600", color: theme.textSecondary },
-    tabLabelActive: { color: "#fff" },
+    tabActive: { backgroundColor: theme.isDark ? theme.link : theme.primary },
+    tabLabel: { fontSize: 13, fontWeight: "600", color: theme.text },
+    tabLabelActive: { color: theme.textSecondary },
 
+    // ── Lista de custos ──
     listContent: { padding: isMobile ? 16 : 32, gap: 10 },
     card: {
       backgroundColor: theme.card,
@@ -68,9 +67,28 @@ export const createFinanceStyles = (
       alignItems: "center",
     },
     cardType: { fontSize: 14, fontWeight: "600", color: theme.text },
-    cardAmount: { fontSize: 15, fontWeight: "700", color: theme.primary },
-    cardMeta: { fontSize: 12, color: theme.textSecondary },
+    cardAmount: { fontSize: 15, fontWeight: "700", color: theme.error },
+    cardMeta: { fontSize: 12, color: theme.text },
 
+<<<<<<< HEAD
+=======
+    // ── FAB de novo lançamento (canto inferior direito) ──
+    fab: {
+      position: "absolute",
+      right: isMobile ? 16 : 32,
+      top: isMobile ? 16 : 32,
+      backgroundColor: theme.isDark ? theme.link : theme.primary,
+      width: 52,
+      height: 52,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 10,
+      elevation: 6,
+    },
+
+    // ── Estado vazio ──
+>>>>>>> c28f21adff0b5402c282cc5360a0257fdd7a1211
     emptyState: { padding: 32, alignItems: "center" },
-    emptyText: { color: theme.textSecondary, fontSize: 13 },
+    emptyText: { color: theme.error, fontSize: 13 },
   });

@@ -1,21 +1,44 @@
 import { ThemeType } from "@/contexts/themeContext";
 
+// Estilos da tela /fuel: topbar fixa com filtros (data + busca) e lista rolável.
+// FAB flutuante no canto inferior direito.
 export const createFuelStyles = (theme: ThemeType, isMobile: boolean) => ({
-  container: { flex: 1, backgroundColor: theme.background },
+  // ── Container raiz ──
+  container: {
+    flex: 1,
+    backgroundColor: theme.background,
+    position: "relative" as const, // necessário pra ancorar o FAB
+  },
 
-  // Cabeçalho fixo (sem abas — Abastecimento não tem sub-seções)
-  header: { padding: isMobile ? 16 : 32, paddingBottom: 12 },
+  // ── Topbar (cabeçalho + filtros) ──
+  topbar: {
+    paddingHorizontal: isMobile ? 16 : 32,
+    paddingTop: isMobile ? 16 : 24,
+    backgroundColor: theme.background,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.borderColor,
+  },
+  header: { marginBottom: 8 },
   title: {
     fontSize: isMobile ? 20 : 24,
     fontWeight: "700" as const,
     color: theme.text,
   },
-  subtitle: { fontSize: 13, color: theme.textSecondary, marginTop: 2 },
+  subtitle: { fontSize: 13, color: theme.text, marginTop: 2 },
 
-  // Lista de abastecimentos
+  // ── Filtros de data lado a lado ──
+  filterRow: {
+    flexDirection: "row" as const,
+    gap: 8,
+    marginTop: 4,
+  },
+  filterCell: { flex: 1 }, // divide o espaço igualmente entre De e Até
+
+  // ── Lista de abastecimentos ──
   listContent: {
     paddingHorizontal: isMobile ? 16 : 32,
-    paddingBottom: 100,
+    paddingVertical: 12,
+    paddingBottom: 100, // espaço pro FAB
     gap: 10,
   },
   card: {
@@ -37,23 +60,26 @@ export const createFuelStyles = (theme: ThemeType, isMobile: boolean) => ({
   cardAmount: {
     fontSize: 15,
     fontWeight: "700" as const,
-    color: theme.primary,
+    color: theme.error,
   },
-  cardMeta: { fontSize: 12, color: theme.textSecondary },
+  cardMeta: { fontSize: 12, color: theme.text },
 
-  // Botão flutuante de novo lançamento
+  // ── FAB de novo abastecimento ──
   fab: {
     position: "absolute" as const,
     right: isMobile ? 16 : 32,
-    bottom: isMobile ? 16 : 32,
-    backgroundColor: theme.primary,
+    top: isMobile ? 16 : 32,
+    backgroundColor: theme.isDark ? theme.link : theme.primary,
     width: 52,
     height: 52,
-    borderRadius: 26,
+    borderRadius: 8,
     alignItems: "center" as const,
     justifyContent: "center" as const,
+    zIndex: 10, // topo do stacking iOS
+    elevation: 6, // topo do stacking Android
   },
 
+  // ── Estado vazio ──
   emptyState: { padding: 32, alignItems: "center" as const },
-  emptyText: { color: theme.textSecondary, fontSize: 13 },
+  emptyText: { color: theme.error, fontSize: 13 },
 });

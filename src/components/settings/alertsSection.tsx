@@ -17,7 +17,12 @@ const SEVERITY_STYLE: Record<
   AlertSeverity,
   { bg: string; text: string; label: string; icon: string }
 > = {
-  vencido: { bg: "#fee2e2", text: "#b91c1c", label: "Vencido", icon: "x-circle" },
+  vencido: {
+    bg: "#fee2e2",
+    text: "#b91c1c",
+    label: "Vencido",
+    icon: "x-circle",
+  },
   critico: {
     bg: "#ffedd5",
     text: "#c2410c",
@@ -95,7 +100,10 @@ export function AlertsSection() {
           const sev = SEVERITY_STYLE[alertSeverity(alert.days_remaining)];
           const isVehicle = alert.entity_kind === "vehicle";
           return (
-            <View key={`${alert.entity_id}-${alert.doc_type}-${idx}`} style={styles.card}>
+            <View
+              key={`${alert.entity_id}-${alert.doc_type}-${idx}`}
+              style={styles.card}
+            >
               <View style={styles.cardRow}>
                 <View style={{ flexDirection: "row", gap: 10, flex: 1 }}>
                   <Feather

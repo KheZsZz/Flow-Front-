@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, Alert, useWindowDimensions } from "react-native";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
@@ -8,12 +8,12 @@ import { Button } from "@/components/button";
 import { createMaintenanceStyles } from "@/styles/maintenance.styles";
 import { maintenanceService } from "@/services/maintenance";
 import { vehiclesService } from "@/services/vehicles";
-import { listKeys } from "@/hooks/querys/useListData";
+import { useMaintenanceTypes, listKeys } from "@/hooks/querys/useListData";
 import rollback from "@/services/rollback";
 
 interface FormData {
   vehicle_id: string;
-  maintenance_type: string;
+  maintenance_type_id: string;
   cost: string;
   odometer: string;
   description: string;
@@ -28,10 +28,12 @@ export default function CreateMaintenanceScreen() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
+  const { data: types = [] } = useMaintenanceTypes();
+
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: {
       vehicle_id: "",
-      maintenance_type: "",
+      maintenance_type_id: "",
       cost: "",
       odometer: "",
       description: "",
@@ -52,10 +54,20 @@ export default function CreateMaintenanceScreen() {
       value: v.id,
     }));
 
+  // Agrupa nome + categoria pra clareza no dropdown
+  const typeOptions = useMemo(
+    () =>
+      types.map((t: any) => ({
+        label: `${t.name} (${t.category})`,
+        value: t.id,
+      })),
+    [types],
+  );
+
   const onSubmit = async (data: FormData) => {
     if (!data.vehicle_id) return Alert.alert("Atenção", "Selecione o veículo.");
-    if (!data.maintenance_type.trim())
-      return Alert.alert("Atenção", "Informe o tipo de manutenção.");
+    if (!data.maintenance_type_id)
+      return Alert.alert("Atenção", "Selecione o tipo de manutenção.");
     if (!data.cost || Number(data.cost) < 0)
       return Alert.alert("Atenção", "Informe um custo válido.");
 
@@ -63,7 +75,7 @@ export default function CreateMaintenanceScreen() {
     try {
       await maintenanceService.create({
         vehicle_id: data.vehicle_id,
-        maintenance_type: data.maintenance_type,
+        maintenance_type_id: data.maintenance_type_id,
         cost: Number(data.cost),
         odometer: data.odometer ? Number(data.odometer) : null,
         description: data.description || null,
@@ -88,12 +100,15 @@ export default function CreateMaintenanceScreen() {
         variant="dropDownList"
         options={vehicleOptions}
       />
+
       <ControlledInput
         control={control}
-        name="maintenance_type"
+        name="maintenance_type_id"
         label="Tipo de manutenção"
-        placeholder="Ex.: Troca de óleo, Revisão, Pneus..."
+        variant="dropDownList"
+        options={typeOptions}
       />
+
       <ControlledInput
         control={control}
         name="cost"

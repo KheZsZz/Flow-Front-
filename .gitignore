@@ -40,5 +40,8 @@ yarn-error.*
 /ios
 /android
 
-pnpm-lock.yaml
+src/servicespnpm-lock.yaml
 pnpm-workspace.yaml
+package-lock.json
+
+.claude/

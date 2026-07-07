@@ -7,8 +7,14 @@ import {
   administrativeExpenseService,
   expenseTypesService,
 } from "@/services/expenses";
-import { maintenanceService } from "@/services/maintenance";
 import { fuelService } from "@/services/fuel";
+
+import {
+  maintenanceService,
+  maintenanceTypesService,
+  MaintenanceCategory,
+  MaintenanceTypeItem,
+} from "@/services/maintenance";
 
 export const listKeys = {
   orders: ["orders"] as const,
@@ -20,6 +26,8 @@ export const listKeys = {
     ["expenses", "types", category ?? "all"] as const,
   maintenances: ["maintenance"] as const,
   fuel: ["fuel"] as const,
+  maintenanceTypes: (category?: string) =>
+    ["maintenance", "types", category ?? "all"] as const,
 };
 
 export function useOrders() {
@@ -107,5 +115,16 @@ export function useFuelEntries() {
       return Array.isArray(data) ? data : [];
     },
     staleTime: 15 * 1000,
+  });
+}
+
+export function useMaintenanceTypes(category?: MaintenanceCategory) {
+  return useQuery({
+    queryKey: listKeys.maintenanceTypes(category),
+    queryFn: async () => {
+      const data = await maintenanceTypesService.list(category);
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 60 * 1000, // cache mais longo — mudam pouco
   });
 }

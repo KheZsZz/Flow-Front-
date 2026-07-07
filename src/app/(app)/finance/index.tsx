@@ -9,17 +9,18 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useForm } from "react-hook-form";
 import { useTheme } from "@/contexts/themeContext";
 import { usePermissions } from "@/hooks/usePermission";
+import { ControlledInput } from "@/components/controllerInput";
 import { createFinanceStyles } from "@/styles/finance.styles";
 import {
   useOperationalExpenses,
   useAdministrativeExpenses,
+  useExpenseTypes,
 } from "@/hooks/querys/useListData";
 import { formatCurrency } from "@/services/formatMoney";
 import { Loadding } from "@/components/loadding";
-import { useForm } from "react-hook-form";
-import { ControlledInput } from "@/components/controllerInput";
 
 type TabKey = "operational" | "administrative";
 
@@ -51,20 +52,49 @@ export default function FinanceScreen() {
 
   const operational = useOperationalExpenses();
   const administrative = useAdministrativeExpenses();
-
   const current = active === "operational" ? operational : administrative;
   const list = current.data ?? [];
 
+  // ── Filtros: data + tipo de despesa (categoria) ──
   const { control, watch, reset } = useForm({
-    defaultValues: { start_date: "", end_date: "" },
+    defaultValues: { start_date: "", end_date: "", expense_type_id: "" },
   });
   const filters = watch();
-  const filtered = list.filter((item: any) => {
-    const d = new Date(item.expense_date);
-    if (filters.start_date && d < new Date(filters.start_date)) return false;
-    if (filters.end_date && d > new Date(filters.end_date)) return false;
-    return true;
-  });
+
+  // Tipos da categoria atualmente ativa (client-side)
+  const { data: types = [] } = useExpenseTypes(
+    active === "operational" ? "Operacional" : "Administrativo",
+  );
+
+  // Toda vez que trocar de aba, limpa o filtro de tipo pra não misturar categorias
+  const handleTabChange = (next: TabKey) => {
+    setActive(next);
+    reset({ ...filters, expense_type_id: "" });
+  };
+
+  const typeOptions = useMemo(
+    () => [
+      { label: "Todas as categorias", value: "" },
+      ...types.map((t: any) => ({ label: t.name, value: t.id })),
+    ],
+    [types],
+  );
+
+  // Filtragem client-side (data + expense_type_id)
+  const filtered = useMemo(() => {
+    return list.filter((item: any) => {
+      const d = new Date(item.expense_date);
+      if (filters.start_date && d < new Date(filters.start_date)) return false;
+      if (filters.end_date && d > new Date(filters.end_date)) return false;
+      if (
+        filters.expense_type_id &&
+        item.expense_type_id !== filters.expense_type_id
+      )
+        return false;
+      return true;
+    });
+  }, [list, filters]);
+
   return (
     <View style={styles.container}>
       <View style={styles.topbar}>
@@ -74,20 +104,35 @@ export default function FinanceScreen() {
             Despesas operacionais e administrativas da operação
           </Text>
         </View>
-        <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
-          <ControlledInput
-            control={control}
-            name="start_date"
-            label="De"
-            variant="date"
-          />
-          <ControlledInput
-            control={control}
-            name="end_date"
-            label="Até"
-            variant="date"
-          />
+
+        {/* Filtros de data */}
+        <View style={styles.filterRow}>
+          <View style={styles.filterCell}>
+            <ControlledInput
+              control={control}
+              name="start_date"
+              label="De"
+              variant="date"
+            />
+          </View>
+          <View style={styles.filterCell}>
+            <ControlledInput
+              control={control}
+              name="end_date"
+              label="Até"
+              variant="date"
+            />
+          </View>
         </View>
+
+        {/* Filtro por tipo (categoria) — reflete a aba ativa */}
+        <ControlledInput
+          control={control}
+          name="expense_type_id"
+          label="Categoria"
+          variant="dropDownList"
+          options={typeOptions}
+        />
 
         <ScrollView
           horizontal
@@ -101,7 +146,7 @@ export default function FinanceScreen() {
               <TouchableOpacity
                 key={tab.key}
                 style={[styles.tab, isActive && styles.tabActive]}
-                onPress={() => setActive(tab.key)}
+                onPress={() => handleTabChange(tab.key)}
               >
                 <Feather
                   name={tab.icon as any}
@@ -123,12 +168,14 @@ export default function FinanceScreen() {
         <Loadding />
       ) : (
         <FlatList
-          data={list}
+          data={filtered}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>Nenhum custo lançado ainda.</Text>
+              <Text style={styles.emptyText}>
+                Nenhum custo encontrado com esses filtros.
+              </Text>
             </View>
           }
           renderItem={({ item }) => (

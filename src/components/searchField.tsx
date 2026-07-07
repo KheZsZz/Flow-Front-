@@ -8,17 +8,6 @@ interface SearchFieldProps {
   onChange: (value: string) => void;
 }
 
-/**
- * Campo de busca/filtro padrão do app.
- *
- * Encapsula a convenção `useForm` + `ControlledInput` + `watch()` — assim as
- * telas de listagem param de usar `TextInput` cru e ganham, de graça, a
- * estilização e os recursos do ControlledInput (ícone, máscara, tema).
- *
- * Uso:
- *   const [search, setSearch] = useState("");
- *   <SearchField placeholder="Pesquisar..." onChange={setSearch} />
- */
 export function SearchField({
   placeholder = "Pesquisar...",
   iconName = "magnifying-glass",
@@ -29,7 +18,6 @@ export function SearchField({
 
   useEffect(() => {
     onChange(q ?? "");
-    // só dispara quando o texto muda
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 
