@@ -1,8 +1,6 @@
 import { StyleSheet } from "react-native";
 import { lightTheme, darkTheme } from "@/constants/colors";
 
-// Estilos da tela /finance: topo fixo com abas (Operacional/Administrativo)
-// + lista rolável, seguindo o esqueleto visual do settings.styles.ts
 export const createFinanceStyles = (
   theme: typeof lightTheme | typeof darkTheme,
   isMobile: boolean,
@@ -72,18 +70,6 @@ export const createFinanceStyles = (
     cardType: { fontSize: 14, fontWeight: "600", color: theme.text },
     cardAmount: { fontSize: 15, fontWeight: "700", color: theme.primary },
     cardMeta: { fontSize: 12, color: theme.textSecondary },
-
-    fab: {
-      position: "absolute",
-      right: isMobile ? 16 : 32,
-      bottom: isMobile ? 16 : 32,
-      backgroundColor: theme.primary,
-      width: 52,
-      height: 52,
-      borderRadius: 26,
-      alignItems: "center",
-      justifyContent: "center",
-    },
 
     emptyState: { padding: 32, alignItems: "center" },
     emptyText: { color: theme.textSecondary, fontSize: 13 },

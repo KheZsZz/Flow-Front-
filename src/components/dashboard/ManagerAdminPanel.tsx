@@ -447,7 +447,7 @@ export function ManagerAdminPanel({ isMobile }: { isMobile: boolean }) {
             <View
               style={{
                 width: 8,
-                height: 8,
+                height: 12,
                 borderRadius: 4,
                 backgroundColor: "#34d399",
               }}
